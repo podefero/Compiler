@@ -1,5 +1,6 @@
 package commandargs;
 
+import exceptions.ArgumentException;
 import net.sourceforge.argparse4j.ArgumentParsers;
 import net.sourceforge.argparse4j.inf.*;
 
@@ -76,6 +77,7 @@ public final class ArgumentFlags {
 
         } catch (ArgumentParserException e) {
             parser.handleError(e);
+            throw new ArgumentException(e.getMessage(), e.getCause());
         }
 
     }

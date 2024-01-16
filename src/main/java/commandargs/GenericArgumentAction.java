@@ -11,7 +11,6 @@ import java.util.Map;
 public class GenericArgumentAction implements ArgumentAction {
     @Override
     public void run(ArgumentParser argumentParser, Argument argument, Map<String, Object> map, String s, Object o) throws ArgumentParserException {
-        System.out.println(s);
         switch (s) {
             case "-l":
                 ArgumentFlags.lexing = true;
