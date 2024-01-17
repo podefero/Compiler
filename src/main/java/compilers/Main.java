@@ -1,4 +1,6 @@
-import commandargs.ArgumentFlags;
+package compilers;
+
+import compilers.commandargs.ArgumentFlags;
 
 public class Main {
     public static void main(String[] args) {

@@ -1,4 +1,4 @@
 #!/bin/bash
+mvn -q -e exec:java -Dexec.args="$@"
 
-java -jar out/artifacts/CompilerJava_jar/CompilerJava.jar "$@"
 

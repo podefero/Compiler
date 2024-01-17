@@ -1,10 +1,10 @@
-package commandargs;
+package compilers.commandargs;
 
-import exceptions.ArgumentException;
 import net.sourceforge.argparse4j.ArgumentParsers;
 import net.sourceforge.argparse4j.inf.*;
 
 public final class ArgumentFlags {
+    public static String errorMessage;
     public static boolean lexing;
     public static boolean printTokens;
     public static boolean parseTree;
@@ -23,7 +23,6 @@ public final class ArgumentFlags {
         ArgumentParser parser = ArgumentParsers.newFor("prog").build()
                 .description("Handle compiler arguments");
 
-        //add arguments
         parser.addArgument("-l")
                 .action(ArgumentFlags.setFlag())
                 .help("lex the input and print the token stream");
@@ -77,7 +76,7 @@ public final class ArgumentFlags {
 
         } catch (ArgumentParserException e) {
             parser.handleError(e);
-            throw new ArgumentException(e.getMessage(), e.getCause());
+            ArgumentFlags.errorMessage = e.getMessage();
         }
 
     }

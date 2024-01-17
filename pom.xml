@@ -20,6 +20,7 @@
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter</artifactId>
       <version>5.8.2</version>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>net.sourceforge.argparse4j</groupId>
@@ -37,6 +38,22 @@
           <includes>
             <include>**/*Test.java</include>
           </includes>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <version>3.0.0</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>java</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <mainClass>compilers.Main</mainClass>
+          <!-- Add any additional configuration if needed -->
         </configuration>
       </plugin>
     </plugins>
