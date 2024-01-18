@@ -1,5 +1,5 @@
 # Compilers
-
+_By: Nathan Jones_
 ## How to run program
 ```bash
 #First build it

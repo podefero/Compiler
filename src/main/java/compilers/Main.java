@@ -5,19 +5,19 @@ import compilers.commandargs.ArgumentFlags;
 public class Main {
     public static void main(String[] args) {
         //parse the command line args
-        ArgumentFlags.init(args);
+        ArgumentFlags argumentFlags = new ArgumentFlags(args);
 
         //call function stubs based on arguments
-        if (ArgumentFlags.lexing) lexing();
-        if (ArgumentFlags.printTokens) printTokens();
-        if (ArgumentFlags.parseTree) parseTree();
-        if (ArgumentFlags.printASTDiagram) printASTDiagram();
-        if (ArgumentFlags.semantics) semantics();
-        if (ArgumentFlags.printSemanticInformation) printSemanticInformation();
-        if (ArgumentFlags.compile) compile();
-        if (ArgumentFlags.graphicalAST) printGraphicalAST();
-        if (ArgumentFlags.outputFile) outputFiles();
-        if (ArgumentFlags.inputFile) inputFile();
+        if (argumentFlags.lexing) lexing();
+        if (argumentFlags.printTokens) printTokens();
+        if (argumentFlags.parseTree) parseTree();
+        if (argumentFlags.printASTDiagram) printASTDiagram();
+        if (argumentFlags.semantics) semantics();
+        if (argumentFlags.printSemanticInformation) printSemanticInformation();
+        if (argumentFlags.compile) compile();
+        if (argumentFlags.graphicalAST) printGraphicalAST();
+        if (argumentFlags.hasOutputFile) outputFiles(argumentFlags.outputFileName);
+        if (argumentFlags.hasInputFile) inputFile(argumentFlags.inputFileName);
     }
 
     static void lexing() {
@@ -52,19 +52,19 @@ public class Main {
         System.out.println("Outputting graphical AST");
     }
 
-    static void outputFiles() {
-        if (ArgumentFlags.outputFileName.equals("[]")) {
+    static void outputFiles(String files) {
+        if (files.equals("[]")) {
             System.out.println("using STDOUT to print");
         } else {
-            System.out.println("Printing files " + ArgumentFlags.outputFileName);
+            System.out.println("Printing files " + files);
         }
     }
 
-    static void inputFile() {
-        if (ArgumentFlags.inputFileName.equals("[]")) {
+    static void inputFile(String file) {
+        if (file.equals("[]")) {
             System.out.println("using STDIN to input");
         } else {
-            System.out.println("Inputting file " + ArgumentFlags.inputFileName);
+            System.out.println("Inputting file " + file);
         }
     }
 

@@ -8,34 +8,35 @@ import net.sourceforge.argparse4j.inf.ArgumentParserException;
 import java.util.Map;
 
 public class GenericArgumentAction implements ArgumentAction {
+    private ArgumentFlags argumentFlags;
+
+    public GenericArgumentAction(ArgumentFlags argumentFlags) {
+        this.argumentFlags = argumentFlags;
+    }
+
     @Override
     public void run(ArgumentParser argumentParser, Argument argument, Map<String, Object> map, String s, Object o) throws ArgumentParserException {
         switch (s) {
             case "-l":
-                ArgumentFlags.lexing = true;
-                ArgumentFlags.printTokens = true;
+                argumentFlags.lexing = true;
+                argumentFlags.printTokens = true;
                 break;
             case "-p":
-                ArgumentFlags.parseTree = true;
-                ArgumentFlags.lexing = true;
-                ArgumentFlags.printASTDiagram = true;
+                argumentFlags.parseTree = true;
+                argumentFlags.lexing = true;
+                argumentFlags.printASTDiagram = true;
                 break;
             case "-s":
-                ArgumentFlags.semantics = true;
-                ArgumentFlags.parseTree = true;
-                ArgumentFlags.lexing = true;
-                ArgumentFlags.printSemanticInformation = true;
+                argumentFlags.semantics = true;
+                argumentFlags.parseTree = true;
+                argumentFlags.lexing = true;
+                argumentFlags.printSemanticInformation = true;
                 break;
             case "-c":
-                ArgumentFlags.compile = true;
-                ArgumentFlags.semantics = true;
-                ArgumentFlags.parseTree = true;
-                ArgumentFlags.lexing = true;
-                break;
-            case "-a":
-                ArgumentFlags.graphicalAST = true;
-                ArgumentFlags.lexing = true;
-                ArgumentFlags.parseTree = true;
+                argumentFlags.compile = true;
+                argumentFlags.semantics = true;
+                argumentFlags.parseTree = true;
+                argumentFlags.lexing = true;
                 break;
         }
 

@@ -1,43 +1,48 @@
 package compilers.commandargs;
 
 import net.sourceforge.argparse4j.ArgumentParsers;
-import net.sourceforge.argparse4j.inf.*;
+import net.sourceforge.argparse4j.inf.ArgumentAction;
+import net.sourceforge.argparse4j.inf.ArgumentParser;
+import net.sourceforge.argparse4j.inf.ArgumentParserException;
+import net.sourceforge.argparse4j.inf.Namespace;
 
-public final class ArgumentFlags {
-    public static String errorMessage;
-    public static boolean lexing;
-    public static boolean printTokens;
-    public static boolean parseTree;
-    public static boolean printASTDiagram;
-    public static boolean semantics;
-    public static boolean printSemanticInformation;
-    public static boolean compile;
-    public static boolean graphicalAST;
-    public static boolean outputFile;
-    public static String outputFileName;
-    public static boolean inputFile;
-    public static String inputFileName;
+public class ArgumentFlags {
+    public String errorMessage;
+    public boolean hasError;
+    public boolean lexing;
+    public boolean printTokens;
+    public boolean parseTree;
+    public boolean printASTDiagram;
+    public boolean semantics;
+    public boolean printSemanticInformation;
+    public boolean compile;
+    public boolean graphicalAST;
+    public boolean hasOutputFile;
+    public String outputFileName;
+    public boolean hasInputFile;
+    public String inputFileName;
 
-    public static void init(String[] args) {
+    public ArgumentFlags(String[] args) {
+        init(args);
+    }
+
+    public void init(String[] args) {
         //setup parser
         ArgumentParser parser = ArgumentParsers.newFor("prog").build()
                 .description("Handle compiler arguments");
 
         parser.addArgument("-l")
-                .action(ArgumentFlags.setFlag())
+                .action(setFlag())
                 .help("lex the input and print the token stream");
         parser.addArgument("-p")
-                .action(ArgumentFlags.setFlag())
+                .action(setFlag())
                 .help("create an abstract syntax tree and print any syntax errors that arise");
         parser.addArgument("-s")
-                .action(ArgumentFlags.setFlag())
+                .action(setFlag())
                 .help("check the program for semantic correctness and display any errors that arise");
         parser.addArgument("-c")
-                .action(ArgumentFlags.setFlag())
+                .action(setFlag())
                 .help("compile the program to assembly ");
-        parser.addArgument("-a")
-                .action(ArgumentFlags.setFlag())
-                .help("create an abstract syntax tree and produce a graphical representation of it");
 
         //special case, not handled in GenericArgumentAction
         //handled below
@@ -63,26 +68,26 @@ public final class ArgumentFlags {
             //handle file output
             String outputFile = res.getString("outputFile");
             if (outputFile != null) {
-                ArgumentFlags.outputFile = true;
-                ArgumentFlags.outputFileName = outputFile;
+                hasOutputFile = true;
+                outputFileName = outputFile;
             }
 
             //handle file input
             String inputFile = res.getString("inputFile");
             if (inputFile != null) {
-                ArgumentFlags.inputFile = true;
-                ArgumentFlags.inputFileName = inputFile;
+                hasInputFile = true;
+                inputFileName = inputFile;
             }
 
         } catch (ArgumentParserException e) {
             parser.handleError(e);
-            ArgumentFlags.errorMessage = e.getMessage();
+            errorMessage = e.getMessage();
         }
 
     }
 
-    public static ArgumentAction setFlag() {
-        return new GenericArgumentAction();
+    public ArgumentAction setFlag() {
+        return new GenericArgumentAction(this);
     }
 
 }
