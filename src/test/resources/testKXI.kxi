@@ -1,0 +1,39 @@
+var num1 = 123;            // Integer literal
+var num2 = 3.14;           // Floating-point literal
+var identifier = _xyz123;  // Identifier with underscore
+var stringVar = "Hello, World!"; // String literal
+
+if (num1 > num2) {
+    print("num1 is greater"); // Basic keyword 'print'
+} else {
+    print("num2 is greater");
+}
+
+// Some operators
+var result = num1 + num2 * (num1 / 2) - 5;
+
+// Comments
+/* This is a multiline
+   comment */
+
+// Invalid token - @ symbol
+var invalidToken = @;
+
+// Another identifier with numbers and underscore
+var anotherIdentifier = abc_456;
+
+// String with escape sequences
+var escapeString = "This is a string with\na new line and a\ttab character.";
+
+// Invalid escape sequence
+var invalidEscape = "Invalid escape: \q";
+
+// Invalid character
+var invalidChar = #;
+
+// String without closing quote
+var unclosedString = "This string is not closed;
+
+// Reserved keywords
+var class = 42; // 'class' is a reserved keyword
+
