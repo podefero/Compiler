@@ -5,7 +5,7 @@ public class CharLitToken extends TokenType<Character> {
 
     public CharLitToken(String tokenText) {
         super(tokenText);
-        value = new EncodeCharacters().encodeText(tokenText, false).charAt(0);
+        value = new EncodeCharacters().encodeText(tokenText).charAt(0);
     }
 
 

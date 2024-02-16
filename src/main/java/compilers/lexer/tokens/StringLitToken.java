@@ -12,7 +12,7 @@ public class StringLitToken extends TokenType<String> {
     @Override
     public String getValue() {
         EncodeCharacters encodeCharacters = new EncodeCharacters();
-        return encodeCharacters.encodeText(value, true);
+        return encodeCharacters.encodeText(value);
     }
 
 

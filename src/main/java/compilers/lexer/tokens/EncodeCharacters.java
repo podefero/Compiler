@@ -3,15 +3,16 @@ package compilers.lexer.tokens;
 public class EncodeCharacters {
 
 
-    public String encodeText(String line, boolean isString) {
+    public String encodeText(String line) {
+        //trim quotes off-line
+        line = trimQuotes(line);
         String encodedString = "";
         boolean hasEscapeSequence = false;
         for (int i = 0; i < line.length(); i++) {
             char ch = line.charAt(i);
 
-            if (ch == '\"' && !hasEscapeSequence && isString) continue;
-            else if (ch == '\'' && !hasEscapeSequence && !isString) continue;
-            if (ch == '\\' && !hasEscapeSequence) {
+            //check length here in case of '\' character being the only character
+            if (ch == '\\' && !hasEscapeSequence && line.length() != 1) {
                 hasEscapeSequence = true;
             } else if (hasEscapeSequence) {
 
@@ -24,6 +25,10 @@ public class EncodeCharacters {
             }
         }
         return encodedString;
+    }
+
+    private String trimQuotes(String line){
+        return line.substring(1, line.length()-1);
     }
 
     private char encodeCharacter(char ch) {

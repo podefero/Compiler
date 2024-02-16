@@ -53,13 +53,28 @@ public class LexerTest {
     }
 
     @Test
-    void testTokenSingleQuoteLit() {
+    void testTokenStringSingleQuoteLit() {
         testTokenType("\"'JohnDoe'\"", KxiLexer.STRINGLIT, "'JohnDoe'");
+    }
+
+    @Test
+    void testTokenStringDoubleQuoteLit() {
+        testTokenType("\"John\"Doe\"\"", KxiLexer.STRINGLIT, "John\"Doe\"");
     }
 
     @Test
     void testTokenCharLit() {
         testTokenType("'J'", KxiLexer.CHARLIT, 'J');
+    }
+
+    @Test
+    void testTokenCharSingleQuoteLit() {
+        testTokenType("'\''", KxiLexer.CHARLIT, '\'');
+    }
+
+    @Test
+    void testTokenCharDoubleQuoteLit() {
+        testTokenType("'\"'", KxiLexer.CHARLIT, '\"');
     }
 
     @Test
@@ -74,12 +89,22 @@ public class LexerTest {
     }
 
     @Test
-    void testTokenEscapeSequences() {
+    void testTokenStringEscapeSequences() {
         testTokenType("\"John\\nDoe\"", KxiLexer.STRINGLIT, "John\nDoe");
         testTokenType("\"John\\rDoe\"", KxiLexer.STRINGLIT, "John\rDoe");
         testTokenType("\"John\\tDoe\"", KxiLexer.STRINGLIT, "John\tDoe");
         testTokenType("\"John\\n\\rDoe\"", KxiLexer.STRINGLIT, "John\n\rDoe");
         testTokenType("\"John\\\"Doe\"", KxiLexer.STRINGLIT, "John\"Doe");
+        testTokenType("\"John\\\\Doe\"", KxiLexer.STRINGLIT, "John\\Doe");
+    }
+
+    @Test
+    void testTokenCharEscapeSequences() {
+        testTokenType("'\\n'", KxiLexer.CHARLIT, '\n');
+        testTokenType("'\\'", KxiLexer.CHARLIT, '\\');
+        testTokenType("'\\t'", KxiLexer.CHARLIT, '\t');
+        testTokenType("'\\r'", KxiLexer.CHARLIT, '\r');
+
     }
 
     @Test

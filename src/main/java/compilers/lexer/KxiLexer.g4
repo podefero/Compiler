@@ -119,8 +119,8 @@ COMMA   :   ',' ;
 COLON   : ':' ;
 
 IDENTIFIER :    (ALPHA | UNDER_SCORE) (ALPHA | DIGIT | UNDER_SCORE)* ;
-CHARLIT : '\'' (UNESCAPED_CHAR | ESCAPED_CHAR | '\\' '\'' | '\\' '"') '\'' ;
-STRINGLIT : '"' (UNESCAPED_CHAR | ESCAPED_CHAR | '\\' '\'' | '\\' '"')* '"' ;
+CHARLIT : '\'' (UNESCAPED_CHAR | ESCAPED_CHAR | '\\' | '\'' | '\\' | '"') '\'' ;
+STRINGLIT : '"' (UNESCAPED_CHAR | ESCAPED_CHAR | '\\' | '\'' | '\\' | '"')* '"' ;
 INTLIT     :    DIGIT+ ;
 COMMENT : '//' ~[\r\n]* LINE_ENDING -> skip;
 MULTI_COMMENT    : '/*' .* '*/' -> skip ;
