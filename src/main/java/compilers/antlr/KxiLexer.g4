@@ -54,6 +54,7 @@ fragment G  :   'g' ;
 //true
 //void
 //while
+fragment M : 'm' ;
 
 
 
@@ -67,7 +68,7 @@ CLASS   :   C L A S S ;
 CHAR_KEY :   C H A R ;
 CIN     :   C I N ;
 COUT    :   C O U T ;
-DEfAULT :   D E F A U L T ;
+DEFAULT :   D E F A U L T ;
 ELSE    :   E L S E ;
 FALSE   :   F A L S E ;
 FOR     :   F O R ;
@@ -85,6 +86,7 @@ THIS    :   T H I S ;
 TRUE    :   T R U E ;
 VOID    :   V O I D ;
 WHILE   :   W H I L E ;
+MAIN    :   M A I N ;
 
 //Punctuation
 SEMICOLON   :   ';' ;
@@ -112,8 +114,8 @@ PLUSEQUALS   :   '+''=' ;
 SUBEQUALS   :   '-''=' ;
 MULTEQUALS  :   '*''=' ;
 DIVEQUALS   :   '/''=' ;
-INSTREAM    :   '<''<' ;
-OUTSTEAM    :   '>''>' ;
+OUTSTREAM    :   '<''<' ;
+INSTREAM    :   '>''>' ;
 DOT :   '.' ;
 COMMA   :   ',' ;
 COLON   : ':' ;

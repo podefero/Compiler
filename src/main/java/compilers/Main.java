@@ -1,7 +1,7 @@
 package compilers;
 
 import compilers.commandargs.ArgumentFlags;
-import compilers.lexer.KxiLexer;
+import compilers.antlr.KxiLexer;
 import compilers.util.InputHandler;
 
 public class Main {

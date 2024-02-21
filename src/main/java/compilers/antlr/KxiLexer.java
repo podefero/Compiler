@@ -1,5 +1,5 @@
 // Generated from /home/nag/Documents/UVU/Spring2024/Compiler/CompilerJava/src/main/java/compilers/lexer/KxiLexer.g4 by ANTLR 4.13.1
-package compilers.lexer;
+package compilers.antlr;
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.Token;

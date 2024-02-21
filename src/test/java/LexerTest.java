@@ -1,4 +1,4 @@
-import compilers.lexer.KxiLexer;
+import compilers.antlr.KxiLexer;
 import compilers.lexer.TokenProcessor;
 import compilers.lexer.tokens.TokenType;
 import compilers.util.InputHandler;
@@ -25,7 +25,7 @@ public class LexerTest {
         System.out.println(filepath);
         CharStream charStream;
 
-        charStream = new InputHandler(filepath).fileToCharStream();
+        charStream = new InputHandler('[' + filepath + ']').fileToCharStream();
 
         // Create an instance of the ANTLR-generated lexer
         KxiLexer kxiLexer = new KxiLexer(charStream);
