@@ -1,31 +1,36 @@
 package compilers;
 
 import compilers.commandargs.ArgumentFlags;
+import compilers.lexer.KxiLexer;
+import compilers.util.InputHandler;
 
 public class Main {
     public static void main(String[] args) {
         //parse the command line args
         ArgumentFlags argumentFlags = new ArgumentFlags(args);
+        InputHandler inputHandler = new InputHandler(argumentFlags.inputFileName);
 
         //call function stubs based on arguments
-        if (argumentFlags.lexing) lexing();
-        if (argumentFlags.printTokens) printTokens();
+        if (argumentFlags.hasOutputFile) outputFiles(argumentFlags.outputFileName);
+        if (argumentFlags.lexing) lexing(argumentFlags, inputHandler);
         if (argumentFlags.parseTree) parseTree();
         if (argumentFlags.printASTDiagram) printASTDiagram();
         if (argumentFlags.semantics) semantics();
         if (argumentFlags.printSemanticInformation) printSemanticInformation();
         if (argumentFlags.compile) compile();
         if (argumentFlags.graphicalAST) printGraphicalAST();
-        if (argumentFlags.hasOutputFile) outputFiles(argumentFlags.outputFileName);
-        if (argumentFlags.hasInputFile) inputFile(argumentFlags.inputFileName);
     }
 
-    static void lexing() {
+    static void lexing(ArgumentFlags argumentFlags, InputHandler inputHandler) {
         System.out.println("Lexing");
+        KxiLexer kxiLexer = new KxiLexer(inputHandler.fileToCharStream());
+
+        if (argumentFlags.printTokens) printTokens(kxiLexer);
     }
 
-    static void printTokens() {
+    static void printTokens(KxiLexer kxiLexer) {
         System.out.println("Printing Tokens");
+        kxiLexer.printTokens();
     }
 
     static void parseTree() {
@@ -59,13 +64,4 @@ public class Main {
             System.out.println("Printing files " + files);
         }
     }
-
-    static void inputFile(String file) {
-        if (file.equals("[]")) {
-            System.out.println("using STDIN to input");
-        } else {
-            System.out.println("Inputting file " + file);
-        }
-    }
-
 }

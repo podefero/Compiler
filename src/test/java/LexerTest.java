@@ -1,7 +1,7 @@
 import compilers.lexer.KxiLexer;
 import compilers.lexer.TokenProcessor;
 import compilers.lexer.tokens.TokenType;
-import compilers.util.InputStreamToChar;
+import compilers.util.InputHandler;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -22,9 +22,10 @@ public class LexerTest {
         //This is testing if a valid kxi file
         //fails on unknown tokens
         String filepath = getClass().getResource("StressTest.kxi").getPath();
+        System.out.println(filepath);
         CharStream charStream;
 
-        charStream = new InputStreamToChar().FileToCharStream(filepath);
+        charStream = new InputHandler(filepath).fileToCharStream();
 
         // Create an instance of the ANTLR-generated lexer
         KxiLexer kxiLexer = new KxiLexer(charStream);
@@ -109,6 +110,7 @@ public class LexerTest {
 
     @Test
     void testInvalidTokens() {
+        testTokenType("\"kk 100", KxiLexer.UNKNOWN, "\"");
 
     }
 

@@ -9,6 +9,8 @@ import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.*;
 
+import java.util.List;
+
 @SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast", "CheckReturnValue", "this-escape"})
 public class KxiLexer extends Lexer {
 	static { RuntimeMetaData.checkVersion("4.13.1", RuntimeMetaData.VERSION); }
@@ -17,15 +19,15 @@ public class KxiLexer extends Lexer {
 	protected static final PredictionContextCache _sharedContextCache =
 		new PredictionContextCache();
 	public static final int
-		BOOL=1, BREAK=2, CASE=3, CLASS=4, CHAR_KEY=5, CIN=6, COUT=7, DEfAULT=8, 
-		ELSE=9, FALSE=10, FOR=11, IF=12, INT=13, NEW=14, NULL=15, PUBLIC=16, PRIVATE=17, 
-		RETURN=18, STATIC=19, STRING=20, SWITCH=21, THIS=22, TRUE=23, VOID=24, 
-		WHILE=25, SEMICOLON=26, LCURLY=27, RCURLY=28, LPARENTH=29, RPARENTH=30, 
-		LBRACKET=31, RBRACKET=32, EQUALS=33, EQUALSEQUALS=34, NOTEQUALS=35, GREATEREQUALS=36, 
-		LESSEQUALS=37, LESSTHEN=38, GREATERTHEN=39, AND=40, OR=41, NOT=42, PLUS=43, 
-		SUBTRACT=44, MULT=45, DIVIDE=46, PLUSEQUALS=47, SUBEQUALS=48, MULTEQUALS=49, 
-		DIVEQUALS=50, INSTREAM=51, OUTSTEAM=52, DOT=53, COMMA=54, COLON=55, IDENTIFIER=56, 
-		CHARLIT=57, STRINGLIT=58, INTLIT=59, COMMENT=60, MULTI_COMMENT=61, WS=62, 
+		BOOL=1, BREAK=2, CASE=3, CLASS=4, CHAR_KEY=5, CIN=6, COUT=7, DEfAULT=8,
+		ELSE=9, FALSE=10, FOR=11, IF=12, INT=13, NEW=14, NULL=15, PUBLIC=16, PRIVATE=17,
+		RETURN=18, STATIC=19, STRING=20, SWITCH=21, THIS=22, TRUE=23, VOID=24,
+		WHILE=25, SEMICOLON=26, LCURLY=27, RCURLY=28, LPARENTH=29, RPARENTH=30,
+		LBRACKET=31, RBRACKET=32, EQUALS=33, EQUALSEQUALS=34, NOTEQUALS=35, GREATEREQUALS=36,
+		LESSEQUALS=37, LESSTHEN=38, GREATERTHEN=39, AND=40, OR=41, NOT=42, PLUS=43,
+		SUBTRACT=44, MULT=45, DIVIDE=46, PLUSEQUALS=47, SUBEQUALS=48, MULTEQUALS=49,
+		DIVEQUALS=50, INSTREAM=51, OUTSTEAM=52, DOT=53, COMMA=54, COLON=55, IDENTIFIER=56,
+		CHARLIT=57, STRINGLIT=58, INTLIT=59, COMMENT=60, MULTI_COMMENT=61, WS=62,
 		NEWLINE=63, UNKNOWN=64;
 	public static String[] channelNames = {
 		"DEFAULT_TOKEN_CHANNEL", "HIDDEN"
@@ -37,17 +39,17 @@ public class KxiLexer extends Lexer {
 
 	private static String[] makeRuleNames() {
 		return new String[] {
-			"ALPHA", "DIGIT", "UNDER_SCORE", "LINE_ENDING", "UNESCAPED_CHAR", "ESCAPED_CHAR", 
-			"CHAR", "B", "O", "L", "T", "R", "U", "E", "F", "A", "S", "K", "C", "H", 
-			"I", "N", "D", "W", "P", "V", "G", "BOOL", "BREAK", "CASE", "CLASS", 
-			"CHAR_KEY", "CIN", "COUT", "DEfAULT", "ELSE", "FALSE", "FOR", "IF", "INT", 
-			"NEW", "NULL", "PUBLIC", "PRIVATE", "RETURN", "STATIC", "STRING", "SWITCH", 
-			"THIS", "TRUE", "VOID", "WHILE", "SEMICOLON", "LCURLY", "RCURLY", "LPARENTH", 
-			"RPARENTH", "LBRACKET", "RBRACKET", "EQUALS", "EQUALSEQUALS", "NOTEQUALS", 
-			"GREATEREQUALS", "LESSEQUALS", "LESSTHEN", "GREATERTHEN", "AND", "OR", 
-			"NOT", "PLUS", "SUBTRACT", "MULT", "DIVIDE", "PLUSEQUALS", "SUBEQUALS", 
-			"MULTEQUALS", "DIVEQUALS", "INSTREAM", "OUTSTEAM", "DOT", "COMMA", "COLON", 
-			"IDENTIFIER", "CHARLIT", "STRINGLIT", "INTLIT", "COMMENT", "MULTI_COMMENT", 
+			"ALPHA", "DIGIT", "UNDER_SCORE", "LINE_ENDING", "UNESCAPED_CHAR", "ESCAPED_CHAR",
+			"CHAR", "B", "O", "L", "T", "R", "U", "E", "F", "A", "S", "K", "C", "H",
+			"I", "N", "D", "W", "P", "V", "G", "BOOL", "BREAK", "CASE", "CLASS",
+			"CHAR_KEY", "CIN", "COUT", "DEfAULT", "ELSE", "FALSE", "FOR", "IF", "INT",
+			"NEW", "NULL", "PUBLIC", "PRIVATE", "RETURN", "STATIC", "STRING", "SWITCH",
+			"THIS", "TRUE", "VOID", "WHILE", "SEMICOLON", "LCURLY", "RCURLY", "LPARENTH",
+			"RPARENTH", "LBRACKET", "RBRACKET", "EQUALS", "EQUALSEQUALS", "NOTEQUALS",
+			"GREATEREQUALS", "LESSEQUALS", "LESSTHEN", "GREATERTHEN", "AND", "OR",
+			"NOT", "PLUS", "SUBTRACT", "MULT", "DIVIDE", "PLUSEQUALS", "SUBEQUALS",
+			"MULTEQUALS", "DIVEQUALS", "INSTREAM", "OUTSTEAM", "DOT", "COMMA", "COLON",
+			"IDENTIFIER", "CHARLIT", "STRINGLIT", "INTLIT", "COMMENT", "MULTI_COMMENT",
 			"WS", "NEWLINE", "UNKNOWN"
 		};
 	}
@@ -55,24 +57,24 @@ public class KxiLexer extends Lexer {
 
 	private static String[] makeLiteralNames() {
 		return new String[] {
-			null, null, null, null, null, null, null, null, null, null, null, null, 
-			null, null, null, null, null, null, null, null, null, null, null, null, 
-			null, null, "';'", "'{'", "'}'", "'('", "')'", "'['", "']'", "'='", null, 
-			null, null, null, "'<'", "'>'", null, null, "'!'", "'+'", "'-'", "'*'", 
+			null, null, null, null, null, null, null, null, null, null, null, null,
+			null, null, null, null, null, null, null, null, null, null, null, null,
+			null, null, "';'", "'{'", "'}'", "'('", "')'", "'['", "']'", "'='", null,
+			null, null, null, "'<'", "'>'", null, null, "'!'", "'+'", "'-'", "'*'",
 			"'/'", null, null, null, null, null, null, "'.'", "','", "':'"
 		};
 	}
 	private static final String[] _LITERAL_NAMES = makeLiteralNames();
 	private static String[] makeSymbolicNames() {
 		return new String[] {
-			null, "BOOL", "BREAK", "CASE", "CLASS", "CHAR_KEY", "CIN", "COUT", "DEfAULT", 
-			"ELSE", "FALSE", "FOR", "IF", "INT", "NEW", "NULL", "PUBLIC", "PRIVATE", 
-			"RETURN", "STATIC", "STRING", "SWITCH", "THIS", "TRUE", "VOID", "WHILE", 
-			"SEMICOLON", "LCURLY", "RCURLY", "LPARENTH", "RPARENTH", "LBRACKET", 
-			"RBRACKET", "EQUALS", "EQUALSEQUALS", "NOTEQUALS", "GREATEREQUALS", "LESSEQUALS", 
-			"LESSTHEN", "GREATERTHEN", "AND", "OR", "NOT", "PLUS", "SUBTRACT", "MULT", 
-			"DIVIDE", "PLUSEQUALS", "SUBEQUALS", "MULTEQUALS", "DIVEQUALS", "INSTREAM", 
-			"OUTSTEAM", "DOT", "COMMA", "COLON", "IDENTIFIER", "CHARLIT", "STRINGLIT", 
+			null, "BOOL", "BREAK", "CASE", "CLASS", "CHAR_KEY", "CIN", "COUT", "DEfAULT",
+			"ELSE", "FALSE", "FOR", "IF", "INT", "NEW", "NULL", "PUBLIC", "PRIVATE",
+			"RETURN", "STATIC", "STRING", "SWITCH", "THIS", "TRUE", "VOID", "WHILE",
+			"SEMICOLON", "LCURLY", "RCURLY", "LPARENTH", "RPARENTH", "LBRACKET",
+			"RBRACKET", "EQUALS", "EQUALSEQUALS", "NOTEQUALS", "GREATEREQUALS", "LESSEQUALS",
+			"LESSTHEN", "GREATERTHEN", "AND", "OR", "NOT", "PLUS", "SUBTRACT", "MULT",
+			"DIVIDE", "PLUSEQUALS", "SUBEQUALS", "MULTEQUALS", "DIVEQUALS", "INSTREAM",
+			"OUTSTEAM", "DOT", "COMMA", "COLON", "IDENTIFIER", "CHARLIT", "STRINGLIT",
 			"INTLIT", "COMMENT", "MULTI_COMMENT", "WS", "NEWLINE", "UNKNOWN"
 		};
 	}
@@ -133,6 +135,16 @@ public class KxiLexer extends Lexer {
 
 	@Override
 	public ATN getATN() { return _ATN; }
+
+	public void printTokens() {
+		CommonTokenStream tokens = new CommonTokenStream(this);
+        tokens.fill();
+		List<Token> tokenList = tokens.getTokens();
+		for (Token token : tokenList) {
+			String tokenName = getVocabulary().getSymbolicName(token.getType());
+			System.out.println("Line#: " + token.getLine() + ":" + token.getCharPositionInLine() + " " + token.getText() + " " + tokenName);
+		}
+	}
 
 	public static final String _serializedATN =
 		"\u0004\u0000@\u0215\u0006\uffff\uffff\u0002\u0000\u0007\u0000\u0002\u0001"+
