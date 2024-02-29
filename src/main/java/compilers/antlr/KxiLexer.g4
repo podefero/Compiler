@@ -5,7 +5,7 @@ fragment ALPHA  :   [A-Za-z] ;
 fragment DIGIT  :   [0-9] ;
 fragment UNDER_SCORE    :   '_' ;
 fragment LINE_ENDING    :  '\r\n' | '\n' | '\r' ;
-fragment UNESCAPED_CHAR : [\u0020-\u0022\u0027-\u005B\u005D-\u005E\u0060-\u007E]+ ;
+fragment UNESCAPED_CHAR : [\u0020-\u0022\u0027-\u005B\u005D-\u005E\u0060-\u007E] ;
 fragment ESCAPED_CHAR : '\\' [rtn] ;
 fragment CHAR   :   UNESCAPED_CHAR | ESCAPED_CHAR ;
 //Bool

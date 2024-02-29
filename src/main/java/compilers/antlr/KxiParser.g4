@@ -4,14 +4,14 @@ options { tokenVocab=KxiLexer; }
 
 compilationUnit : classDefinition* VOID MAIN LPARENTH RPARENTH block ;
 classDefinition : CLASS IDENTIFIER LCURLY classMemberDefinition* RCURLY ;
-scalarType : VOID | INT | CHAR | BOOL | STRING | IDENTIFIER ;
+scalarType : VOID | INT | CHAR_KEY | BOOL | STRING | IDENTIFIER ;
 type : scalarType (LBRACKET RBRACKET)* ;
 modifier : PUBLIC | PRIVATE ;
 classMemberDefinition : methodDeclaration | dataMemberDeclaration | constructorDeclaration ;
 dataMemberDeclaration : STATIC? modifier variableDeclaration ;
 methodDeclaration : STATIC? modifier type methodSuffix ;
 constructorDeclaration : methodSuffix ;
-methodSuffix : IDENTIFIER LPARENTH parameterList RPARENTH block ;
+methodSuffix : IDENTIFIER LPARENTH parameterList? RPARENTH block ;
 parameterList : parameter (COMMA parameter)* ;
 parameter : type IDENTIFIER ;
 variableDeclaration : type IDENTIFIER initializer? SEMICOLON ;
@@ -24,6 +24,7 @@ statement : IF LPARENTH expression RPARENTH statement (ELSE statement)?
             | CIN INSTREAM expression SEMICOLON
             | SWITCH LPARENTH expression RPARENTH caseBlock
             | BREAK SEMICOLON
+            | expression SEMICOLON
             | block
             | variableDeclaration ;
 block : LCURLY statement* RCURLY ;
