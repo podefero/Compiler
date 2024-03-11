@@ -86,7 +86,6 @@ THIS    :   T H I S ;
 TRUE    :   T R U E ;
 VOID    :   V O I D ;
 WHILE   :   W H I L E ;
-MAIN    :   M A I N ;
 
 //Punctuation
 SEMICOLON   :   ';' ;

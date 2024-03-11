@@ -2,7 +2,7 @@ parser grammar KxiParser;
 
 options { tokenVocab=KxiLexer; }
 
-compilationUnit : classDefinition* VOID MAIN LPARENTH RPARENTH block ;
+compilationUnit : classDefinition* VOID IDENTIFIER LPARENTH RPARENTH block ;
 classDefinition : CLASS IDENTIFIER LCURLY classMemberDefinition* RCURLY ;
 scalarType : VOID | INT | CHAR_KEY | BOOL | STRING | IDENTIFIER ;
 type : scalarType (LBRACKET RBRACKET)* ;
@@ -35,10 +35,10 @@ expression : expression EQUALS expression
             | expression SUBEQUALS expression
             | expression MULTEQUALS expression
             | expression DIVEQUALS expression
-            | expression PLUS expression
-            | expression SUBTRACT expression
             | expression MULT expression
             | expression DIVIDE expression
+            | expression PLUS expression
+            | expression SUBTRACT expression
             | expression EQUALSEQUALS expression
             | expression NOTEQUALS expression
             | expression LESSTHEN expression
