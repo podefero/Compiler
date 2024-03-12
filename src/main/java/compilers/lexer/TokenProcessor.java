@@ -22,6 +22,8 @@ public class TokenProcessor {
             case KxiLexer.TRUE:
             case KxiLexer.FALSE:
                 return new BoolToken(token.getText());
+            case KxiLexer.IDENTIFIER:
+                return new IdentifierToken(token.getText());
             default:
                 return new DefaultToken(token.getText());
 

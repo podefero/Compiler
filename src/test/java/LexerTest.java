@@ -69,6 +69,12 @@ public class LexerTest {
     }
 
     @Test
+    void testTokenIdentifier() {
+        testTokenType("main", KxiLexer.IDENTIFIER, "main");
+    }
+
+
+    @Test
     void testTokenCharSingleQuoteLit() {
         testTokenType("'\''", KxiLexer.CHARLIT, '\'');
     }
