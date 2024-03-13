@@ -3,7 +3,6 @@ package compilers.transform.kxi;
 
 import compilers.ast.AbstractKxiNode;
 import compilers.ast.kxi_nodes.expressions.AbstractKxiExpression;
-import compilers.ast.kxi_nodes.expressions.KxiExpression;
 import compilers.ast.kxi_nodes.expressions.binary.arithmic.KxiDiv;
 import compilers.ast.kxi_nodes.expressions.binary.arithmic.KxiMult;
 import compilers.ast.kxi_nodes.expressions.binary.arithmic.KxiPlus;
@@ -19,12 +18,8 @@ import static compilers.antlr.KxiParser.*;
 
 public class KxiFactoryExpression extends AbstractKxiFactory {
 
-    public KxiFactoryExpression(ParserRuleContext ctx, Queue<AbstractKxiNode> queue) {
-        super(ctx, queue);
-    }
-
     @Override
-    public AbstractKxiNode build() {
+    public AbstractKxiNode build(ParserRuleContext ctx, Queue<AbstractKxiNode> queue) {
         KxiParseHelper parseHelper = new KxiParseHelper();
         int type = parseHelper.getTokenType(parseHelper.findFirstTerminal(ctx.children));
         switch (type) {
@@ -59,7 +54,7 @@ public class KxiFactoryExpression extends AbstractKxiFactory {
             case OR:
                 return new KxiOr((AbstractKxiExpression) queue.poll(), (AbstractKxiExpression) queue.poll());
             default:
-                return new KxiExpression();
+                return null;
         }
     }
 }

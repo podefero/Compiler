@@ -11,14 +11,12 @@ import compilers.ast.kxi_nodes.class_members.KxiConstructor;
 import compilers.ast.kxi_nodes.class_members.KxiDataMember;
 import compilers.ast.kxi_nodes.class_members.KxiMethod;
 import compilers.ast.kxi_nodes.scope.KxiBlock;
-import compilers.ast.kxi_nodes.scope.KxiCaseBlock;
+import compilers.ast.kxi_nodes.scope.KxiCaseBlockInt;
 import compilers.ast.kxi_nodes.scope.KxiClass;
 import compilers.ast.kxi_nodes.statements.KxiBreakStatement;
-import compilers.transform.kxi.AbstractKxiFactory;
 import compilers.transform.kxi.KxiFactoryExpression;
 import compilers.util.KxiParseHelper;
 import lombok.Getter;
-import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.AbstractParseTreeVisitor;
 
 import java.util.ArrayDeque;
@@ -155,7 +153,7 @@ public class AntlrToKxiVisitor<Void> extends AbstractParseTreeVisitor<Void> impl
     @Override
     public Void visitCaseBlock(KxiParser.CaseBlockContext ctx) {
         visitChildren(ctx);
-        addToQue(new KxiCaseBlock());
+        addToQue(new KxiCaseBlockInt());
         return null;
     }
 
@@ -169,8 +167,8 @@ public class AntlrToKxiVisitor<Void> extends AbstractParseTreeVisitor<Void> impl
     @Override
     public Void visitExpression(KxiParser.ExpressionContext ctx) {
         visitChildren(ctx);
-        KxiFactoryExpression factoryExpression = new KxiFactoryExpression(ctx, nodeQueue);
-        addToQue(factoryExpression.build());
+        //KxiFactoryExpression factoryExpression = new KxiFactoryExpression(ctx, nodeQueue);
+        //addToQue(factoryExpression.build());
         return null;
     }
 

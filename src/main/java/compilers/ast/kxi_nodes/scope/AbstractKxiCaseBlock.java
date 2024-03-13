@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import java.util.List;
 
 @AllArgsConstructor
-public class KxiBlock extends AbstractKxiScope{
-    private List<AbstractKxiStatement> statements;
+public abstract class AbstractKxiCaseBlock<T> extends AbstractKxiScope{
+    protected List<T> cases;
+    protected List<AbstractKxiStatement> statements;
 }

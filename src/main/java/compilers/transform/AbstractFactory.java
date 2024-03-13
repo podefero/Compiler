@@ -4,13 +4,8 @@ import lombok.AllArgsConstructor;
 
 import java.util.Queue;
 
-@AllArgsConstructor
 public abstract class AbstractFactory<Source, Destination>  {
-    protected Source ctx;
-    protected Queue<Destination> queue;
-
-
-    public Destination build() {
+    public Destination build(Source ctx, Queue<Destination> queue ) {
         return null;
     }
 }

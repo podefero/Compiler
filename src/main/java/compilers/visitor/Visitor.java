@@ -1,4 +1,4 @@
-package compilers.ast;
+package compilers.visitor;
 
 public interface Visitor {
 }
