@@ -35,6 +35,7 @@ public class KxiParser extends Parser {
 		RULE_initializer = 13, RULE_statement = 14, RULE_block = 15, RULE_caseBlock = 16, 
 		RULE_case = 17, RULE_expression = 18, RULE_arguments = 19, RULE_argumentList = 20, 
 		RULE_index = 21;
+
 	private static String[] makeRuleNames() {
 		return new String[] {
 			"compilationUnit", "classDefinition", "scalarType", "type", "modifier", 
@@ -139,6 +140,11 @@ public class KxiParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_compilationUnit; }
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof KxiParserVisitor ) return ((KxiParserVisitor<? extends T>)visitor).visitCompilationUnit(this);
+			else return visitor.visitChildren(this);
+		}
 	}
 
 	public final CompilationUnitContext compilationUnit() throws RecognitionException {
@@ -201,6 +207,11 @@ public class KxiParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_classDefinition; }
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof KxiParserVisitor ) return ((KxiParserVisitor<? extends T>)visitor).visitClassDefinition(this);
+			else return visitor.visitChildren(this);
+		}
 	}
 
 	public final ClassDefinitionContext classDefinition() throws RecognitionException {
@@ -257,6 +268,11 @@ public class KxiParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_scalarType; }
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof KxiParserVisitor ) return ((KxiParserVisitor<? extends T>)visitor).visitScalarType(this);
+			else return visitor.visitChildren(this);
+		}
 	}
 
 	public final ScalarTypeContext scalarType() throws RecognitionException {
@@ -306,6 +322,11 @@ public class KxiParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_type; }
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof KxiParserVisitor ) return ((KxiParserVisitor<? extends T>)visitor).visitType(this);
+			else return visitor.visitChildren(this);
+		}
 	}
 
 	public final TypeContext type() throws RecognitionException {
@@ -356,6 +377,11 @@ public class KxiParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_modifier; }
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof KxiParserVisitor ) return ((KxiParserVisitor<? extends T>)visitor).visitModifier(this);
+			else return visitor.visitChildren(this);
+		}
 	}
 
 	public final ModifierContext modifier() throws RecognitionException {
@@ -403,6 +429,11 @@ public class KxiParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_classMemberDefinition; }
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof KxiParserVisitor ) return ((KxiParserVisitor<? extends T>)visitor).visitClassMemberDefinition(this);
+			else return visitor.visitChildren(this);
+		}
 	}
 
 	public final ClassMemberDefinitionContext classMemberDefinition() throws RecognitionException {
@@ -459,6 +490,11 @@ public class KxiParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_dataMemberDeclaration; }
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof KxiParserVisitor ) return ((KxiParserVisitor<? extends T>)visitor).visitDataMemberDeclaration(this);
+			else return visitor.visitChildren(this);
+		}
 	}
 
 	public final DataMemberDeclarationContext dataMemberDeclaration() throws RecognitionException {
@@ -511,6 +547,11 @@ public class KxiParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_methodDeclaration; }
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof KxiParserVisitor ) return ((KxiParserVisitor<? extends T>)visitor).visitMethodDeclaration(this);
+			else return visitor.visitChildren(this);
+		}
 	}
 
 	public final MethodDeclarationContext methodDeclaration() throws RecognitionException {
@@ -558,6 +599,11 @@ public class KxiParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_constructorDeclaration; }
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof KxiParserVisitor ) return ((KxiParserVisitor<? extends T>)visitor).visitConstructorDeclaration(this);
+			else return visitor.visitChildren(this);
+		}
 	}
 
 	public final ConstructorDeclarationContext constructorDeclaration() throws RecognitionException {
@@ -596,6 +642,11 @@ public class KxiParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_methodSuffix; }
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof KxiParserVisitor ) return ((KxiParserVisitor<? extends T>)visitor).visitMethodSuffix(this);
+			else return visitor.visitChildren(this);
+		}
 	}
 
 	public final MethodSuffixContext methodSuffix() throws RecognitionException {
@@ -652,6 +703,11 @@ public class KxiParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_parameterList; }
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof KxiParserVisitor ) return ((KxiParserVisitor<? extends T>)visitor).visitParameterList(this);
+			else return visitor.visitChildren(this);
+		}
 	}
 
 	public final ParameterListContext parameterList() throws RecognitionException {
@@ -702,6 +758,11 @@ public class KxiParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_parameter; }
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof KxiParserVisitor ) return ((KxiParserVisitor<? extends T>)visitor).visitParameter(this);
+			else return visitor.visitChildren(this);
+		}
 	}
 
 	public final ParameterContext parameter() throws RecognitionException {
@@ -741,6 +802,11 @@ public class KxiParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_variableDeclaration; }
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof KxiParserVisitor ) return ((KxiParserVisitor<? extends T>)visitor).visitVariableDeclaration(this);
+			else return visitor.visitChildren(this);
+		}
 	}
 
 	public final VariableDeclarationContext variableDeclaration() throws RecognitionException {
@@ -789,6 +855,11 @@ public class KxiParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_initializer; }
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof KxiParserVisitor ) return ((KxiParserVisitor<? extends T>)visitor).visitInitializer(this);
+			else return visitor.visitChildren(this);
+		}
 	}
 
 	public final InitializerContext initializer() throws RecognitionException {
@@ -858,6 +929,11 @@ public class KxiParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_statement; }
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof KxiParserVisitor ) return ((KxiParserVisitor<? extends T>)visitor).visitStatement(this);
+			else return visitor.visitChildren(this);
+		}
 	}
 
 	public final StatementContext statement() throws RecognitionException {
@@ -1068,6 +1144,11 @@ public class KxiParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_block; }
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof KxiParserVisitor ) return ((KxiParserVisitor<? extends T>)visitor).visitBlock(this);
+			else return visitor.visitChildren(this);
+		}
 	}
 
 	public final BlockContext block() throws RecognitionException {
@@ -1130,6 +1211,11 @@ public class KxiParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_caseBlock; }
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof KxiParserVisitor ) return ((KxiParserVisitor<? extends T>)visitor).visitCaseBlock(this);
+			else return visitor.visitChildren(this);
+		}
 	}
 
 	public final CaseBlockContext caseBlock() throws RecognitionException {
@@ -1204,6 +1290,11 @@ public class KxiParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_case; }
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof KxiParserVisitor ) return ((KxiParserVisitor<? extends T>)visitor).visitCase(this);
+			else return visitor.visitChildren(this);
+		}
 	}
 
 	public final CaseContext case_() throws RecognitionException {
@@ -1305,6 +1396,11 @@ public class KxiParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_expression; }
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof KxiParserVisitor ) return ((KxiParserVisitor<? extends T>)visitor).visitExpression(this);
+			else return visitor.visitChildren(this);
+		}
 	}
 
 	public final ExpressionContext expression() throws RecognitionException {
@@ -1715,6 +1811,11 @@ public class KxiParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_arguments; }
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof KxiParserVisitor ) return ((KxiParserVisitor<? extends T>)visitor).visitArguments(this);
+			else return visitor.visitChildren(this);
+		}
 	}
 
 	public final ArgumentsContext arguments() throws RecognitionException {
@@ -1767,6 +1868,11 @@ public class KxiParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_argumentList; }
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof KxiParserVisitor ) return ((KxiParserVisitor<? extends T>)visitor).visitArgumentList(this);
+			else return visitor.visitChildren(this);
+		}
 	}
 
 	public final ArgumentListContext argumentList() throws RecognitionException {
@@ -1818,6 +1924,11 @@ public class KxiParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_index; }
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof KxiParserVisitor ) return ((KxiParserVisitor<? extends T>)visitor).visitIndex(this);
+			else return visitor.visitChildren(this);
+		}
 	}
 
 	public final IndexContext index() throws RecognitionException {

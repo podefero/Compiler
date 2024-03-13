@@ -1,6 +1,6 @@
 import compilers.antlr.KxiLexer;
-import compilers.lexer.TokenProcessor;
-import compilers.lexer.tokens.TokenType;
+import compilers.ast.kxi_nodes.expressions.token_expression.TokenProcessor;
+import compilers.ast.kxi_nodes.expressions.token_expression.TokenType;
 import compilers.util.InputHandler;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
