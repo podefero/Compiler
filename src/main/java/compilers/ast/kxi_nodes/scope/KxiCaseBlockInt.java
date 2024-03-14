@@ -7,7 +7,7 @@ import java.util.List;
 
 public class KxiCaseBlockInt extends AbstractKxiCaseBlock<KxiIntCase>{
 
-    public KxiCaseBlockInt(List<KxiIntCase> cases, List<AbstractKxiStatement> statements) {
-        super(cases, statements);
+    public KxiCaseBlockInt(List<AbstractKxiStatement> statements, List<KxiIntCase> cases) {
+        super(statements, cases);
     }
 }

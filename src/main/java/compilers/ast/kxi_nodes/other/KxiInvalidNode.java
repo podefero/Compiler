@@ -1,4 +1,4 @@
-package compilers.ast.kxi_nodes;
+package compilers.ast.kxi_nodes.other;
 
 import compilers.ast.AbstractKxiNode;
 import lombok.AllArgsConstructor;

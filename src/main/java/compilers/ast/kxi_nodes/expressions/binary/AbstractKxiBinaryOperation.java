@@ -7,5 +7,4 @@ import lombok.AllArgsConstructor;
 public abstract class AbstractKxiBinaryOperation extends AbstractKxiExpression {
     protected AbstractKxiExpression expressionL;
     protected AbstractKxiExpression expressionR;
-
 }

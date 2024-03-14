@@ -7,6 +7,6 @@ import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 public class KxiParameter extends AbstractKxiNode {
-    private KxiType type;
     private IdentifierToken id;
+    private KxiType type;
 }

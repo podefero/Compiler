@@ -2,14 +2,13 @@ package compilers.transform.kxi;
 
 import compilers.ast.AbstractKxiNode;
 import compilers.ast.ScalarType;
-import compilers.ast.kxi_nodes.KxiInvalidNode;
 import compilers.ast.kxi_nodes.KxiMain;
 import compilers.ast.kxi_nodes.KxiType;
 import compilers.ast.kxi_nodes.KxiVariableDeclaration;
+import compilers.ast.kxi_nodes.expressions.AbstractKxiExpression;
 import compilers.ast.kxi_nodes.expressions.token_expression.IdentifierToken;
+import compilers.ast.kxi_nodes.other.KxiInvalidNode;
 import compilers.ast.kxi_nodes.scope.KxiBlock;
-import compilers.ast.kxi_nodes.scope.KxiClass;
-import compilers.ast.kxi_nodes.statements.AbstractKxiStatement;
 import org.antlr.v4.runtime.ParserRuleContext;
 
 import java.util.Optional;
@@ -20,18 +19,26 @@ import static compilers.antlr.KxiParser.*;
 public class KxiFactoryDefault extends AbstractKxiFactory {
     @Override
     public AbstractKxiNode build(ParserRuleContext ctx, Stack<AbstractKxiNode> stack) {
-        if (ctx instanceof VariableDeclarationContext)
-            return new KxiVariableDeclaration(pop(stack)
-                    , new IdentifierToken(getTokenText(((VariableDeclarationContext) ctx).IDENTIFIER()))
-                    , Optional.ofNullable(pop(stack)));
+        if (ctx instanceof VariableDeclarationContext) {
+            VariableDeclarationContext varCtx = (VariableDeclarationContext) ctx;
+            Optional<AbstractKxiExpression> expression;
 
-        else if (ctx instanceof BlockContext) {
-            return new KxiBlock(popList(stack, AbstractKxiStatement.class));
+            if (varCtx.initializer() != null) expression = Optional.of(pop(stack));
+            else expression = Optional.empty();
+
+            return new KxiVariableDeclaration(expression
+                    , new IdentifierToken(getTokenText(varCtx.IDENTIFIER()))
+                    , pop(stack));
+
+        } else if (ctx instanceof BlockContext) {
+            int size = ((BlockContext) ctx).statement().size();
+            return new KxiBlock(popList(stack, size));
 
         } else if (ctx instanceof CompilationUnitContext) {
-            return new KxiMain(new IdentifierToken(getTokenText(((CompilationUnitContext) ctx).IDENTIFIER()))
-                    , popList(stack, KxiClass.class)
-                    , pop(stack));
+            int size = ((CompilationUnitContext) ctx).classDefinition().size();
+            return new KxiMain(pop(stack)
+                    , new IdentifierToken(getTokenText(((CompilationUnitContext) ctx).IDENTIFIER()))
+                    , popList(stack, size));
 
         } else if (ctx instanceof TypeContext) {
             ScalarType scalarType = ScalarType.UNKNOWN;

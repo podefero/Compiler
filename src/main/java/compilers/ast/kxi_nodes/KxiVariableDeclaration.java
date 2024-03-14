@@ -10,8 +10,7 @@ import java.util.Optional;
 
 @AllArgsConstructor
 public class KxiVariableDeclaration extends AbstractKxiNode {
-    private KxiType type;
-    private IdentifierToken id;
     private Optional<AbstractKxiExpression> expressionHuh;
-
+    private IdentifierToken id;
+    private KxiType type;
 }

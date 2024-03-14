@@ -7,7 +7,8 @@ import lombok.AllArgsConstructor;
 import java.util.List;
 
 public class KxiCaseBlockChar extends AbstractKxiCaseBlock<KxiCharCase>{
-    public KxiCaseBlockChar(List<KxiCharCase> cases, List<AbstractKxiStatement> statements) {
-        super(cases, statements);
+
+    public KxiCaseBlockChar(List<AbstractKxiStatement> statements, List<KxiCharCase> cases) {
+        super(statements, cases);
     }
 }

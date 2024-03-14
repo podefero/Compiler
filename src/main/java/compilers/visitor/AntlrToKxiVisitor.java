@@ -120,14 +120,12 @@ public class AntlrToKxiVisitor<Void> extends AbstractParseTreeVisitor<Void> impl
     @Override
     public Void visitInitializer(KxiParser.InitializerContext ctx) {
         visitChildren(ctx);
-        transformNode(ctx);
         return null;
     }
 
     @Override
     public Void visitStatement(KxiParser.StatementContext ctx) {
         visitChildren(ctx);
-        //logic to handle which statement class based on context
         transformNode(ctx);
         return null;
     }

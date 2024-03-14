@@ -6,6 +6,6 @@ import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 public class KxiNewExpressionArgument extends AbstractKxiExpression{
-    private KxiType type;
     private KxiArguments arguments;
+    private KxiType type;
 }

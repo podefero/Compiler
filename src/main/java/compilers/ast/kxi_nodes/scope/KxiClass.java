@@ -8,6 +8,6 @@ import java.util.List;
 
 @AllArgsConstructor
 public class KxiClass extends AbstractKxiScope{
-    private IdentifierToken id;
     private List<KxiAbstractKxiClassMember> classMemberList;
+    private IdentifierToken id;
 }

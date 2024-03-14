@@ -10,7 +10,7 @@ import java.util.List;
 
 @AllArgsConstructor
 public class KxiMain extends AbstractKxiNode {
+    private KxiBlock block;
     private IdentifierToken id;
     private List<KxiClass> classList;
-    private KxiBlock block;
 }

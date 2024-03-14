@@ -5,7 +5,7 @@ import compilers.ast.kxi_nodes.expressions.AbstractKxiExpression;
 
 public abstract class AbstractBinaryArithmicExpression extends AbstractKxiBinaryOperation {
 
-    public AbstractBinaryArithmicExpression(AbstractKxiExpression expressionL, AbstractKxiExpression expressionR) {
+    public AbstractBinaryArithmicExpression(AbstractKxiExpression expressionR, AbstractKxiExpression expressionL) {
         super(expressionL, expressionR);
     }
 }

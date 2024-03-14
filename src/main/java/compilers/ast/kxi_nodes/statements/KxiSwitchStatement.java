@@ -6,6 +6,6 @@ import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 public class KxiSwitchStatement extends AbstractKxiStatement{
-    private AbstractKxiExpression expression;
     private AbstractKxiCaseBlock caseBlock;
+    private AbstractKxiExpression expression;
 }

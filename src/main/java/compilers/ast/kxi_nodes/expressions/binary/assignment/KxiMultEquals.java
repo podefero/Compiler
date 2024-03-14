@@ -4,7 +4,7 @@ import compilers.ast.kxi_nodes.expressions.AbstractKxiExpression;
 
 public class KxiMultEquals extends AbstractBinaryAssignmentExpression {
 
-    public KxiMultEquals(AbstractKxiExpression expressionL, AbstractKxiExpression expressionR) {
-        super(expressionL, expressionR);
+    public KxiMultEquals(AbstractKxiExpression expressionR, AbstractKxiExpression expressionL) {
+        super(expressionR, expressionL);
     }
 }

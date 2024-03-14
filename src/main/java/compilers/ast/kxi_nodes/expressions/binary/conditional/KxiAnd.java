@@ -3,7 +3,7 @@ package compilers.ast.kxi_nodes.expressions.binary.conditional;
 import compilers.ast.kxi_nodes.expressions.AbstractKxiExpression;
 
 public class KxiAnd extends AbstractBinaryConditionalExpression{
-    public KxiAnd(AbstractKxiExpression expressionL, AbstractKxiExpression expressionR) {
-        super(expressionL, expressionR);
+    public KxiAnd(AbstractKxiExpression expressionR, AbstractKxiExpression expressionL) {
+        super(expressionR, expressionL);
     }
 }

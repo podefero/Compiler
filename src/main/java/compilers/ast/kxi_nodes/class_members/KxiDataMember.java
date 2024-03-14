@@ -5,13 +5,13 @@ import compilers.ast.Modifier;
 import compilers.ast.kxi_nodes.KxiType;
 import compilers.ast.kxi_nodes.KxiVariableDeclaration;
 import compilers.ast.kxi_nodes.expressions.token_expression.IdentifierToken;
+import lombok.AllArgsConstructor;
 
+@AllArgsConstructor
 public class KxiDataMember extends KxiAbstractKxiClassMember {
 
     private KxiVariableDeclaration variableDeclaration;
+    private Modifier modifier;
+    boolean isStatic;
 
-    public KxiDataMember(boolean isStatic, Modifier modifier, KxiType type, IdentifierToken id, KxiVariableDeclaration variableDeclaration) {
-        super(isStatic, modifier, type, id);
-        this.variableDeclaration = variableDeclaration;
-    }
 }
