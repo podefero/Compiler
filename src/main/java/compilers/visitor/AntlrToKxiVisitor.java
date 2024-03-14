@@ -3,55 +3,44 @@ package compilers.visitor;
 import compilers.antlr.KxiParser;
 import compilers.antlr.KxiParserVisitor;
 import compilers.ast.AbstractKxiNode;
-import compilers.ast.kxi_nodes.KxiCharCase;
-import compilers.ast.kxi_nodes.KxiMain;
-import compilers.ast.kxi_nodes.KxiParameter;
-import compilers.ast.kxi_nodes.KxiVariableDeclaration;
-import compilers.ast.kxi_nodes.class_members.KxiConstructor;
-import compilers.ast.kxi_nodes.class_members.KxiDataMember;
-import compilers.ast.kxi_nodes.class_members.KxiMethod;
-import compilers.ast.kxi_nodes.scope.KxiBlock;
-import compilers.ast.kxi_nodes.scope.KxiCaseBlockInt;
-import compilers.ast.kxi_nodes.scope.KxiClass;
-import compilers.ast.kxi_nodes.statements.KxiBreakStatement;
-import compilers.transform.kxi.KxiFactoryExpression;
+import compilers.transform.kxi.AbstractKxiFactory;
+import compilers.transform.kxi.KxiFactoryBase;
 import compilers.util.KxiParseHelper;
 import lombok.Getter;
+import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.AbstractParseTreeVisitor;
 
-import java.util.ArrayDeque;
-import java.util.Queue;
+import java.util.Stack;
 
 @Getter
 public class AntlrToKxiVisitor<Void> extends AbstractParseTreeVisitor<Void> implements KxiParserVisitor<Void> {
-    private Queue<AbstractKxiNode> nodeQueue;
+    private final Stack<AbstractKxiNode> nodeStack;
     private AbstractKxiNode rootNode;
-    private KxiParseHelper parseHelper;
+    private final KxiParseHelper parseHelper;
+    private final AbstractKxiFactory factory;
 
     public AntlrToKxiVisitor() {
-        nodeQueue = new ArrayDeque<>();
+        nodeStack = new Stack<>();
         parseHelper = new KxiParseHelper();
+        factory = new KxiFactoryBase();
     }
 
-    private void addToQue(AbstractKxiNode kxiNode) {
-        nodeQueue.add(kxiNode);
-    }
-
-    private AbstractKxiNode pop() {
-        return nodeQueue.poll();
+    private void transformNode(ParserRuleContext ctx) {
+        nodeStack.push(factory.build(ctx, nodeStack));
     }
 
     @Override
     public Void visitCompilationUnit(KxiParser.CompilationUnitContext ctx) {
         visitChildren(ctx);
-        addToQue(new KxiMain());
+        transformNode(ctx);
+        rootNode = nodeStack.pop();
         return null;
     }
 
     @Override
     public Void visitClassDefinition(KxiParser.ClassDefinitionContext ctx) {
         visitChildren(ctx);
-        addToQue(new KxiClass());
+        transformNode(ctx);
         return null;
     }
 
@@ -63,7 +52,7 @@ public class AntlrToKxiVisitor<Void> extends AbstractParseTreeVisitor<Void> impl
 
     @Override
     public Void visitType(KxiParser.TypeContext ctx) {
-        //figure out from parent context
+        transformNode(ctx);
         return null;
     }
 
@@ -83,21 +72,21 @@ public class AntlrToKxiVisitor<Void> extends AbstractParseTreeVisitor<Void> impl
     @Override
     public Void visitDataMemberDeclaration(KxiParser.DataMemberDeclarationContext ctx) {
         visitChildren(ctx);
-        addToQue(new KxiDataMember());
+        transformNode(ctx);
         return null;
     }
 
     @Override
     public Void visitMethodDeclaration(KxiParser.MethodDeclarationContext ctx) {
         visitChildren(ctx);
-        addToQue(new KxiMethod());
+        transformNode(ctx);
         return null;
     }
 
     @Override
     public Void visitConstructorDeclaration(KxiParser.ConstructorDeclarationContext ctx) {
         visitChildren(ctx);
-        addToQue(new KxiConstructor());
+        transformNode(ctx);
         return null;
     }
 
@@ -117,21 +106,21 @@ public class AntlrToKxiVisitor<Void> extends AbstractParseTreeVisitor<Void> impl
     @Override
     public Void visitParameter(KxiParser.ParameterContext ctx) {
         //don't need to visit children here
-        addToQue(new KxiParameter());
+        transformNode(ctx);
         return null;
     }
 
     @Override
     public Void visitVariableDeclaration(KxiParser.VariableDeclarationContext ctx) {
         visitChildren(ctx);
-        addToQue(new KxiVariableDeclaration());
+        transformNode(ctx);
         return null;
     }
 
     @Override
     public Void visitInitializer(KxiParser.InitializerContext ctx) {
         visitChildren(ctx);
-        //don't need this on stack
+        transformNode(ctx);
         return null;
     }
 
@@ -139,36 +128,35 @@ public class AntlrToKxiVisitor<Void> extends AbstractParseTreeVisitor<Void> impl
     public Void visitStatement(KxiParser.StatementContext ctx) {
         visitChildren(ctx);
         //logic to handle which statement class based on context
-        addToQue(new KxiBreakStatement()); //placeholder
+        transformNode(ctx);
         return null;
     }
 
     @Override
     public Void visitBlock(KxiParser.BlockContext ctx) {
         visitChildren(ctx);
-        addToQue(new KxiBlock());
+        transformNode(ctx);
         return null;
     }
 
     @Override
     public Void visitCaseBlock(KxiParser.CaseBlockContext ctx) {
         visitChildren(ctx);
-        addToQue(new KxiCaseBlockInt());
+        transformNode(ctx);
         return null;
     }
 
     @Override
     public Void visitCase(KxiParser.CaseContext ctx) {
         visitChildren(ctx);
-        addToQue(new KxiCharCase()); //placeholder
+        transformNode(ctx);
         return null;
     }
 
     @Override
     public Void visitExpression(KxiParser.ExpressionContext ctx) {
         visitChildren(ctx);
-        //KxiFactoryExpression factoryExpression = new KxiFactoryExpression(ctx, nodeQueue);
-        //addToQue(factoryExpression.build());
+        transformNode(ctx);
         return null;
     }
 

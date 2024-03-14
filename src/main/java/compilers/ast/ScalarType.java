@@ -6,5 +6,6 @@ public enum ScalarType {
     CHAR,
     BOOL,
     STRING,
-    ID
+    ID,
+    UNKNOWN
 }
