@@ -1,16 +1,16 @@
 package compilers.ast.kxi_nodes.expressions.token_expression;
 
-public class StringLitToken extends TokenType<String> {
-    private String value;
+import compilers.ast.ScalarType;
 
-    public StringLitToken(String tokenText) {
-        super(tokenText);
+public class StringLitToken extends TokenType<String> {
+    public StringLitToken(String tokenText, ScalarType scalarType) {
+        super(tokenText, scalarType);
         value = tokenText;
     }
 
 
     @Override
-    public String getValue() {
+    public String getTokenText() {
         EncodeCharacters encodeCharacters = new EncodeCharacters();
         return encodeCharacters.encodeText(value);
     }

@@ -1,17 +1,18 @@
 package compilers.ast.kxi_nodes.expressions.token_expression;
 
-public class BoolToken extends TokenType<Boolean> {
-    private boolean value;
+import compilers.ast.ScalarType;
 
-    public BoolToken(String tokenText) {
-        super(tokenText);
+public class BoolToken extends TokenType<Boolean> {
+
+
+    public BoolToken(String tokenText, ScalarType scalarType) {
+        super(tokenText, scalarType);
         if(tokenText.equals("false")) value = false;
         else if(tokenText.equals("true")) value = true;
     }
 
-
     @Override
-    public Boolean getValue() {
+    public Boolean getTokenText() {
         return value;
     }
 }

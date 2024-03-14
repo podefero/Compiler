@@ -1,14 +1,17 @@
 package compilers.transform.kxi;
 
 import compilers.ast.AbstractKxiNode;
+import compilers.ast.Modifier;
 import compilers.ast.ScalarType;
 import compilers.ast.kxi_nodes.KxiMain;
 import compilers.ast.kxi_nodes.KxiType;
 import compilers.ast.kxi_nodes.KxiVariableDeclaration;
+import compilers.ast.kxi_nodes.class_members.KxiDataMember;
 import compilers.ast.kxi_nodes.expressions.AbstractKxiExpression;
 import compilers.ast.kxi_nodes.expressions.token_expression.IdentifierToken;
 import compilers.ast.kxi_nodes.other.KxiInvalidNode;
 import compilers.ast.kxi_nodes.scope.KxiBlock;
+import compilers.ast.kxi_nodes.scope.KxiClass;
 import org.antlr.v4.runtime.ParserRuleContext;
 
 import java.util.Optional;
@@ -27,7 +30,7 @@ public class KxiFactoryDefault extends AbstractKxiFactory {
             else expression = Optional.empty();
 
             return new KxiVariableDeclaration(expression
-                    , new IdentifierToken(getTokenText(varCtx.IDENTIFIER()))
+                    , new IdentifierToken(getTokenText(varCtx.IDENTIFIER()), ScalarType.ID)
                     , pop(stack));
 
         } else if (ctx instanceof BlockContext) {
@@ -37,7 +40,7 @@ public class KxiFactoryDefault extends AbstractKxiFactory {
         } else if (ctx instanceof CompilationUnitContext) {
             int size = ((CompilationUnitContext) ctx).classDefinition().size();
             return new KxiMain(pop(stack)
-                    , new IdentifierToken(getTokenText(((CompilationUnitContext) ctx).IDENTIFIER()))
+                    , new IdentifierToken(getTokenText(((CompilationUnitContext) ctx).IDENTIFIER()), ScalarType.ID)
                     , popList(stack, size));
 
         } else if (ctx instanceof TypeContext) {
@@ -51,6 +54,19 @@ public class KxiFactoryDefault extends AbstractKxiFactory {
             else if (scalarTypeContext.STRING() != null) scalarType = ScalarType.STRING;
             else if (scalarTypeContext.IDENTIFIER() != null) scalarType = ScalarType.ID;
             return new KxiType(scalarType, numArrays);
+
+        } else if (ctx instanceof ClassDefinitionContext) {
+            int size = ((ClassDefinitionContext) ctx).classMemberDefinition().size();
+            return new KxiClass(popList(stack, size)
+                    , new IdentifierToken(getTokenText(((ClassDefinitionContext) ctx).IDENTIFIER()), ScalarType.ID));
+        } else if (ctx instanceof DataMemberDeclarationContext) {
+            DataMemberDeclarationContext dataMemberDeclarationContext = (DataMemberDeclarationContext) ctx;
+            Modifier modifier;
+            boolean isStatic = false;
+            if (dataMemberDeclarationContext.modifier().PRIVATE() != null) modifier = Modifier.PRIVATE;
+            else modifier = Modifier.PUBLIC;
+            if (dataMemberDeclarationContext.STATIC() != null) isStatic = true;
+            return new KxiDataMember(pop(stack), modifier, isStatic);
         }
         return new KxiInvalidNode(Optional.ofNullable(ctx), Optional.ofNullable(stack), Optional.empty());
     }

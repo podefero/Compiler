@@ -144,7 +144,7 @@ public class LexerTest {
             }
         }
         if (processedType != null)
-            assertEquals(expected, processedType.getValue());
+            assertEquals(expected, processedType.getTokenText());
         else {
             printTokens(tokens);
             fail("processedType is null");

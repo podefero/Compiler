@@ -7,5 +7,7 @@ public enum ScalarType {
     BOOL,
     STRING,
     ID,
+    NULL,
+    THIS,
     UNKNOWN
 }

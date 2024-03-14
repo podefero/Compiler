@@ -1,6 +1,7 @@
 package compilers.transform.kxi;
 
 import compilers.ast.AbstractKxiNode;
+import compilers.ast.kxi_nodes.statements.KxiExpressionStatement;
 import compilers.ast.kxi_nodes.statements.KxiVariableDeclarationStatement;
 import org.antlr.v4.runtime.ParserRuleContext;
 
@@ -13,8 +14,10 @@ public class KxiFactoryStatement extends AbstractKxiFactory{
     public AbstractKxiNode build(ParserRuleContext ctx, Stack<AbstractKxiNode> stack) {
         StatementContext statementContext = (StatementContext) ctx;
 
-        if(((StatementContext) ctx).variableDeclaration() != null) {
+        if(statementContext.variableDeclaration() != null) {
             return new KxiVariableDeclarationStatement(pop(stack));
+        } else if (!statementContext.expression().isEmpty() && statementContext.SEMICOLON() != null) {
+            return new KxiExpressionStatement(pop(stack));
         }
 
         return super.build(ctx, stack);

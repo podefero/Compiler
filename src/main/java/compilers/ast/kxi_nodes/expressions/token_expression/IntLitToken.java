@@ -1,16 +1,17 @@
 package compilers.ast.kxi_nodes.expressions.token_expression;
 
-public class IntLitToken extends TokenType<Integer> {
-    private int value;
+import compilers.ast.ScalarType;
 
-    public IntLitToken(String tokenText) {
-        super(tokenText);
+public class IntLitToken extends TokenType<Integer> {
+
+    public IntLitToken(String tokenText, ScalarType scalarType) {
+        super(tokenText, scalarType);
         value = Integer.parseInt(tokenText);
     }
 
 
     @Override
-    public Integer getValue() {
+    public Integer getTokenText() {
         return value;
     }
 }

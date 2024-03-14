@@ -2,6 +2,7 @@ package compilers.transform.kxi;
 
 
 import compilers.ast.AbstractKxiNode;
+import compilers.ast.ScalarType;
 import compilers.ast.kxi_nodes.expressions.*;
 import compilers.ast.kxi_nodes.expressions.binary.arithmic.KxiDiv;
 import compilers.ast.kxi_nodes.expressions.binary.arithmic.KxiMult;
@@ -86,28 +87,28 @@ public class KxiFactoryExpression extends AbstractKxiFactory {
                 case LPARENTH:
                     return new KxiParenthExpression(pop(stack));
                 case INTLIT:
-                    return new IntLitToken(getTokenText(expressionContext.INTLIT()));
+                    return new IntLitToken(getTokenText(expressionContext.INTLIT()), ScalarType.INT);
                 case CHARLIT:
-                    return new CharLitToken(getTokenText(expressionContext.CHARLIT()));
+                    return new CharLitToken(getTokenText(expressionContext.CHARLIT()), ScalarType.CHAR);
                 case STRINGLIT:
-                    return new StringLitToken(getTokenText(expressionContext.STRINGLIT()));
+                    return new StringLitToken(getTokenText(expressionContext.STRINGLIT()), ScalarType.STRING);
                 case TRUE:
-                    return new BoolToken(getTokenText(expressionContext.TRUE()));
+                    return new BoolToken(getTokenText(expressionContext.TRUE()), ScalarType.BOOL);
                 case FALSE:
-                    return new BoolToken(getTokenText(expressionContext.FALSE()));
+                    return new BoolToken(getTokenText(expressionContext.FALSE()), ScalarType.BOOL);
                 case NULL:
-                    return new NullToken(getTokenText(expressionContext.NULL()));
+                    return new NullToken(getTokenText(expressionContext.NULL()), ScalarType.NULL);
                 case THIS:
-                    return new ThisToken(getTokenText(expressionContext.THIS()));
+                    return new ThisToken(getTokenText(expressionContext.THIS()), ScalarType.THIS);
                 case IDENTIFIER:
-                    return new IdentifierToken(getTokenText(expressionContext.IDENTIFIER()));
+                    return new IdentifierToken(getTokenText(expressionContext.IDENTIFIER()), ScalarType.ID);
                 case NEW:
                     if (expressionContext.index() != null)
                         return new KxiNewExpressionIndex(pop(stack), pop(stack));
                     else
                         return new KxiNewExpressionArgument(pop(stack), pop(stack));
                 case DOT:
-                    return new KxiDotExpression(pop(stack), new IdentifierToken(getTokenText(expressionContext.IDENTIFIER())));
+                    return new KxiDotExpression(pop(stack), new IdentifierToken(getTokenText(expressionContext.IDENTIFIER()), ScalarType.ID));
                 default:
                     return super.build(ctx, stack);
             }
