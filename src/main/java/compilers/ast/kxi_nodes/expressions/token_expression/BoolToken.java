@@ -5,8 +5,9 @@ import compilers.ast.ScalarType;
 public class BoolToken extends TokenType<Boolean> {
 
 
-    public BoolToken(String tokenText, ScalarType scalarType) {
-        super(tokenText, scalarType);
+    public BoolToken(String tokenText) {
+        super(tokenText);
+        scalarType = ScalarType.BOOL;
         if(tokenText.equals("false")) value = false;
         else if(tokenText.equals("true")) value = true;
     }

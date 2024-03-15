@@ -9,12 +9,13 @@ import compilers.ast.kxi_nodes.scope.KxiBlock;
 import lombok.AllArgsConstructor;
 
 import java.util.List;
+import java.util.Optional;
 
 @AllArgsConstructor
 public class KxiMethod extends KxiAbstractKxiClassMember {
 
     private KxiBlock block;
-    private List<KxiParameter> parameters;
+    private Optional<List<KxiParameter>> parameters;
     private KxiType type;
     private Modifier modifier;
     boolean isStatic;

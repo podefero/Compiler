@@ -4,8 +4,9 @@ import compilers.ast.ScalarType;
 
 public class NullToken extends TokenType<String> {
 
-    public NullToken(String tokenText, ScalarType scalarType) {
-        super(tokenText, scalarType);
+    public NullToken(String tokenText) {
+        super(tokenText);
+        scalarType = ScalarType.NULL;
         value = tokenText;
     }
 

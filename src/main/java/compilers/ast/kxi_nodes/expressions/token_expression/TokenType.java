@@ -7,8 +7,7 @@ public abstract class TokenType<T> extends AbstractKxiExpression {
     protected T value;
     protected ScalarType scalarType;
 
-    public TokenType(String tokenText, ScalarType scalarType) {
-        this.scalarType = scalarType;
+    public TokenType(String tokenText) {
 
     }
 

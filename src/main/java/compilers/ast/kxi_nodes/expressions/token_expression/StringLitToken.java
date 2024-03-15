@@ -3,8 +3,9 @@ package compilers.ast.kxi_nodes.expressions.token_expression;
 import compilers.ast.ScalarType;
 
 public class StringLitToken extends TokenType<String> {
-    public StringLitToken(String tokenText, ScalarType scalarType) {
-        super(tokenText, scalarType);
+    public StringLitToken(String tokenText) {
+        super(tokenText);
+        scalarType = ScalarType.STRING;
         value = tokenText;
     }
 

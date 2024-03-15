@@ -15,18 +15,18 @@ public class TokenProcessor {
     public TokenType getTokenType(Token token) {
         switch (token.getType()) {
             case KxiLexer.INTLIT:
-                return new IntLitToken(token.getText(), ScalarType.INT);
+                return new IntLitToken(token.getText());
             case KxiLexer.STRINGLIT:
-                return new StringLitToken(token.getText(), ScalarType.STRING);
+                return new StringLitToken(token.getText());
             case KxiLexer.CHARLIT:
-                return new CharLitToken(token.getText(), ScalarType.CHAR);
+                return new CharLitToken(token.getText());
             case KxiLexer.TRUE:
             case KxiLexer.FALSE:
-                return new BoolToken(token.getText(), ScalarType.BOOL);
+                return new BoolToken(token.getText());
             case KxiLexer.IDENTIFIER:
-                return new IdentifierToken(token.getText(), ScalarType.ID);
+                return new IdentifierToken(token.getText());
             default:
-                return new DefaultToken(token.getText(), ScalarType.UNKNOWN);
+                return new DefaultToken(token.getText());
 
         }
     }

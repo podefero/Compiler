@@ -5,6 +5,6 @@ import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 public class KxiNewExpressionIndex extends AbstractKxiExpression{
-    private KxiExpressionIndex index;
+    private AbstractKxiExpression index;
     private KxiType type;
 }

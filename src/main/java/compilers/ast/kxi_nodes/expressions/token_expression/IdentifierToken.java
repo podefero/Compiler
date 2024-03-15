@@ -4,8 +4,9 @@ import compilers.ast.ScalarType;
 
 public class IdentifierToken extends TokenType<String> {
 
-    public IdentifierToken(String tokenText, ScalarType scalarType) {
-        super(tokenText, scalarType);
+    public IdentifierToken(String tokenText) {
+        super(tokenText);
+        scalarType = ScalarType.ID;
         value = tokenText;
     }
 

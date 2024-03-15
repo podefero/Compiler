@@ -4,8 +4,9 @@ import compilers.ast.ScalarType;
 
 public class IntLitToken extends TokenType<Integer> {
 
-    public IntLitToken(String tokenText, ScalarType scalarType) {
-        super(tokenText, scalarType);
+    public IntLitToken(String tokenText) {
+        super(tokenText);
+        scalarType = ScalarType.INT;
         value = Integer.parseInt(tokenText);
     }
 

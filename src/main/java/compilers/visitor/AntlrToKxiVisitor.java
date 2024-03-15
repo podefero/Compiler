@@ -3,6 +3,7 @@ package compilers.visitor;
 import compilers.antlr.KxiParser;
 import compilers.antlr.KxiParserVisitor;
 import compilers.ast.AbstractKxiNode;
+import compilers.ast.kxi_nodes.other.KxiInvalidNode;
 import compilers.transform.kxi.AbstractKxiFactory;
 import compilers.transform.kxi.KxiFactoryBase;
 import compilers.util.KxiParseHelper;
@@ -27,6 +28,11 @@ public class AntlrToKxiVisitor<Void> extends AbstractParseTreeVisitor<Void> impl
 
     private void transformNode(ParserRuleContext ctx) {
         nodeStack.push(factory.build(ctx, nodeStack));
+//        try {
+//            nodeStack.push(factory.build(ctx, nodeStack));
+//        } catch (ClassCastException ex) {
+//            nodeStack.push(new KxiInvalidNode(ctx, nodeStack, ex));
+//        }
     }
 
     @Override
@@ -105,7 +111,7 @@ public class AntlrToKxiVisitor<Void> extends AbstractParseTreeVisitor<Void> impl
 
     @Override
     public Void visitParameter(KxiParser.ParameterContext ctx) {
-        //don't need to visit children here
+        visitChildren(ctx);
         transformNode(ctx);
         return null;
     }

@@ -4,8 +4,9 @@ import compilers.ast.ScalarType;
 
 public class DefaultToken extends TokenType<String> {
 
-    public DefaultToken(String tokenText, ScalarType scalarType) {
-        super(tokenText, scalarType);
+    public DefaultToken(String tokenText) {
+        super(tokenText);
+        scalarType = ScalarType.UNKNOWN;
         value = tokenText;
     }
 

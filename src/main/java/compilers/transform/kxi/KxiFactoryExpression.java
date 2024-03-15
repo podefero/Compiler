@@ -2,7 +2,7 @@ package compilers.transform.kxi;
 
 
 import compilers.ast.AbstractKxiNode;
-import compilers.ast.ScalarType;
+import compilers.ast.kxi_nodes.KxiCase;
 import compilers.ast.kxi_nodes.expressions.*;
 import compilers.ast.kxi_nodes.expressions.binary.arithmic.KxiDiv;
 import compilers.ast.kxi_nodes.expressions.binary.arithmic.KxiMult;
@@ -14,6 +14,7 @@ import compilers.ast.kxi_nodes.expressions.token_expression.*;
 import compilers.ast.kxi_nodes.expressions.uni.KxiNot;
 import compilers.ast.kxi_nodes.expressions.uni.KxiUniPlus;
 import compilers.ast.kxi_nodes.expressions.uni.KxiUniSubtract;
+import compilers.ast.kxi_nodes.other.KxiInvalidNode;
 import compilers.util.KxiParseHelper;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.TerminalNode;
@@ -28,15 +29,22 @@ public class KxiFactoryExpression extends AbstractKxiFactory {
     @Override
     public AbstractKxiNode build(ParserRuleContext ctx, Stack<AbstractKxiNode> stack) {
         ExpressionContext expressionContext = (ExpressionContext) ctx;
-        KxiParseHelper parseHelper = new KxiParseHelper();
-        TerminalNode terminalNode = parseHelper.findFirstTerminal(ctx.children);
-        int type = parseHelper.getTokenType(terminalNode);
+
 
         //Expression with only non-terminals
         if (expressionContext.expression(0) != null && expressionContext.index() != null)
             return new KxiExpressionIndex(pop(stack), pop(stack));
-        else if (expressionContext.expression(0) != null && expressionContext.arguments() != null)
-            return new KxiExpressionArguments(pop(stack), pop(stack));
+        else if (expressionContext.expression(0) != null && expressionContext.arguments() != null) {
+            if (expressionContext.arguments().argumentList() != null)
+                return new KxiExpressionArguments(popList(stack, getListSizeFromCtx(expressionContext.arguments().argumentList().expression()))
+                        , pop(stack));
+            else
+                return new KxiExpressionArguments(popList(stack, 0), pop(stack));
+        }
+
+        KxiParseHelper parseHelper = new KxiParseHelper();
+        TerminalNode terminalNode = parseHelper.findFirstTerminal(ctx.children);
+        int type = parseHelper.getTokenType(terminalNode);
 
         //handle the pattern expression terminal expression
         if (ctx.children.size() == 3) {
@@ -71,8 +79,10 @@ public class KxiFactoryExpression extends AbstractKxiFactory {
                     return new KxiAnd(pop(stack), pop(stack));
                 case OR:
                     return new KxiOr(pop(stack), pop(stack));
+                case DOT:
+                    return new KxiDotExpression(pop(stack), new IdentifierToken(getTokenText(expressionContext.IDENTIFIER())));
                 default:
-                    return super.build(ctx, stack);
+                    break;
             }
         }
         //handle other expression with terminal
@@ -87,32 +97,34 @@ public class KxiFactoryExpression extends AbstractKxiFactory {
                 case LPARENTH:
                     return new KxiParenthExpression(pop(stack));
                 case INTLIT:
-                    return new IntLitToken(getTokenText(expressionContext.INTLIT()), ScalarType.INT);
+                    return new IntLitToken(getTokenText(expressionContext.INTLIT()));
                 case CHARLIT:
-                    return new CharLitToken(getTokenText(expressionContext.CHARLIT()), ScalarType.CHAR);
+                    return new CharLitToken(getTokenText(expressionContext.CHARLIT()));
                 case STRINGLIT:
-                    return new StringLitToken(getTokenText(expressionContext.STRINGLIT()), ScalarType.STRING);
+                    return new StringLitToken(getTokenText(expressionContext.STRINGLIT()));
                 case TRUE:
-                    return new BoolToken(getTokenText(expressionContext.TRUE()), ScalarType.BOOL);
+                    return new BoolToken(getTokenText(expressionContext.TRUE()));
                 case FALSE:
-                    return new BoolToken(getTokenText(expressionContext.FALSE()), ScalarType.BOOL);
+                    return new BoolToken(getTokenText(expressionContext.FALSE()));
                 case NULL:
-                    return new NullToken(getTokenText(expressionContext.NULL()), ScalarType.NULL);
+                    return new NullToken(getTokenText(expressionContext.NULL()));
                 case THIS:
-                    return new ThisToken(getTokenText(expressionContext.THIS()), ScalarType.THIS);
+                    return new ThisToken(getTokenText(expressionContext.THIS()));
                 case IDENTIFIER:
-                    return new IdentifierToken(getTokenText(expressionContext.IDENTIFIER()), ScalarType.ID);
+                    return new IdentifierToken(getTokenText(expressionContext.IDENTIFIER()));
                 case NEW:
                     if (expressionContext.index() != null)
                         return new KxiNewExpressionIndex(pop(stack), pop(stack));
-                    else
-                        return new KxiNewExpressionArgument(pop(stack), pop(stack));
-                case DOT:
-                    return new KxiDotExpression(pop(stack), new IdentifierToken(getTokenText(expressionContext.IDENTIFIER()), ScalarType.ID));
+                    else {
+                        if (expressionContext.arguments().argumentList() != null)
+                            return new KxiNewExpressionArgument(popList(stack, getListSizeFromCtx(expressionContext.arguments().argumentList().expression()))
+                                    , pop(stack));
+
+                    }
                 default:
-                    return super.build(ctx, stack);
+                    break;
             }
         }
-
+        return new KxiInvalidNode(ctx, stack, null);
     }
 }

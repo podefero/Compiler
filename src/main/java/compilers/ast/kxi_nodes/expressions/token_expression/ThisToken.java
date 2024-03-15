@@ -4,8 +4,9 @@ import compilers.ast.ScalarType;
 
 public class ThisToken extends TokenType<String> {
 
-    public ThisToken(String tokenText, ScalarType scalarType) {
-        super(tokenText, scalarType);
+    public ThisToken(String tokenText) {
+        super(tokenText);
+        scalarType = ScalarType.THIS;
         value = tokenText;
     }
 
