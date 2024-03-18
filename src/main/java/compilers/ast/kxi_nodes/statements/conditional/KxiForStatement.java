@@ -10,7 +10,7 @@ public class KxiForStatement extends AbstractKxiConditionalStatement {
     private Optional<AbstractKxiExpression> postExpression;
     private Optional<AbstractKxiExpression> preExpression;
 
-    public KxiForStatement(AbstractKxiStatement statement, Optional<AbstractKxiExpression> postExpression, AbstractBinaryConditionalExpression conditionalExpression,  Optional<AbstractKxiExpression> preExpression ) {
+    public KxiForStatement(AbstractKxiStatement statement, Optional<AbstractKxiExpression> postExpression, AbstractKxiExpression conditionalExpression,  Optional<AbstractKxiExpression> preExpression ) {
         super(statement, conditionalExpression);
         this.preExpression = preExpression;
         this.postExpression = postExpression;

@@ -1,6 +1,7 @@
 package compilers.transform;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Stack;
 
@@ -31,6 +32,7 @@ public abstract class AbstractFactory<Source, Destination> {
         for (int i = 0; i < size; i++) {
             list.add(pop(stack));
         }
+        Collections.reverse(list);
         return list;
     }
 

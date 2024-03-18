@@ -1,7 +1,7 @@
 package compilers.transform.kxi;
 
 import compilers.antlr.KxiParser;
-import compilers.ast.AbstractKxiNode;
+import compilers.ast.kxi_nodes.AbstractKxiNode;
 import compilers.transform.AbstractFactory;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.TerminalNode;

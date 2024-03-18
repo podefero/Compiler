@@ -1,6 +1,5 @@
 package compilers.ast.kxi_nodes;
 
-import compilers.ast.AbstractKxiNode;
 import compilers.ast.kxi_nodes.statements.AbstractKxiStatement;
 import lombok.AllArgsConstructor;
 

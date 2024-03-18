@@ -1,6 +1,6 @@
 package compilers.ast.kxi_nodes.expressions.token_expression;
 
-import compilers.ast.ScalarType;
+import compilers.ast.kxi_nodes.ScalarType;
 import compilers.ast.kxi_nodes.expressions.AbstractKxiExpression;
 
 public abstract class TokenType<T> extends AbstractKxiExpression {

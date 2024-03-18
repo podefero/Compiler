@@ -1,8 +1,7 @@
 package compilers.transform.kxi;
 
 
-import compilers.ast.AbstractKxiNode;
-import compilers.ast.kxi_nodes.KxiCase;
+import compilers.ast.kxi_nodes.AbstractKxiNode;
 import compilers.ast.kxi_nodes.expressions.*;
 import compilers.ast.kxi_nodes.expressions.binary.arithmic.KxiDiv;
 import compilers.ast.kxi_nodes.expressions.binary.arithmic.KxiMult;
@@ -19,6 +18,7 @@ import compilers.util.KxiParseHelper;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
+import java.util.Optional;
 import java.util.Stack;
 
 import static compilers.antlr.KxiParser.*;
@@ -73,6 +73,10 @@ public class KxiFactoryExpression extends AbstractKxiFactory {
                     return new KxiNotEquals(pop(stack), pop(stack));
                 case LESSTHEN:
                     return new KxiLessThen(pop(stack), pop(stack));
+                case GREATERTHEN:
+                    return new KxiGreaterThen(pop(stack), pop(stack));
+                case LESSEQUALS:
+                    return new KxiLessEqualsThen(pop(stack), pop(stack));
                 case GREATEREQUALS:
                     return new KxiGreaterEqualsThen(pop(stack), pop(stack));
                 case AND:
@@ -81,6 +85,20 @@ public class KxiFactoryExpression extends AbstractKxiFactory {
                     return new KxiOr(pop(stack), pop(stack));
                 case DOT:
                     return new KxiDotExpression(pop(stack), new IdentifierToken(getTokenText(expressionContext.IDENTIFIER())));
+                case LPARENTH:
+                    return new KxiParenthExpression(pop(stack));
+                case NEW:
+                    if (expressionContext.index() != null)
+                        return new KxiNewExpressionIndex(pop(stack), pop(stack));
+                    else {
+                        if (expressionContext.arguments().argumentList() != null)
+                            return new KxiNewExpressionArgument(Optional.of(popList(stack, getListSizeFromCtx(expressionContext.arguments().argumentList().expression())))
+                                    , new IdentifierToken(getTokenText(expressionContext.IDENTIFIER())));
+                        else
+                            return new KxiNewExpressionArgument(Optional.empty(), new IdentifierToken(getTokenText(expressionContext.IDENTIFIER())));
+
+
+                    }
                 default:
                     break;
             }
@@ -94,8 +112,6 @@ public class KxiFactoryExpression extends AbstractKxiFactory {
                     return new KxiUniPlus(pop(stack));
                 case SUBTRACT:
                     return new KxiUniSubtract(pop(stack));
-                case LPARENTH:
-                    return new KxiParenthExpression(pop(stack));
                 case INTLIT:
                     return new IntLitToken(getTokenText(expressionContext.INTLIT()));
                 case CHARLIT:
@@ -112,15 +128,6 @@ public class KxiFactoryExpression extends AbstractKxiFactory {
                     return new ThisToken(getTokenText(expressionContext.THIS()));
                 case IDENTIFIER:
                     return new IdentifierToken(getTokenText(expressionContext.IDENTIFIER()));
-                case NEW:
-                    if (expressionContext.index() != null)
-                        return new KxiNewExpressionIndex(pop(stack), pop(stack));
-                    else {
-                        if (expressionContext.arguments().argumentList() != null)
-                            return new KxiNewExpressionArgument(popList(stack, getListSizeFromCtx(expressionContext.arguments().argumentList().expression()))
-                                    , pop(stack));
-
-                    }
                 default:
                     break;
             }

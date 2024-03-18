@@ -1,4 +1,4 @@
-package compilers.ast;
+package compilers.ast.kxi_nodes;
 
 import compilers.visitor.Visitor;
 

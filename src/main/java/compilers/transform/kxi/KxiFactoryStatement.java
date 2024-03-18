@@ -1,7 +1,6 @@
 package compilers.transform.kxi;
 
-import compilers.ast.AbstractKxiNode;
-import compilers.ast.kxi_nodes.KxiCase;
+import compilers.ast.kxi_nodes.AbstractKxiNode;
 import compilers.ast.kxi_nodes.expressions.AbstractKxiExpression;
 import compilers.ast.kxi_nodes.expressions.binary.conditional.AbstractBinaryConditionalExpression;
 import compilers.ast.kxi_nodes.statements.*;
@@ -31,9 +30,9 @@ public class KxiFactoryStatement extends AbstractKxiFactory {
 
         } else if (statementContext.IF() != null) {
             if (statementContext.ELSE() != null)
-                return new KxiIfStatement(Optional.empty(), pop(stack), pop(stack));
-            else
                 return new KxiIfStatement(Optional.of(pop(stack)), pop(stack), pop(stack));
+            else
+                return new KxiIfStatement(Optional.empty(), pop(stack), pop(stack));
 
         } else if (statementContext.WHILE() != null) {
             return new KxiWhileStatement(pop(stack), pop(stack));

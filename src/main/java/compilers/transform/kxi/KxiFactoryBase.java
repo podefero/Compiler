@@ -1,6 +1,6 @@
 package compilers.transform.kxi;
 
-import compilers.ast.AbstractKxiNode;
+import compilers.ast.kxi_nodes.AbstractKxiNode;
 import org.antlr.v4.runtime.ParserRuleContext;
 
 import java.util.Stack;

@@ -59,7 +59,8 @@ expression : expression EQUALS expression
             | NULL
             | THIS
             | IDENTIFIER
-            | NEW type (arguments | index)
+            | NEW type index
+            | NEW IDENTIFIER arguments
             | expression DOT IDENTIFIER
             | expression index
             | expression arguments ;

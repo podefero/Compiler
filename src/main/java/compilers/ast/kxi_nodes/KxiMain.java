@@ -1,6 +1,5 @@
 package compilers.ast.kxi_nodes;
 
-import compilers.ast.AbstractKxiNode;
 import compilers.ast.kxi_nodes.expressions.token_expression.IdentifierToken;
 import compilers.ast.kxi_nodes.scope.KxiBlock;
 import compilers.ast.kxi_nodes.scope.KxiClass;

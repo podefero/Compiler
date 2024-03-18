@@ -1,18 +1,17 @@
-package compilers.ast.kxi_nodes.class_members;
+package compilers.ast.kxi_nodes;
 
-
-import compilers.ast.kxi_nodes.KxiParameter;
 import compilers.ast.kxi_nodes.expressions.token_expression.IdentifierToken;
 import compilers.ast.kxi_nodes.scope.KxiBlock;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 import java.util.List;
 import java.util.Optional;
 
 @AllArgsConstructor
-public class KxiConstructor extends KxiAbstractKxiClassMember {
+@Getter
+public class KxiMethodSuffixHelper extends AbstractKxiNode {
     private KxiBlock block;
     private Optional<List<KxiParameter>> parameters;
     private IdentifierToken id;
-
 }

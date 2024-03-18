@@ -1,9 +1,10 @@
 package compilers.transform.kxi;
 
-import compilers.ast.AbstractKxiNode;
-import compilers.ast.Modifier;
-import compilers.ast.ScalarType;
+import compilers.ast.kxi_nodes.AbstractKxiNode;
+import compilers.ast.kxi_nodes.Modifier;
+import compilers.ast.kxi_nodes.ScalarType;
 import compilers.ast.kxi_nodes.*;
+import compilers.ast.kxi_nodes.class_members.KxiConstructor;
 import compilers.ast.kxi_nodes.class_members.KxiDataMember;
 import compilers.ast.kxi_nodes.class_members.KxiMethod;
 import compilers.ast.kxi_nodes.expressions.AbstractKxiExpression;
@@ -62,30 +63,41 @@ public class KxiFactoryDefault extends AbstractKxiFactory {
                     , new IdentifierToken(getTokenText(((ClassDefinitionContext) ctx).IDENTIFIER())));
 
         } else if (ctx instanceof DataMemberDeclarationContext) {
-            DataMemberDeclarationContext dataMemberDeclarationContext = (DataMemberDeclarationContext) ctx;
-            Modifier modifier;
             boolean isStatic = false;
-            if (dataMemberDeclarationContext.modifier().PRIVATE() != null) modifier = Modifier.PRIVATE;
-            else modifier = Modifier.PUBLIC;
-            if (dataMemberDeclarationContext.STATIC() != null) isStatic = true;
-            return new KxiDataMember(pop(stack), modifier, isStatic);
+            if (((DataMemberDeclarationContext) ctx).STATIC() != null) isStatic = true;
+            return new KxiDataMember(pop(stack), ((KxiModifierHelper) pop(stack)).getModifier(), isStatic);
 
         } else if (ctx instanceof MethodDeclarationContext) {
-            MethodDeclarationContext methodDeclarationContext = (MethodDeclarationContext) ctx;
-            Modifier modifier;
-            boolean isStatic = false;
-            if (methodDeclarationContext.modifier().PRIVATE() != null) modifier = Modifier.PRIVATE;
-            else modifier = Modifier.PUBLIC;
-            if (methodDeclarationContext.STATIC() != null) isStatic = true;
-            int size = 0;
+            boolean isStatic;
+            if (((MethodDeclarationContext) ctx).STATIC() != null) isStatic = true;
+            else isStatic = false;
+            KxiMethodSuffixHelper methodSuffixHelper = pop(stack);
+            KxiType type = pop(stack);
+            KxiModifierHelper modifierHelper = pop(stack);
+
+            return new KxiMethod(methodSuffixHelper.getBlock(), methodSuffixHelper.getParameters(), type, modifierHelper.getModifier(), isStatic);
+
+        } else if (ctx instanceof ConstructorDeclarationContext) {
+            KxiMethodSuffixHelper methodSuffixHelper = pop(stack);
+            return new KxiConstructor(methodSuffixHelper.getBlock(), methodSuffixHelper.getParameters(), methodSuffixHelper.getId());
+
+        } else if (ctx instanceof MethodSuffixContext) {
+            MethodSuffixContext methodSuffixContext = (MethodSuffixContext) ctx;
             KxiBlock block = pop(stack);
             Optional<List<KxiParameter>> parameterList;
-            if (methodDeclarationContext.methodSuffix().parameterList() != null) {
-                parameterList = Optional.of(popList(stack, getListSizeFromCtx(methodDeclarationContext.methodSuffix().parameterList().parameter())));
+            if (methodSuffixContext.parameterList() != null) {
+                parameterList = Optional.of(popList(stack, getListSizeFromCtx(methodSuffixContext.parameterList().parameter())));
             } else {
                 parameterList = Optional.empty();
             }
-            return new KxiMethod(block, parameterList, pop(stack), modifier, isStatic);
+            return new KxiMethodSuffixHelper(block, parameterList, new IdentifierToken(getTokenText(methodSuffixContext.IDENTIFIER())));
+
+        } else if (ctx instanceof ModifierContext) {
+            ModifierContext modifierContext = (ModifierContext) ctx;
+            Modifier modifier;
+            if (modifierContext.PRIVATE() != null) modifier = Modifier.PRIVATE;
+            else modifier = Modifier.PUBLIC;
+            return new KxiModifierHelper(modifier);
 
         } else if (ctx instanceof ParameterContext) {
             return new KxiParameter(new IdentifierToken(getTokenText(((ParameterContext) ctx).IDENTIFIER())), pop(stack));
@@ -108,6 +120,6 @@ public class KxiFactoryDefault extends AbstractKxiFactory {
                         , new CharLitToken(getTokenText(caseContext.CHARLIT())));
 
         }
-        return new KxiInvalidNode(ctx,stack, null);
+        return new KxiInvalidNode(ctx, stack, null);
     }
 }

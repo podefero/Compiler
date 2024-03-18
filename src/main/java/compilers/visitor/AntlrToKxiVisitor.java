@@ -2,7 +2,7 @@ package compilers.visitor;
 
 import compilers.antlr.KxiParser;
 import compilers.antlr.KxiParserVisitor;
-import compilers.ast.AbstractKxiNode;
+import compilers.ast.kxi_nodes.AbstractKxiNode;
 import compilers.ast.kxi_nodes.other.KxiInvalidNode;
 import compilers.transform.kxi.AbstractKxiFactory;
 import compilers.transform.kxi.KxiFactoryBase;
@@ -27,12 +27,16 @@ public class AntlrToKxiVisitor<Void> extends AbstractParseTreeVisitor<Void> impl
     }
 
     private void transformNode(ParserRuleContext ctx) {
-        nodeStack.push(factory.build(ctx, nodeStack));
-//        try {
-//            nodeStack.push(factory.build(ctx, nodeStack));
-//        } catch (ClassCastException ex) {
-//            nodeStack.push(new KxiInvalidNode(ctx, nodeStack, ex));
-//        }
+//        nodeStack.push(factory.build(ctx, nodeStack));
+        try {
+            AbstractKxiNode node = factory.build(ctx, nodeStack);
+            if(node instanceof KxiInvalidNode) {
+                System.out.println("break");
+            }
+            nodeStack.push(node);
+        } catch (ClassCastException ex) {
+            nodeStack.push(new KxiInvalidNode(ctx, nodeStack, ex));
+        }
     }
 
     @Override
@@ -64,14 +68,14 @@ public class AntlrToKxiVisitor<Void> extends AbstractParseTreeVisitor<Void> impl
 
     @Override
     public Void visitModifier(KxiParser.ModifierContext ctx) {
-        //handled in ClassMember
+        transformNode(ctx);
         return null;
     }
 
     @Override
     public Void visitClassMemberDefinition(KxiParser.ClassMemberDefinitionContext ctx) {
         visitChildren(ctx);
-        //handled in its children
+       // transformNode(ctx);
         return null;
     }
 
@@ -99,7 +103,7 @@ public class AntlrToKxiVisitor<Void> extends AbstractParseTreeVisitor<Void> impl
     @Override
     public Void visitMethodSuffix(KxiParser.MethodSuffixContext ctx) {
         visitChildren(ctx);
-        //handled in parent nodes
+        transformNode(ctx);
         return null;
     }
 
