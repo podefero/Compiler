@@ -1,10 +1,10 @@
 package compilers.ast.kxi_nodes.expressions;
 
-import compilers.ast.kxi_nodes.KxiType;
+import compilers.ast.kxi_nodes.KxiTypeHelper;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 public class KxiNewExpressionIndex extends AbstractKxiExpression{
     private AbstractKxiExpression index;
-    private KxiType type;
+    private KxiTypeHelper type;
 }

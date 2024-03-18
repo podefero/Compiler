@@ -4,6 +4,6 @@ import compilers.ast.kxi_nodes.expressions.AbstractKxiExpression;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
-public class KxiIndex extends AbstractKxiNode {
+public class KxiIndexHelper extends AbstractKxiNode {
     private AbstractKxiExpression expression;
 }

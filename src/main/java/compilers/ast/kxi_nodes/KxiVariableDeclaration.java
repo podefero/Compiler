@@ -8,7 +8,7 @@ import java.util.Optional;
 
 @AllArgsConstructor
 public class KxiVariableDeclaration extends AbstractKxiNode {
-    private Optional<AbstractKxiExpression> expressionHuh;
+    private Optional<AbstractKxiExpression> initializer;
     private IdentifierToken id;
-    private KxiType type;
+    private KxiTypeHelper type;
 }

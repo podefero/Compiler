@@ -6,14 +6,10 @@ import compilers.commandargs.ArgumentFlags;
 import compilers.antlr.KxiLexer;
 import compilers.util.InputHandler;
 import compilers.util.OutputHandler;
-import compilers.visitor.AntlrToKxiVisitor;
-import compilers.visitor.GraphVizVisitor;
-import guru.nidi.graphviz.engine.Format;
-import guru.nidi.graphviz.engine.Graphviz;
-import org.antlr.v4.runtime.CharStream;
+import compilers.visitor.kxi.AntlrToKxiVisitor;
+import compilers.visitor.kxi.GraphVizVisitor;
 import org.antlr.v4.runtime.CommonTokenStream;
 
-import java.io.File;
 import java.io.IOException;
 
 public class Main {
@@ -62,7 +58,7 @@ public class Main {
     static void printASTDiagram(KxiMain kxiMain, OutputHandler outputHandler) throws IOException {
         System.out.println("Creating an AST diagram");
         GraphVizVisitor graphVizVisitor = new GraphVizVisitor();
-        graphVizVisitor.visitKxiMain(kxiMain);
+        kxiMain.accept(graphVizVisitor);
         outputHandler.outputAST(graphVizVisitor.getGraph());
     }
 

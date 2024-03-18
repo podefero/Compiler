@@ -56,7 +56,7 @@ public class KxiFactoryDefault extends AbstractKxiFactory {
             else if (scalarTypeContext.BOOL() != null) scalarType = ScalarType.BOOL;
             else if (scalarTypeContext.STRING() != null) scalarType = ScalarType.STRING;
             else if (scalarTypeContext.IDENTIFIER() != null) scalarType = ScalarType.ID;
-            return new KxiType(scalarType, numArrays);
+            return new KxiTypeHelper(scalarType, numArrays);
 
         } else if (ctx instanceof ClassDefinitionContext) {
             return new KxiClass(popList(stack, getListSizeFromCtx(((ClassDefinitionContext) ctx).classMemberDefinition()))
@@ -72,7 +72,7 @@ public class KxiFactoryDefault extends AbstractKxiFactory {
             if (((MethodDeclarationContext) ctx).STATIC() != null) isStatic = true;
             else isStatic = false;
             KxiMethodSuffixHelper methodSuffixHelper = pop(stack);
-            KxiType type = pop(stack);
+            KxiTypeHelper type = pop(stack);
             KxiModifierHelper modifierHelper = pop(stack);
 
             return new KxiMethod(methodSuffixHelper.getBlock(), methodSuffixHelper.getParameters(), methodSuffixHelper.getId(), type, modifierHelper.getModifier(), isStatic);
@@ -103,7 +103,7 @@ public class KxiFactoryDefault extends AbstractKxiFactory {
             return new KxiParameter(new IdentifierToken(getTokenText(((ParameterContext) ctx).IDENTIFIER())), pop(stack));
 
         } else if (ctx instanceof IndexContext) {
-            return new KxiIndex(pop(stack));
+            return new KxiIndexHelper(pop(stack));
 
         } else if (ctx instanceof CaseBlockContext) {
             CaseBlockContext caseBlockContext = (CaseBlockContext) ctx;
