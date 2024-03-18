@@ -1,31 +1,41 @@
 package compilers;
 
+import compilers.antlr.KxiParser;
+import compilers.ast.kxi_nodes.KxiMain;
 import compilers.commandargs.ArgumentFlags;
 import compilers.antlr.KxiLexer;
 import compilers.util.InputHandler;
+import compilers.util.OutputHandler;
+import compilers.visitor.AntlrToKxiVisitor;
+import compilers.visitor.GraphVizVisitor;
+import guru.nidi.graphviz.engine.Format;
+import guru.nidi.graphviz.engine.Graphviz;
+import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.CommonTokenStream;
+
+import java.io.File;
+import java.io.IOException;
 
 public class Main {
     public static void main(String[] args) {
         //parse the command line args
         ArgumentFlags argumentFlags = new ArgumentFlags(args);
         InputHandler inputHandler = new InputHandler(argumentFlags.inputFileName);
+        OutputHandler outputHandler = new OutputHandler(argumentFlags.outputFileName);
 
         //call function stubs based on arguments
-        if (argumentFlags.hasOutputFile) outputFiles(argumentFlags.outputFileName);
-        if (argumentFlags.lexing) lexing(argumentFlags, inputHandler);
-        if (argumentFlags.parseTree) parseTree();
-        if (argumentFlags.printASTDiagram) printASTDiagram();
+        if (argumentFlags.lexing) lexing(argumentFlags, inputHandler, outputHandler);
         if (argumentFlags.semantics) semantics();
         if (argumentFlags.printSemanticInformation) printSemanticInformation();
         if (argumentFlags.compile) compile();
-        if (argumentFlags.graphicalAST) printGraphicalAST();
     }
 
-    static void lexing(ArgumentFlags argumentFlags, InputHandler inputHandler) {
+    static void lexing(ArgumentFlags argumentFlags, InputHandler inputHandler, OutputHandler outputHandler) {
         System.out.println("Lexing");
         KxiLexer kxiLexer = new KxiLexer(inputHandler.fileToCharStream());
 
         if (argumentFlags.printTokens) printTokens(kxiLexer);
+        if (argumentFlags.parseTree) parseTree(new CommonTokenStream(kxiLexer), argumentFlags, outputHandler);
     }
 
     static void printTokens(KxiLexer kxiLexer) {
@@ -33,12 +43,27 @@ public class Main {
         kxiLexer.printTokens();
     }
 
-    static void parseTree() {
+    static void parseTree(CommonTokenStream tokenStream, ArgumentFlags argumentFlags, OutputHandler outputHandler) {
+        KxiParser parser = new KxiParser(tokenStream);
         System.out.println("Parsing");
+        AntlrToKxiVisitor antlrToKxiVisitor = new AntlrToKxiVisitor();
+        antlrToKxiVisitor.visitCompilationUnit(parser.compilationUnit());
+        KxiMain kxiMain = (KxiMain) antlrToKxiVisitor.getRootNode();
+
+        if(argumentFlags.printASTDiagram) {
+            try {
+                printASTDiagram(kxiMain, outputHandler);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
-    static void printASTDiagram() {
+    static void printASTDiagram(KxiMain kxiMain, OutputHandler outputHandler) throws IOException {
         System.out.println("Creating an AST diagram");
+        GraphVizVisitor graphVizVisitor = new GraphVizVisitor();
+        graphVizVisitor.visitKxiMain(kxiMain);
+        outputHandler.outputAST(graphVizVisitor.getGraph());
     }
 
     static void semantics() {
@@ -53,15 +78,4 @@ public class Main {
         System.out.println("Compiling to assembly");
     }
 
-    static void printGraphicalAST() {
-        System.out.println("Outputting graphical AST");
-    }
-
-    static void outputFiles(String files) {
-        if (files.equals("[]")) {
-            System.out.println("using STDOUT to print");
-        } else {
-            System.out.println("Printing files " + files);
-        }
-    }
 }

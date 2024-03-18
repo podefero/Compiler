@@ -75,7 +75,7 @@ public class KxiFactoryDefault extends AbstractKxiFactory {
             KxiType type = pop(stack);
             KxiModifierHelper modifierHelper = pop(stack);
 
-            return new KxiMethod(methodSuffixHelper.getBlock(), methodSuffixHelper.getParameters(), type, modifierHelper.getModifier(), isStatic);
+            return new KxiMethod(methodSuffixHelper.getBlock(), methodSuffixHelper.getParameters(), methodSuffixHelper.getId(), type, modifierHelper.getModifier(), isStatic);
 
         } else if (ctx instanceof ConstructorDeclarationContext) {
             KxiMethodSuffixHelper methodSuffixHelper = pop(stack);

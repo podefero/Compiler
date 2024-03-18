@@ -1,12 +1,7 @@
 package compilers.ast.kxi_nodes;
 
-import compilers.visitor.Visitor;
+import compilers.ast.GenericNode;
 
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.List;
+public class AbstractKxiNode extends GenericNode {
 
-public class AbstractKxiNode {
-    public void accept(Visitor visit) {
-    }
 }

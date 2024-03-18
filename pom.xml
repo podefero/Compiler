@@ -32,6 +32,21 @@
           <artifactId>lombok</artifactId>
           <version>1.18.24</version>
       </dependency>
+    <dependency>
+      <groupId>guru.nidi</groupId>
+      <artifactId>graphviz-java</artifactId>
+      <version>0.18.1</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-core</artifactId>
+      <version>2.13.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-slf4j-impl</artifactId>
+      <version>2.13.0</version>
+    </dependency>
   </dependencies>
   <build>
     <plugins>
@@ -73,6 +88,7 @@
           <!-- Add any additional configuration if needed -->
         </configuration>
       </plugin>
+
     </plugins>
   </build>
 </project>

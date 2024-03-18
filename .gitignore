@@ -18,6 +18,9 @@ target/
 src/main/java/compilers/antlr/KxiLexer.interp
 src/main/java/compilers/antlr/KxiLexer.tokens
 
+### OUTPUT FILES ###
+dot
+
 ### Eclipse ###
 .apt_generated
 .classpath
