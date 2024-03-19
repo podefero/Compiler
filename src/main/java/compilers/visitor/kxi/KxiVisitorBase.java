@@ -1,9 +1,6 @@
 package compilers.visitor.kxi;
 
-import compilers.ast.kxi_nodes.KxiCaseChar;
-import compilers.ast.kxi_nodes.KxiCaseInt;
-import compilers.ast.kxi_nodes.KxiMain;
-import compilers.ast.kxi_nodes.KxiVariableDeclaration;
+import compilers.ast.kxi_nodes.*;
 import compilers.ast.kxi_nodes.class_members.KxiConstructor;
 import compilers.ast.kxi_nodes.class_members.KxiDataMember;
 import compilers.ast.kxi_nodes.class_members.KxiMethod;
@@ -27,6 +24,7 @@ import compilers.ast.kxi_nodes.statements.conditional.KxiIfStatement;
 import compilers.ast.kxi_nodes.statements.conditional.KxiWhileStatement;
 
 public abstract class KxiVisitorBase implements VisitKxi{
+
     @Override
     public void visit(KxiMain kxiMain) {
 
