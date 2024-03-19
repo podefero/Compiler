@@ -39,17 +39,17 @@ public class KxiFactoryStatement extends AbstractKxiFactory {
 
         } else if (statementContext.FOR() != null) {
             AbstractKxiStatement statement = pop(stack);
-            Optional<AbstractKxiExpression> postExpression = Optional.empty();
+            AbstractKxiExpression postExpression = null;
             AbstractBinaryConditionalExpression conditionalExpression;
-            Optional<AbstractKxiExpression> preExpression = Optional.empty();
+            AbstractKxiExpression preExpression = null;
 
             if (statementContext.children.get(6) instanceof ExpressionContext)
-                postExpression = Optional.of(pop(stack));
+                postExpression = pop(stack);
 
             conditionalExpression = pop(stack);
 
             if (statementContext.children.get(2) instanceof ExpressionContext)
-                preExpression = Optional.of(pop(stack));
+                preExpression = pop(stack);
 
             return new KxiForStatement(statement, postExpression, conditionalExpression, preExpression);
 

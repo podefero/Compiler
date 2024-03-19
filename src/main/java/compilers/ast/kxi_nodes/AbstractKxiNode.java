@@ -5,5 +5,7 @@ import compilers.visitor.kxi.VisitKxi;
 
 
 public abstract class AbstractKxiNode extends GenericNode<VisitKxi> {
-
+    public AbstractKxiNode(GenericNode ... genericNodes) {
+        super(genericNodes);
+    }
 }

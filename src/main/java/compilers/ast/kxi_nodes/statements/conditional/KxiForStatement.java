@@ -4,17 +4,22 @@ import compilers.ast.kxi_nodes.expressions.AbstractKxiExpression;
 import compilers.ast.kxi_nodes.expressions.binary.conditional.AbstractBinaryConditionalExpression;
 import compilers.ast.kxi_nodes.statements.AbstractKxiStatement;
 import compilers.visitor.kxi.VisitKxi;
+import lombok.Getter;
 
 import java.util.Optional;
 
+@Getter
 public class KxiForStatement extends AbstractKxiConditionalStatement {
-    private Optional<AbstractKxiExpression> postExpression;
-    private Optional<AbstractKxiExpression> preExpression;
+    private AbstractKxiExpression postExpression;
+    private AbstractKxiExpression preExpression;
 
-    public KxiForStatement(AbstractKxiStatement statement, Optional<AbstractKxiExpression> postExpression, AbstractKxiExpression conditionalExpression,  Optional<AbstractKxiExpression> preExpression ) {
-        super(statement, conditionalExpression);
-        this.preExpression = preExpression;
+    public KxiForStatement(AbstractKxiStatement statement, AbstractKxiExpression postExpression, AbstractKxiExpression conditionalExpression,  AbstractKxiExpression preExpression ) {
+        super(statement, postExpression, conditionalExpression, preExpression);
+        this.statement = statement;
         this.postExpression = postExpression;
+        this.conditionalExpression = conditionalExpression;
+        this.preExpression = preExpression;
+
     }
 
     @Override
@@ -22,13 +27,5 @@ public class KxiForStatement extends AbstractKxiConditionalStatement {
         visit.preVisit(this);
         visitChildren(visit);
         visit.visit(this);
-    }
-
-    @Override
-    protected void visitChildren(VisitKxi visit) {
-        visitNode(preExpression, visit);
-        conditionalExpression.accept(visit);
-        visitNode(postExpression, visit);
-        statement.accept(visit);
     }
 }

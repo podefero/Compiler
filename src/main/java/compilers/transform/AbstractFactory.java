@@ -1,5 +1,8 @@
 package compilers.transform;
 
+import compilers.ast.GenericListNode;
+import compilers.ast.GenericNode;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -22,18 +25,20 @@ public abstract class AbstractFactory<Source, Destination> {
         return null;
     }
 
-    public <T extends Destination> T pop(Stack<Destination> stack) {
+    public <T extends GenericNode> T pop(Stack<Destination> stack) {
         return (T) stack.pop();
     }
 
-    public <T extends Destination> List<T> popList(Stack<Destination> stack, int size) {
+    public <T extends GenericNode> T popList(Stack<Destination> stack, int size) {
         List<T> list = new ArrayList<>();
 
         for (int i = 0; i < size; i++) {
             list.add(pop(stack));
         }
         Collections.reverse(list);
-        return list;
+        GenericListNode genericListNode = new GenericListNode((List<GenericListNode>) list);
+
+        return (T) genericListNode;
     }
 
     public <T extends Source> boolean objectIsNotNull(Source evaluate) {

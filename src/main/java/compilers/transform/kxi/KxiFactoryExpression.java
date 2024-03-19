@@ -13,7 +13,7 @@ import compilers.ast.kxi_nodes.expressions.token_expression.*;
 import compilers.ast.kxi_nodes.expressions.uni.KxiNot;
 import compilers.ast.kxi_nodes.expressions.uni.KxiUniPlus;
 import compilers.ast.kxi_nodes.expressions.uni.KxiUniSubtract;
-import compilers.ast.kxi_nodes.other.KxiInvalidNode;
+import compilers.ast.kxi_nodes.helper.KxiInvalidNode;
 import compilers.util.KxiParseHelper;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.TerminalNode;
@@ -92,10 +92,10 @@ public class KxiFactoryExpression extends AbstractKxiFactory {
                         return new KxiNewExpressionIndex(pop(stack), pop(stack));
                     else {
                         if (expressionContext.arguments().argumentList() != null)
-                            return new KxiNewExpressionArgument(Optional.of(popList(stack, getListSizeFromCtx(expressionContext.arguments().argumentList().expression())))
+                            return new KxiNewExpressionArgument(popList(stack, getListSizeFromCtx(expressionContext.arguments().argumentList().expression()))
                                     , new IdentifierToken(getTokenText(expressionContext.IDENTIFIER())));
                         else
-                            return new KxiNewExpressionArgument(Optional.empty(), new IdentifierToken(getTokenText(expressionContext.IDENTIFIER())));
+                            return new KxiNewExpressionArgument(popList(stack, 0), new IdentifierToken(getTokenText(expressionContext.IDENTIFIER())));
 
 
                     }

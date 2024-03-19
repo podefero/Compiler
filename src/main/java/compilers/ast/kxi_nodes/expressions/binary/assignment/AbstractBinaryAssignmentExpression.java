@@ -9,7 +9,7 @@ public abstract class AbstractBinaryAssignmentExpression extends AbstractKxiBina
 
 
     public AbstractBinaryAssignmentExpression(AbstractKxiExpression expressionR, AbstractKxiExpression expressionL) {
-        super(expressionL, expressionR);
+        super(expressionR, expressionL);
     }
 
     @Override

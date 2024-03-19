@@ -16,7 +16,7 @@ import compilers.ast.kxi_nodes.expressions.uni.KxiNot;
 import compilers.ast.kxi_nodes.expressions.uni.KxiUniPlus;
 import compilers.ast.kxi_nodes.expressions.uni.KxiUniSubtract;
 import compilers.ast.kxi_nodes.scope.KxiBlock;
-import compilers.ast.kxi_nodes.scope.KxiCaseBlock;
+import compilers.ast.kxi_nodes.scope.KxiCaseBlockInt;
 import compilers.ast.kxi_nodes.scope.KxiClass;
 import compilers.ast.kxi_nodes.statements.*;
 import compilers.ast.kxi_nodes.statements.conditional.KxiForStatement;
@@ -116,7 +116,7 @@ public abstract class KxiVisitorBase implements VisitKxi{
     }
 
     @Override
-    public void visit(KxiCaseBlock kxiCaseBlock) {
+    public void visit(KxiCaseBlockInt kxiCaseBlockInt) {
 
     }
 
@@ -386,7 +386,7 @@ public abstract class KxiVisitorBase implements VisitKxi{
     }
 
     @Override
-    public void preVisit(KxiCaseBlock kxiCaseBlock) {
+    public void preVisit(KxiCaseBlockInt kxiCaseBlockInt) {
 
     }
 

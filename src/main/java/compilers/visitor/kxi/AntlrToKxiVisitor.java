@@ -3,7 +3,7 @@ package compilers.visitor.kxi;
 import compilers.antlr.KxiParser;
 import compilers.antlr.KxiParserVisitor;
 import compilers.ast.kxi_nodes.AbstractKxiNode;
-import compilers.ast.kxi_nodes.other.KxiInvalidNode;
+import compilers.ast.kxi_nodes.helper.KxiInvalidNode;
 import compilers.transform.kxi.AbstractKxiFactory;
 import compilers.transform.kxi.KxiFactoryBase;
 import compilers.util.KxiParseHelper;

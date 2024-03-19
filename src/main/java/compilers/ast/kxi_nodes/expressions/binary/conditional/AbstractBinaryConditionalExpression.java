@@ -6,7 +6,7 @@ import compilers.visitor.kxi.VisitKxi;
 
 public abstract class AbstractBinaryConditionalExpression extends AbstractKxiBinaryOperation {
     public AbstractBinaryConditionalExpression(AbstractKxiExpression expressionR, AbstractKxiExpression expressionL) {
-        super(expressionL, expressionR);
+        super(expressionR, expressionL);
     }
 
     @Override

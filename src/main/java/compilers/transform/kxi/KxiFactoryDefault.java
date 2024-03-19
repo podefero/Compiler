@@ -1,5 +1,6 @@
 package compilers.transform.kxi;
 
+import compilers.ast.GenericListNode;
 import compilers.ast.kxi_nodes.AbstractKxiNode;
 import compilers.ast.kxi_nodes.Modifier;
 import compilers.ast.kxi_nodes.ScalarType;
@@ -11,13 +12,15 @@ import compilers.ast.kxi_nodes.expressions.AbstractKxiExpression;
 import compilers.ast.kxi_nodes.expressions.token_expression.CharLitToken;
 import compilers.ast.kxi_nodes.expressions.token_expression.IdentifierToken;
 import compilers.ast.kxi_nodes.expressions.token_expression.IntLitToken;
-import compilers.ast.kxi_nodes.other.KxiInvalidNode;
+import compilers.ast.kxi_nodes.helper.KxiInvalidNode;
+import compilers.ast.kxi_nodes.helper.KxiMethodSuffixHelper;
+import compilers.ast.kxi_nodes.helper.KxiModifierHelper;
+import compilers.ast.kxi_nodes.helper.KxiStaticHelper;
 import compilers.ast.kxi_nodes.scope.KxiBlock;
-import compilers.ast.kxi_nodes.scope.KxiCaseBlock;
+import compilers.ast.kxi_nodes.scope.KxiCaseBlockInt;
 import compilers.ast.kxi_nodes.scope.KxiClass;
 import org.antlr.v4.runtime.ParserRuleContext;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.Stack;
 
@@ -64,29 +67,23 @@ public class KxiFactoryDefault extends AbstractKxiFactory {
 
         } else if (ctx instanceof DataMemberDeclarationContext) {
             boolean isStatic = ((DataMemberDeclarationContext) ctx).STATIC() != null;
-            return new KxiDataMember(pop(stack), ((KxiModifierHelper) pop(stack)).getModifier(), isStatic);
+            return new KxiDataMember(pop(stack), pop(stack), new KxiStaticHelper(isStatic));
 
         } else if (ctx instanceof MethodDeclarationContext) {
-            boolean isStatic;
-            isStatic = ((MethodDeclarationContext) ctx).STATIC() != null;
-            KxiMethodSuffixHelper methodSuffixHelper = pop(stack);
-            KxiType type = pop(stack);
-            KxiModifierHelper modifierHelper = pop(stack);
-
-            return new KxiMethod(methodSuffixHelper.getBlock(), methodSuffixHelper.getParameters(), methodSuffixHelper.getId(), type, modifierHelper.getModifier(), isStatic);
+            boolean isStatic = ((MethodDeclarationContext) ctx).STATIC() != null;
+            return new KxiMethod(pop(stack), pop(stack), pop(stack), new KxiStaticHelper(isStatic));
 
         } else if (ctx instanceof ConstructorDeclarationContext) {
-            KxiMethodSuffixHelper methodSuffixHelper = pop(stack);
-            return new KxiConstructor(methodSuffixHelper.getBlock(), methodSuffixHelper.getParameters(), methodSuffixHelper.getId());
+            return new KxiConstructor(pop(stack));
 
         } else if (ctx instanceof MethodSuffixContext) {
             MethodSuffixContext methodSuffixContext = (MethodSuffixContext) ctx;
             KxiBlock block = pop(stack);
-            Optional<List<KxiParameter>> parameterList;
+            GenericListNode parameterList;
             if (methodSuffixContext.parameterList() != null) {
-                parameterList = Optional.of(popList(stack, getListSizeFromCtx(methodSuffixContext.parameterList().parameter())));
+                parameterList = popList(stack, getListSizeFromCtx(methodSuffixContext.parameterList().parameter()));
             } else {
-                parameterList = Optional.empty();
+                parameterList = popList(stack, 0);
             }
             return new KxiMethodSuffixHelper(block, parameterList, new IdentifierToken(getTokenText(methodSuffixContext.IDENTIFIER())));
 
@@ -102,7 +99,7 @@ public class KxiFactoryDefault extends AbstractKxiFactory {
 
         } else if (ctx instanceof CaseBlockContext) {
             CaseBlockContext caseBlockContext = (CaseBlockContext) ctx;
-            return new KxiCaseBlock(popList(stack, getListSizeFromCtx(caseBlockContext.statement()))
+            return new KxiCaseBlockInt(popList(stack, getListSizeFromCtx(caseBlockContext.statement()))
                     , popList(stack, getListSizeFromCtx(caseBlockContext.case_())));
 
         } else if (ctx instanceof CaseContext) {

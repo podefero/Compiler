@@ -4,10 +4,13 @@ import compilers.ast.kxi_nodes.expressions.token_expression.IdentifierToken;
 import compilers.visitor.kxi.VisitKxi;
 import lombok.AllArgsConstructor;
 
-@AllArgsConstructor
 public class KxiDotExpression extends AbstractKxiExpression{
     private AbstractKxiExpression expression;
     private IdentifierToken id;
+
+    public KxiDotExpression(AbstractKxiExpression expression, IdentifierToken id) {
+        super(expression, id);
+    }
 
     @Override
     public void accept(VisitKxi visit) {

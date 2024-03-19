@@ -19,7 +19,8 @@ import compilers.ast.kxi_nodes.expressions.uni.KxiNot;
 import compilers.ast.kxi_nodes.expressions.uni.KxiUniPlus;
 import compilers.ast.kxi_nodes.expressions.uni.KxiUniSubtract;
 import compilers.ast.kxi_nodes.scope.KxiBlock;
-import compilers.ast.kxi_nodes.scope.KxiCaseBlock;
+import compilers.ast.kxi_nodes.scope.KxiCaseBlockChar;
+import compilers.ast.kxi_nodes.scope.KxiCaseBlockInt;
 import compilers.ast.kxi_nodes.scope.KxiClass;
 import compilers.ast.kxi_nodes.statements.*;
 import compilers.ast.kxi_nodes.statements.conditional.KxiForStatement;
@@ -47,7 +48,7 @@ public interface VisitKxi {
     void visit(KxiVariableDeclarationStatement kxiVariableDeclarationStatement);
 
     void visit(KxiBlock kxiBlock);
-    void visit(KxiCaseBlock kxiCaseBlock);
+    void visit(KxiCaseBlockInt kxiCaseBlockInt);
     void visit(KxiCaseInt kxiCaseInt);
     void visit(KxiCaseChar kxiCaseChar);
 
@@ -107,7 +108,7 @@ public interface VisitKxi {
     void preVisit(KxiBlockStatement kxiBlockStatement);
     void preVisit(KxiVariableDeclarationStatement kxiVariableDeclarationStatement);
     void preVisit(KxiBlock kxiBlock);
-    void preVisit(KxiCaseBlock kxiCaseBlock);
+    void preVisit(KxiCaseBlockInt kxiCaseBlockInt);
     void preVisit(KxiCaseInt kxiCaseInt);
     void preVisit(KxiCaseChar kxiCaseChar);
     void preVisit(KxiEquals kxiEquals);
@@ -143,4 +144,8 @@ public interface VisitKxi {
     void preVisit(KxiDotExpression kxiDotExpression);
     void preVisit(KxiExpressionIndex kxiExpressionIndex);
     void preVisit(KxiExpressionArguments kxiExpressionArguments);
+
+    void preVisit(KxiCaseBlockChar kxiCaseBlockChar);
+
+    void visit(KxiCaseBlockChar kxiCaseBlockChar);
 }

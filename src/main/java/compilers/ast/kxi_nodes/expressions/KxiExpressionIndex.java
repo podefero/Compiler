@@ -1,12 +1,19 @@
 package compilers.ast.kxi_nodes.expressions;
 
 import compilers.visitor.kxi.VisitKxi;
-import lombok.AllArgsConstructor;
+import lombok.Getter;
 
-@AllArgsConstructor
-public class KxiExpressionIndex extends AbstractKxiExpression{
+@Getter
+public
+class KxiExpressionIndex extends AbstractKxiExpression {
     private AbstractKxiExpression index;
     private AbstractKxiExpression expression;
+
+    public KxiExpressionIndex(AbstractKxiExpression index, AbstractKxiExpression expression) {
+        super(index, expression);
+        this.index = index;
+        this.expression = expression;
+    }
 
     @Override
     public void accept(VisitKxi visit) {
@@ -15,9 +22,4 @@ public class KxiExpressionIndex extends AbstractKxiExpression{
         visit.visit(this);
     }
 
-    @Override
-    protected void visitChildren(VisitKxi visit) {
-        expression.accept(visit);
-        index.accept(visit);
-    }
 }
