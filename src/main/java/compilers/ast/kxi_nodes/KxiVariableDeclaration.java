@@ -10,5 +10,5 @@ import java.util.Optional;
 public class KxiVariableDeclaration extends AbstractKxiNode {
     private Optional<AbstractKxiExpression> initializer;
     private IdentifierToken id;
-    private KxiTypeHelper type;
+    private KxiType type;
 }

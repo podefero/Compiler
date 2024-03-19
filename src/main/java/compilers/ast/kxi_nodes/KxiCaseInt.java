@@ -1,14 +1,18 @@
-package compilers.ast.kxi_nodes.scope;
+package compilers.ast.kxi_nodes;
 
+import compilers.ast.kxi_nodes.expressions.token_expression.IntLitToken;
 import compilers.ast.kxi_nodes.statements.AbstractKxiStatement;
 import compilers.visitor.kxi.VisitKxi;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 import java.util.List;
 
+@Getter
 @AllArgsConstructor
-public class KxiBlock extends AbstractKxiScope{
+public class KxiCaseInt extends AbstractKxiNode {
     private List<AbstractKxiStatement> statements;
+    private IntLitToken caseValue;
 
     @Override
     public void accept(VisitKxi visit) {
@@ -18,7 +22,9 @@ public class KxiBlock extends AbstractKxiScope{
     }
 
     @Override
-    protected void visitChildren(VisitKxi visit) {
-        visitList(statements, visit);
+    public void visitChildren(VisitKxi visitKxi) {
+        caseValue.accept(visitKxi);
+        visitList(statements, visitKxi);
     }
+
 }

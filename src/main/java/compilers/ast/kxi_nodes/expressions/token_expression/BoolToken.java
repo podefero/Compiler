@@ -1,6 +1,7 @@
 package compilers.ast.kxi_nodes.expressions.token_expression;
 
 import compilers.ast.kxi_nodes.ScalarType;
+import compilers.visitor.kxi.VisitKxi;
 
 public class BoolToken extends TokenType<Boolean> {
 
@@ -15,5 +16,11 @@ public class BoolToken extends TokenType<Boolean> {
     @Override
     public Boolean getTokenText() {
         return value;
+    }
+
+    @Override
+    public void accept(VisitKxi visit) {
+        visit.preVisit(this);
+        visit.visit(this);
     }
 }

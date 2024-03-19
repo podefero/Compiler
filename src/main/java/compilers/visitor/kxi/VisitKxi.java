@@ -1,6 +1,7 @@
 package compilers.visitor.kxi;
 
-import compilers.ast.kxi_nodes.KxiCase;
+import compilers.ast.kxi_nodes.KxiCaseChar;
+import compilers.ast.kxi_nodes.KxiCaseInt;
 import compilers.ast.kxi_nodes.KxiMain;
 import compilers.ast.kxi_nodes.KxiVariableDeclaration;
 import compilers.ast.kxi_nodes.class_members.KxiConstructor;
@@ -47,7 +48,9 @@ public interface VisitKxi {
 
     void visit(KxiBlock kxiBlock);
     void visit(KxiCaseBlock kxiCaseBlock);
-    void visit(KxiCase kxiCase);
+    void visit(KxiCaseInt kxiCaseInt);
+    void visit(KxiCaseChar kxiCaseChar);
+
 
     void visit(KxiEquals kxiEquals);
     void visit(KxiPlusEquals kxiPlusEquals);
@@ -105,7 +108,8 @@ public interface VisitKxi {
     void preVisit(KxiVariableDeclarationStatement kxiVariableDeclarationStatement);
     void preVisit(KxiBlock kxiBlock);
     void preVisit(KxiCaseBlock kxiCaseBlock);
-    void preVisit(KxiCase kxiCase);
+    void preVisit(KxiCaseInt kxiCaseInt);
+    void preVisit(KxiCaseChar kxiCaseChar);
     void preVisit(KxiEquals kxiEquals);
     void preVisit(KxiPlusEquals kxiPlusEquals);
     void preVisit(KxiSubtractEquals kxiSubtractEquals);
