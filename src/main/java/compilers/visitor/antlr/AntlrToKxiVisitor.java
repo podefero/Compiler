@@ -1,4 +1,4 @@
-package compilers.visitor.kxi;
+package compilers.visitor.antlr;
 
 import compilers.antlr.KxiParser;
 import compilers.antlr.KxiParserVisitor;

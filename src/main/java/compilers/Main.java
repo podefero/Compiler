@@ -7,7 +7,7 @@ import compilers.antlr.KxiLexer;
 import compilers.util.InputHandler;
 import compilers.util.OutputHandler;
 import compilers.visitor.generic.GraphVizVisitor;
-import compilers.visitor.kxi.AntlrToKxiVisitor;
+import compilers.visitor.antlr.AntlrToKxiVisitor;
 import org.antlr.v4.runtime.CommonTokenStream;
 
 import java.io.IOException;
