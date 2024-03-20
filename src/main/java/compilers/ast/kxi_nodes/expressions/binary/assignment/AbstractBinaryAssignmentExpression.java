@@ -2,7 +2,7 @@ package compilers.ast.kxi_nodes.expressions.binary.assignment;
 
 import compilers.ast.kxi_nodes.expressions.binary.AbstractKxiBinaryOperation;
 import compilers.ast.kxi_nodes.expressions.AbstractKxiExpression;
-import compilers.visitor.kxi.VisitKxi;
+import compilers.visitor.kxi.KxiVisitorBase;
 
 
 public abstract class AbstractBinaryAssignmentExpression extends AbstractKxiBinaryOperation {
@@ -13,7 +13,7 @@ public abstract class AbstractBinaryAssignmentExpression extends AbstractKxiBina
     }
 
     @Override
-    public void accept(VisitKxi visit) {
+    public void accept(KxiVisitorBase visit) {
         super.accept(visit);
     }
 }

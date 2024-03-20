@@ -35,7 +35,7 @@ public abstract class AbstractFactory<Source, Destination> {
         for (int i = 0; i < size; i++) {
             list.add(pop(stack));
         }
-        Collections.reverse(list);
+        //Collections.reverse(list);
         GenericListNode genericListNode = new GenericListNode((List<GenericListNode>) list);
 
         return (T) genericListNode;

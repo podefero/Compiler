@@ -3,8 +3,7 @@ package compilers.ast.kxi_nodes;
 import compilers.ast.GenericListNode;
 import compilers.ast.kxi_nodes.expressions.token_expression.IntLitToken;
 import compilers.ast.kxi_nodes.statements.AbstractKxiStatement;
-import compilers.visitor.kxi.VisitKxi;
-import lombok.AllArgsConstructor;
+import compilers.visitor.kxi.KxiVisitorBase;
 import lombok.Getter;
 
 import java.util.List;
@@ -21,7 +20,7 @@ public class KxiCaseInt extends AbstractKxiNode {
     }
 
     @Override
-    public void accept(VisitKxi visit) {
+    public void accept(KxiVisitorBase visit) {
         visit.preVisit(this);
         visitChildren(visit);
         visit.visit(this);

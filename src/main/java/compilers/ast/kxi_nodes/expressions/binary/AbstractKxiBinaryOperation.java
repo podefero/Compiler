@@ -1,7 +1,7 @@
 package compilers.ast.kxi_nodes.expressions.binary;
 
 import compilers.ast.kxi_nodes.expressions.AbstractKxiExpression;
-import compilers.visitor.kxi.VisitKxi;
+import compilers.visitor.kxi.KxiVisitorBase;
 import lombok.Getter;
 
 @Getter
@@ -16,7 +16,7 @@ public abstract class AbstractKxiBinaryOperation extends AbstractKxiExpression {
     }
 
     @Override
-    public void accept(VisitKxi visit) {
+    public void accept(KxiVisitorBase visit) {
         visitChildren(visit);
     }
 }

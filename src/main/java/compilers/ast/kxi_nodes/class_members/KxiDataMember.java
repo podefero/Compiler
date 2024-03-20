@@ -5,7 +5,7 @@ import compilers.ast.kxi_nodes.KxiVariableDeclaration;
 import compilers.ast.kxi_nodes.Modifier;
 import compilers.ast.kxi_nodes.helper.KxiModifierHelper;
 import compilers.ast.kxi_nodes.helper.KxiStaticHelper;
-import compilers.visitor.kxi.VisitKxi;
+import compilers.visitor.kxi.KxiVisitorBase;
 import lombok.Getter;
 
 @Getter
@@ -22,7 +22,7 @@ public class KxiDataMember extends KxiAbstractKxiClassMember {
     }
 
     @Override
-    public void accept(VisitKxi visit) {
+    public void accept(KxiVisitorBase visit) {
         visit.preVisit(this);
         visitChildren(visit);
         visit.visit(this);

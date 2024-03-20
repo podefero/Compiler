@@ -2,7 +2,7 @@ package compilers.ast.kxi_nodes.expressions.binary.conditional;
 
 import compilers.ast.kxi_nodes.expressions.AbstractKxiExpression;
 import compilers.ast.kxi_nodes.expressions.binary.AbstractKxiBinaryOperation;
-import compilers.visitor.kxi.VisitKxi;
+import compilers.visitor.kxi.KxiVisitorBase;
 
 public abstract class AbstractBinaryConditionalExpression extends AbstractKxiBinaryOperation {
     public AbstractBinaryConditionalExpression(AbstractKxiExpression expressionR, AbstractKxiExpression expressionL) {
@@ -10,7 +10,7 @@ public abstract class AbstractBinaryConditionalExpression extends AbstractKxiBin
     }
 
     @Override
-    public void accept(VisitKxi visit) {
+    public void accept(KxiVisitorBase visit) {
         super.accept(visit);
     }
 }

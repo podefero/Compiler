@@ -1,11 +1,8 @@
 package compilers.ast.kxi_nodes.statements;
 
 import compilers.ast.kxi_nodes.expressions.AbstractKxiExpression;
-import compilers.visitor.kxi.VisitKxi;
-import lombok.AllArgsConstructor;
+import compilers.visitor.kxi.KxiVisitorBase;
 import lombok.Getter;
-
-import java.util.Optional;
 
 @Getter
 public class KxiReturnStatement extends AbstractKxiStatement {
@@ -17,7 +14,7 @@ public class KxiReturnStatement extends AbstractKxiStatement {
     }
 
     @Override
-    public void accept(VisitKxi visit) {
+    public void accept(KxiVisitorBase visit) {
         visit.preVisit(this);
         visitChildren(visit);
         visit.visit(this);

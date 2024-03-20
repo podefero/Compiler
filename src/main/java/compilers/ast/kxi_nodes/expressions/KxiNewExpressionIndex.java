@@ -1,8 +1,7 @@
 package compilers.ast.kxi_nodes.expressions;
 
 import compilers.ast.kxi_nodes.KxiType;
-import compilers.visitor.kxi.VisitKxi;
-import lombok.AllArgsConstructor;
+import compilers.visitor.kxi.KxiVisitorBase;
 import lombok.Getter;
 
 @Getter
@@ -18,7 +17,7 @@ class KxiNewExpressionIndex extends AbstractKxiExpression {
     }
 
     @Override
-    public void accept(VisitKxi visit) {
+    public void accept(KxiVisitorBase visit) {
         visit.preVisit(this);
         visitChildren(visit);
         visit.visit(this);

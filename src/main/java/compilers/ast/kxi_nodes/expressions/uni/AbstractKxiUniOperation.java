@@ -1,8 +1,7 @@
 package compilers.ast.kxi_nodes.expressions.uni;
 
 import compilers.ast.kxi_nodes.expressions.AbstractKxiExpression;
-import compilers.visitor.kxi.VisitKxi;
-import lombok.AllArgsConstructor;
+import compilers.visitor.kxi.KxiVisitorBase;
 import lombok.Getter;
 
 @Getter
@@ -15,12 +14,12 @@ public abstract class AbstractKxiUniOperation extends AbstractKxiExpression {
     }
 
     @Override
-    public void accept(VisitKxi visit) {
+    public void accept(KxiVisitorBase visit) {
         visitChildren(visit);
     }
 
     @Override
-    protected void visitChildren(VisitKxi visit) {
+    protected void visitChildren(KxiVisitorBase visit) {
         expression.accept(visit);
     }
 }

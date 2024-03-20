@@ -29,7 +29,7 @@ public class OutputHandler {
 
     public void outputAST(MutableGraph graph) throws IOException {
         if (!useStdout)
-            Graphviz.fromGraph(graph).width(200).render(Format.DOT).toFile(new File(getRelativeOutputFile("dot")));
+            Graphviz.fromGraph(graph).width(1920).height(1080).render(Format.DOT).toFile(new File(getRelativeOutputFile("dot")));
         else
             System.out.println(Graphviz.fromGraph(graph).render(Format.DOT));
     }

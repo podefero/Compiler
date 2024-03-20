@@ -1,7 +1,7 @@
 package compilers.ast.kxi_nodes.expressions.binary.arithmic;
 
 import compilers.ast.kxi_nodes.expressions.AbstractKxiExpression;
-import compilers.visitor.kxi.VisitKxi;
+import compilers.visitor.kxi.KxiVisitorBase;
 
 public class KxiDiv extends AbstractBinaryArithmicExpression{
     public KxiDiv(AbstractKxiExpression expressionR, AbstractKxiExpression expressionL) {
@@ -9,7 +9,7 @@ public class KxiDiv extends AbstractBinaryArithmicExpression{
     }
 
     @Override
-    public void accept(VisitKxi visit) {
+    public void accept(KxiVisitorBase visit) {
         visit.preVisit(this);
         super.accept(visit);
         visit.visit(this);

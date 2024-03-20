@@ -2,10 +2,8 @@ package compilers.ast.kxi_nodes.statements.conditional;
 
 import compilers.ast.kxi_nodes.expressions.AbstractKxiExpression;
 import compilers.ast.kxi_nodes.statements.AbstractKxiStatement;
-import compilers.visitor.kxi.VisitKxi;
+import compilers.visitor.kxi.KxiVisitorBase;
 import lombok.Getter;
-
-import java.util.Optional;
 
 @Getter
 public class KxiIfStatement extends AbstractKxiConditionalStatement {
@@ -20,7 +18,7 @@ public class KxiIfStatement extends AbstractKxiConditionalStatement {
     }
 
     @Override
-    public void accept(VisitKxi visit) {
+    public void accept(KxiVisitorBase visit) {
         visit.preVisit(this);
         visitChildren(visit);
         visit.visit(this);

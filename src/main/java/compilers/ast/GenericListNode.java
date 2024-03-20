@@ -12,6 +12,6 @@ import java.util.List;
  * Helps build the param list
  */
 public class GenericListNode extends GenericNode {
-    private List<GenericListNode> list;
+    private List<? extends GenericNode> list;
 
 }

@@ -5,7 +5,7 @@ import compilers.ast.kxi_nodes.KxiParameter;
 import compilers.ast.kxi_nodes.expressions.token_expression.IdentifierToken;
 import compilers.ast.kxi_nodes.helper.KxiMethodSuffixHelper;
 import compilers.ast.kxi_nodes.scope.KxiBlock;
-import compilers.visitor.kxi.VisitKxi;
+import compilers.visitor.kxi.KxiVisitorBase;
 import lombok.Getter;
 
 import java.util.List;
@@ -25,7 +25,7 @@ public class KxiConstructor extends KxiAbstractKxiClassMember {
     }
 
     @Override
-    public void accept(VisitKxi visit) {
+    public void accept(KxiVisitorBase visit) {
         visit.preVisit(this);
         visitChildren(visit);
         visit.visit(this);

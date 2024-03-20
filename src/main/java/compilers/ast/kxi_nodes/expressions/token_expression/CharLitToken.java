@@ -1,7 +1,7 @@
 package compilers.ast.kxi_nodes.expressions.token_expression;
 
 import compilers.ast.kxi_nodes.ScalarType;
-import compilers.visitor.kxi.VisitKxi;
+import compilers.visitor.kxi.KxiVisitorBase;
 
 public class CharLitToken extends TokenType<Character> {
 
@@ -18,7 +18,7 @@ public class CharLitToken extends TokenType<Character> {
     }
 
     @Override
-    public void accept(VisitKxi visit) {
+    public void accept(KxiVisitorBase visit) {
         visit.preVisit(this);
         visit.visit(this);
     }

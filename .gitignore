@@ -20,7 +20,7 @@ src/main/java/compilers/antlr/KxiLexer.tokens
 
 ### OUTPUT FILES ###
 dot
-
+png
 ### Eclipse ###
 .apt_generated
 .classpath
