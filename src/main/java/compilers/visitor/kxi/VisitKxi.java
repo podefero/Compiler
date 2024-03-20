@@ -41,7 +41,7 @@ public interface VisitKxi {
     void visit(KxiReturnStatement kxiReturnStatement);
     void visit(KxiCoutStatement kxiCoutStatement);
     void visit(KxiCinStatement kxiCinStatement);
-    void visit(KxiSwitchStatement kxiSwitchStatement);
+    void visit(KxiSwitchStatementInt kxiSwitchStatementInt);
     void visit(KxiBreakStatement kxiBreakStatement);
     void visit(KxiExpressionStatement kxiExpressionStatement);
     void visit(KxiBlockStatement kxiBlockStatement);
@@ -102,7 +102,7 @@ public interface VisitKxi {
     void preVisit(KxiReturnStatement kxiReturnStatement);
     void preVisit(KxiCoutStatement kxiCoutStatement);
     void preVisit(KxiCinStatement kxiCinStatement);
-    void preVisit(KxiSwitchStatement kxiSwitchStatement);
+    void preVisit(KxiSwitchStatementInt kxiSwitchStatementInt);
     void preVisit(KxiBreakStatement kxiBreakStatement);
     void preVisit(KxiExpressionStatement kxiExpressionStatement);
     void preVisit(KxiBlockStatement kxiBlockStatement);
@@ -148,4 +148,8 @@ public interface VisitKxi {
     void preVisit(KxiCaseBlockChar kxiCaseBlockChar);
 
     void visit(KxiCaseBlockChar kxiCaseBlockChar);
+
+    void preVisit(KxiSwitchStatementChar kxiSwitchStatementChar);
+
+    void visit(KxiSwitchStatementChar kxiSwitchStatementChar);
 }

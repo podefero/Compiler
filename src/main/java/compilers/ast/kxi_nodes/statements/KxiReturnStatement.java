@@ -3,12 +3,18 @@ package compilers.ast.kxi_nodes.statements;
 import compilers.ast.kxi_nodes.expressions.AbstractKxiExpression;
 import compilers.visitor.kxi.VisitKxi;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 import java.util.Optional;
 
-@AllArgsConstructor
-public class KxiReturnStatement extends AbstractKxiStatement{
-    private Optional<AbstractKxiExpression> expression;
+@Getter
+public class KxiReturnStatement extends AbstractKxiStatement {
+    private AbstractKxiExpression expression;
+
+    public KxiReturnStatement(AbstractKxiExpression expression) {
+        super(expression);
+        this.expression = expression;
+    }
 
     @Override
     public void accept(VisitKxi visit) {
@@ -16,10 +22,4 @@ public class KxiReturnStatement extends AbstractKxiStatement{
         visitChildren(visit);
         visit.visit(this);
     }
-
-    @Override
-    protected void visitChildren(VisitKxi visit) {
-        visitNode(expression, visit);
-    }
-
 }

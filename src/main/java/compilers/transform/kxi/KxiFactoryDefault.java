@@ -32,10 +32,10 @@ public class KxiFactoryDefault extends AbstractKxiFactory {
     public AbstractKxiNode build(ParserRuleContext ctx, Stack<AbstractKxiNode> stack) {
         if (ctx instanceof VariableDeclarationContext) {
             VariableDeclarationContext varCtx = (VariableDeclarationContext) ctx;
-            Optional<AbstractKxiExpression> expression;
+            AbstractKxiExpression expression;
 
-            if (varCtx.initializer() != null) expression = Optional.of(pop(stack));
-            else expression = Optional.empty();
+            if (varCtx.initializer() != null) expression = pop(stack);
+            else expression = null;
 
             return new KxiVariableDeclaration(expression
                     , new IdentifierToken(getTokenText(varCtx.IDENTIFIER()))

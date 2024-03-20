@@ -3,15 +3,19 @@ package compilers.ast.kxi_nodes.statements.conditional;
 import compilers.ast.kxi_nodes.expressions.AbstractKxiExpression;
 import compilers.ast.kxi_nodes.statements.AbstractKxiStatement;
 import compilers.visitor.kxi.VisitKxi;
+import lombok.Getter;
 
 import java.util.Optional;
 
+@Getter
 public class KxiIfStatement extends AbstractKxiConditionalStatement {
-    private Optional<AbstractKxiStatement> elseStatement;
+    private AbstractKxiStatement elseStatement;
 
 
-    public KxiIfStatement(Optional<AbstractKxiStatement> elseStatement, AbstractKxiStatement statement, AbstractKxiExpression conditionalExpression) {
-        super(statement, conditionalExpression);
+    public KxiIfStatement(AbstractKxiStatement elseStatement, AbstractKxiStatement statement, AbstractKxiExpression conditionalExpression) {
+        super(elseStatement, statement, conditionalExpression);
+        this.conditionalExpression = conditionalExpression;
+        this.statement = statement;
         this.elseStatement = elseStatement;
     }
 
@@ -22,10 +26,4 @@ public class KxiIfStatement extends AbstractKxiConditionalStatement {
         visit.visit(this);
     }
 
-    @Override
-    protected void visitChildren(VisitKxi visit) {
-        conditionalExpression.accept(visit);
-        statement.accept(visit);
-        visitNode(elseStatement, visit);
-    }
 }

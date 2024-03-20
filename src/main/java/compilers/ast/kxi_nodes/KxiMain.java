@@ -1,5 +1,6 @@
 package compilers.ast.kxi_nodes;
 
+import compilers.ast.GenericListNode;
 import compilers.ast.GenericNode;
 import compilers.ast.kxi_nodes.expressions.token_expression.IdentifierToken;
 import compilers.ast.kxi_nodes.scope.KxiBlock;
@@ -11,15 +12,15 @@ import java.util.List;
 
 @Getter
 public class KxiMain extends AbstractKxiNode {
-    private final KxiBlock block;
-    private final IdentifierToken id;
-    private final List<KxiClass> classList;
+    private KxiBlock block;
+    private IdentifierToken id;
+    private List<KxiClass> classList;
 
-    public KxiMain(GenericNode... genericNodes) {
-        super(genericNodes);
-        block = getNode(0);
-        id = getNode(1);
-        classList = getNodeList(2);
+    public KxiMain(KxiBlock block, IdentifierToken id, GenericListNode classList) {
+        super(block, id, classList);
+        this.block = block;
+        this.id = id;
+        this.classList = getNodeList(classList);
     }
 
     @Override

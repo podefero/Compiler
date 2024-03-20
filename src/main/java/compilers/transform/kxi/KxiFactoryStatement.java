@@ -3,13 +3,13 @@ package compilers.transform.kxi;
 import compilers.ast.kxi_nodes.AbstractKxiNode;
 import compilers.ast.kxi_nodes.expressions.AbstractKxiExpression;
 import compilers.ast.kxi_nodes.expressions.binary.conditional.AbstractBinaryConditionalExpression;
+import compilers.ast.kxi_nodes.scope.KxiCaseBlockInt;
 import compilers.ast.kxi_nodes.statements.*;
 import compilers.ast.kxi_nodes.statements.conditional.KxiForStatement;
 import compilers.ast.kxi_nodes.statements.conditional.KxiIfStatement;
 import compilers.ast.kxi_nodes.statements.conditional.KxiWhileStatement;
 import org.antlr.v4.runtime.ParserRuleContext;
 
-import java.util.Optional;
 import java.util.Stack;
 
 import static compilers.antlr.KxiParser.*;
@@ -23,16 +23,19 @@ public class KxiFactoryStatement extends AbstractKxiFactory {
             return new KxiVariableDeclarationStatement(pop(stack));
 
         } else if (statementContext.SWITCH() != null) {
-            return new KxiSwitchStatement(pop(stack), pop(stack));
+            if (stack.peek() instanceof KxiCaseBlockInt)
+                return new KxiSwitchStatementInt(pop(stack), pop(stack));
+            else
+                return new KxiSwitchStatementChar(pop(stack), pop(stack));
 
         } else if (statementContext.BREAK() != null) {
             return new KxiBreakStatement();
 
         } else if (statementContext.IF() != null) {
             if (statementContext.ELSE() != null)
-                return new KxiIfStatement(Optional.of(pop(stack)), pop(stack), pop(stack));
+                return new KxiIfStatement(pop(stack), pop(stack), pop(stack));
             else
-                return new KxiIfStatement(Optional.empty(), pop(stack), pop(stack));
+                return new KxiIfStatement(null, pop(stack), pop(stack));
 
         } else if (statementContext.WHILE() != null) {
             return new KxiWhileStatement(pop(stack), pop(stack));
@@ -55,9 +58,9 @@ public class KxiFactoryStatement extends AbstractKxiFactory {
 
         } else if (statementContext.RETURN() != null) {
             if (statementContext.children.get(1) instanceof ExpressionContext)
-                return new KxiReturnStatement(Optional.of(pop(stack)));
+                return new KxiReturnStatement(pop(stack));
             else
-                return new KxiReturnStatement(Optional.empty());
+                return new KxiReturnStatement(null);
 
         } else if (statementContext.COUT() != null) {
             return new KxiCoutStatement(pop(stack));

@@ -4,11 +4,15 @@ import compilers.ast.kxi_nodes.expressions.AbstractKxiExpression;
 import compilers.ast.kxi_nodes.expressions.binary.conditional.AbstractBinaryConditionalExpression;
 import compilers.ast.kxi_nodes.statements.AbstractKxiStatement;
 import compilers.visitor.kxi.VisitKxi;
+import lombok.Getter;
 
-public class KxiWhileStatement extends AbstractKxiConditionalStatement{
+@Getter
+public class KxiWhileStatement extends AbstractKxiConditionalStatement {
 
     public KxiWhileStatement(AbstractKxiStatement statement, AbstractKxiExpression conditionalExpression) {
         super(statement, conditionalExpression);
+        this.statement = statement;
+        this.conditionalExpression = conditionalExpression;
     }
 
     @Override
@@ -18,9 +22,4 @@ public class KxiWhileStatement extends AbstractKxiConditionalStatement{
         visit.visit(this);
     }
 
-    @Override
-    protected void visitChildren(VisitKxi visit) {
-        conditionalExpression.accept(visit);
-        statement.accept(visit);
-    }
 }
