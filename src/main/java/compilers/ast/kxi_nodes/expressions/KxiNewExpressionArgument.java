@@ -14,6 +14,7 @@ class KxiNewExpressionArgument extends AbstractKxiExpression{
     private IdentifierToken id;
 
     public KxiNewExpressionArgument(GenericListNode arguments, IdentifierToken id) {
+        super(arguments, id);
         this.arguments = getNodeList(arguments);
         this.id = id;
     }

@@ -4,11 +4,12 @@ import compilers.ast.kxi_nodes.expressions.token_expression.IdentifierToken;
 import compilers.visitor.kxi.KxiVisitorBase;
 
 public class KxiDotExpression extends AbstractKxiExpression{
-    private AbstractKxiExpression expression;
     private IdentifierToken id;
+    private AbstractKxiExpression expression;
 
-    public KxiDotExpression(AbstractKxiExpression expression, IdentifierToken id) {
-        super(expression, id);
+
+    public KxiDotExpression(IdentifierToken id, AbstractKxiExpression expression) {
+        super(id, expression);
     }
 
     @Override

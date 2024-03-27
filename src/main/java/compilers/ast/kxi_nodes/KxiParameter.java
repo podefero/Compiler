@@ -5,8 +5,13 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
-@AllArgsConstructor
 public class KxiParameter extends AbstractKxiNode {
     private IdentifierToken id;
     private KxiType type;
+
+    public KxiParameter(IdentifierToken id, KxiType type) {
+        super(id);
+        this.id = id;
+        this.type = type;
+    }
 }

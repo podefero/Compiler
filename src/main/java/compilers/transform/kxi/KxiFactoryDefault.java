@@ -52,14 +52,18 @@ public class KxiFactoryDefault extends AbstractKxiFactory {
         } else if (ctx instanceof TypeContext) {
             ScalarType scalarType = ScalarType.UNKNOWN;
             ScalarTypeContext scalarTypeContext = ((TypeContext) ctx).scalarType();
+            IdentifierToken id = null;
             int numArrays = ((TypeContext) ctx).LBRACKET().size();
             if (scalarTypeContext.VOID() != null) scalarType = ScalarType.VOID;
             else if (scalarTypeContext.INT() != null) scalarType = ScalarType.INT;
             else if (scalarTypeContext.CHAR_KEY() != null) scalarType = ScalarType.CHAR;
             else if (scalarTypeContext.BOOL() != null) scalarType = ScalarType.BOOL;
             else if (scalarTypeContext.STRING() != null) scalarType = ScalarType.STRING;
-            else if (scalarTypeContext.IDENTIFIER() != null) scalarType = ScalarType.ID;
-            return new KxiType(scalarType, numArrays);
+            else if (scalarTypeContext.IDENTIFIER() != null) {
+                scalarType = ScalarType.ID;
+                id = new IdentifierToken(getTokenText(((TypeContext) ctx).scalarType().IDENTIFIER()));
+            }
+            return new KxiType(scalarType, numArrays, id);
 
         } else if (ctx instanceof ClassDefinitionContext) {
             return new KxiClass(popList(stack, getListSizeFromCtx(((ClassDefinitionContext) ctx).classMemberDefinition()))

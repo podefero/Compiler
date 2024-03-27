@@ -84,7 +84,7 @@ public class KxiFactoryExpression extends AbstractKxiFactory {
                 case OR:
                     return new KxiOr(pop(stack), pop(stack));
                 case DOT:
-                    return new KxiDotExpression(pop(stack), new IdentifierToken(getTokenText(expressionContext.IDENTIFIER())));
+                    return new KxiDotExpression(new IdentifierToken(getTokenText(expressionContext.IDENTIFIER())), pop(stack));
                 case LPARENTH:
                     return new KxiParenthExpression(pop(stack));
                 case NEW:
