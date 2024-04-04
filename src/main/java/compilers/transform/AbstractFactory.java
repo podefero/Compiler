@@ -4,7 +4,6 @@ import compilers.ast.GenericListNode;
 import compilers.ast.GenericNode;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Stack;
 

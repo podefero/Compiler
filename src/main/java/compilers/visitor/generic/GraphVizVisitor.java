@@ -1,11 +1,10 @@
 package compilers.visitor.generic;
 
 import compilers.ast.GenericNode;
-import compilers.ast.kxi_nodes.expressions.token_expression.TokenType;
+import compilers.ast.kxi_nodes.token_literals.TokenLiteral;
 import guru.nidi.graphviz.model.MutableGraph;
 import lombok.Getter;
 
-import java.lang.reflect.Field;
 import java.util.Stack;
 
 import static guru.nidi.graphviz.model.Factory.mutGraph;
@@ -44,8 +43,8 @@ public class GraphVizVisitor extends GenericVisitor {
         if (prevNode != null && curNode != null) {
             String prevName;
             String curName;
-            if (curNode instanceof TokenType) {
-                curName = ((TokenType<?>) curNode).getValue().toString() + "\n(" + curNode.getClass().getSimpleName() + curNode.hashCode() + ")";
+            if (curNode instanceof TokenLiteral) {
+                curName = ((TokenLiteral<?>) curNode).getValue().toString() + "\n(" + curNode.getClass().getSimpleName() + curNode.hashCode() + ")";
             } else {
                 curName = curNode.getClass().getSimpleName() + curNode.hashCode();
             }

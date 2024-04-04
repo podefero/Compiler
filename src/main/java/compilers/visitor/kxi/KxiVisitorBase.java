@@ -14,7 +14,6 @@ import compilers.ast.kxi_nodes.expressions.binary.arithmic.KxiPlus;
 import compilers.ast.kxi_nodes.expressions.binary.arithmic.KxiSubtract;
 import compilers.ast.kxi_nodes.expressions.binary.assignment.*;
 import compilers.ast.kxi_nodes.expressions.binary.conditional.*;
-import compilers.ast.kxi_nodes.expressions.token_expression.*;
 import compilers.ast.kxi_nodes.expressions.uni.KxiNot;
 import compilers.ast.kxi_nodes.expressions.uni.KxiUniPlus;
 import compilers.ast.kxi_nodes.expressions.uni.KxiUniSubtract;
@@ -26,6 +25,7 @@ import compilers.ast.kxi_nodes.statements.*;
 import compilers.ast.kxi_nodes.statements.conditional.KxiForStatement;
 import compilers.ast.kxi_nodes.statements.conditional.KxiIfStatement;
 import compilers.ast.kxi_nodes.statements.conditional.KxiWhileStatement;
+import compilers.ast.kxi_nodes.token_literals.*;
 
 public abstract class KxiVisitorBase implements VisitKxi {
 

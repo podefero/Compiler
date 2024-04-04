@@ -1,0 +1,5 @@
+class Test {
+    private int k;
+    Test test = new Test();
+    test.k = 2;
+}

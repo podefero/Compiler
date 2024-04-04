@@ -12,7 +12,8 @@ import org.antlr.v4.runtime.ParserRuleContext;
 
 import java.util.Stack;
 
-import static compilers.antlr.KxiParser.*;
+import static compilers.antlr.KxiParser.ExpressionContext;
+import static compilers.antlr.KxiParser.StatementContext;
 
 public class KxiFactoryStatement extends AbstractKxiFactory {
     @Override

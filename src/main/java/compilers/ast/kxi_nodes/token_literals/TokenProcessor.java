@@ -1,4 +1,4 @@
-package compilers.ast.kxi_nodes.expressions.token_expression;
+package compilers.ast.kxi_nodes.token_literals;
 
 import compilers.antlr.KxiLexer;
 import org.antlr.v4.runtime.Token;
@@ -10,7 +10,7 @@ public class TokenProcessor {
 
     }
 
-    public TokenType getTokenType(Token token) {
+    public TokenLiteral getTokenType(Token token) {
         switch (token.getType()) {
             case KxiLexer.INTLIT:
                 return new IntLitToken(token.getText());

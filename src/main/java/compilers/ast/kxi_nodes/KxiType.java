@@ -1,7 +1,6 @@
 package compilers.ast.kxi_nodes;
 
-import compilers.ast.kxi_nodes.expressions.token_expression.IdentifierToken;
-import lombok.AllArgsConstructor;
+import compilers.ast.kxi_nodes.token_literals.IdentifierToken;
 import lombok.Getter;
 
 @Getter
@@ -15,6 +14,9 @@ public class KxiType extends AbstractKxiNode {
         this.scalarType = scalarType;
         this.arrayDimensions = arrayDimensions;
         this.idName = idName;
+    }
 
+    public int getSize() {
+        return 0;
     }
 }

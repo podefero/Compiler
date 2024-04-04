@@ -1,6 +1,6 @@
 import compilers.antlr.KxiLexer;
-import compilers.ast.kxi_nodes.expressions.token_expression.TokenProcessor;
-import compilers.ast.kxi_nodes.expressions.token_expression.TokenType;
+import compilers.ast.kxi_nodes.token_literals.TokenProcessor;
+import compilers.ast.kxi_nodes.token_literals.TokenLiteral;
 import compilers.util.InputHandler;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
@@ -136,7 +136,7 @@ public class LexerTest {
         //make sure I get the right data type out of each token
         List<Token> tokens = getTokenList(input);
         TokenProcessor processor = new TokenProcessor();
-        TokenType processedType = null;
+        TokenLiteral processedType = null;
 
         for (Token token : tokens) {
             if (token.getType() == tokenType) {

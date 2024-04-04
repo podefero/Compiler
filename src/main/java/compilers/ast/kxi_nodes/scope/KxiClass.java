@@ -2,7 +2,7 @@ package compilers.ast.kxi_nodes.scope;
 
 import compilers.ast.GenericListNode;
 import compilers.ast.kxi_nodes.class_members.KxiAbstractKxiClassMember;
-import compilers.ast.kxi_nodes.expressions.token_expression.IdentifierToken;
+import compilers.ast.kxi_nodes.token_literals.IdentifierToken;
 import compilers.visitor.kxi.KxiVisitorBase;
 
 import java.util.List;

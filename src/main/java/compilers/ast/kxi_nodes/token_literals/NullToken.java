@@ -1,15 +1,16 @@
-package compilers.ast.kxi_nodes.expressions.token_expression;
+package compilers.ast.kxi_nodes.token_literals;
 
 import compilers.ast.kxi_nodes.ScalarType;
 import compilers.visitor.kxi.KxiVisitorBase;
 
-public class IdentifierToken extends TokenType<String> {
+public class NullToken extends TokenLiteral<String> {
 
-    public IdentifierToken(String tokenText) {
+    public NullToken(String tokenText) {
         super(tokenText);
-        scalarType = ScalarType.ID;
+        scalarType = ScalarType.NULL;
         value = tokenText;
     }
+
 
     @Override
     public String getTokenText() {

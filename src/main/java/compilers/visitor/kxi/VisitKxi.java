@@ -14,7 +14,7 @@ import compilers.ast.kxi_nodes.expressions.binary.arithmic.KxiPlus;
 import compilers.ast.kxi_nodes.expressions.binary.arithmic.KxiSubtract;
 import compilers.ast.kxi_nodes.expressions.binary.assignment.*;
 import compilers.ast.kxi_nodes.expressions.binary.conditional.*;
-import compilers.ast.kxi_nodes.expressions.token_expression.*;
+import compilers.ast.kxi_nodes.expressions.literals.*;
 import compilers.ast.kxi_nodes.expressions.uni.KxiNot;
 import compilers.ast.kxi_nodes.expressions.uni.KxiUniPlus;
 import compilers.ast.kxi_nodes.expressions.uni.KxiUniSubtract;
@@ -26,6 +26,7 @@ import compilers.ast.kxi_nodes.statements.*;
 import compilers.ast.kxi_nodes.statements.conditional.KxiForStatement;
 import compilers.ast.kxi_nodes.statements.conditional.KxiIfStatement;
 import compilers.ast.kxi_nodes.statements.conditional.KxiWhileStatement;
+import compilers.ast.kxi_nodes.token_literals.*;
 
 public interface VisitKxi {
     void visit(KxiMain kxiMain);
@@ -147,9 +148,32 @@ public interface VisitKxi {
 
     void preVisit(KxiCaseBlockChar kxiCaseBlockChar);
 
+    // The forgotten Ones
+
     void visit(KxiCaseBlockChar kxiCaseBlockChar);
 
     void preVisit(KxiSwitchStatementChar kxiSwitchStatementChar);
-
     void visit(KxiSwitchStatementChar kxiSwitchStatementChar);
+
+    void preVisit(ExpressionBoolLit expressionLit);
+    void visit(ExpressionBoolLit expressionLit);
+
+    void preVisit(ExpressionCharLit expressionLit);
+    void visit(ExpressionCharLit expressionLit);
+
+    void preVisit(ExpressionIntLit expressionLit);
+    void visit(ExpressionIntLit expressionLit);
+
+    void preVisit(ExpressionIdLit expressionLit);
+    void visit(ExpressionIdLit expressionLit);
+
+    void preVisit(ExpressionNullLit expressionLit);
+    void visit(ExpressionNullLit expressionLit);
+
+    void preVisit(ExpressionStringLit expressionLit);
+    void visit(ExpressionStringLit expressionLit);
+
+    void preVisit(ExpressionThisLit expressionLit);
+    void visit(ExpressionThisLit expressionLit);
+
 }

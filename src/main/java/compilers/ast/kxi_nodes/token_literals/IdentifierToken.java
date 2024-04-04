@@ -1,19 +1,18 @@
-package compilers.ast.kxi_nodes.expressions.token_expression;
+package compilers.ast.kxi_nodes.token_literals;
 
 import compilers.ast.kxi_nodes.ScalarType;
 import compilers.visitor.kxi.KxiVisitorBase;
 
-public class IntLitToken extends TokenType<Integer> {
+public class IdentifierToken extends TokenLiteral<String> {
 
-    public IntLitToken(String tokenText) {
+    public IdentifierToken(String tokenText) {
         super(tokenText);
-        scalarType = ScalarType.INT;
-        value = Integer.parseInt(tokenText);
+        scalarType = ScalarType.ID;
+        value = tokenText;
     }
 
-
     @Override
-    public Integer getTokenText() {
+    public String getTokenText() {
         return value;
     }
 

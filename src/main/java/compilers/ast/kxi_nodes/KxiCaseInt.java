@@ -1,8 +1,8 @@
 package compilers.ast.kxi_nodes;
 
 import compilers.ast.GenericListNode;
-import compilers.ast.kxi_nodes.expressions.token_expression.IntLitToken;
 import compilers.ast.kxi_nodes.statements.AbstractKxiStatement;
+import compilers.ast.kxi_nodes.token_literals.IntLitToken;
 import compilers.visitor.kxi.KxiVisitorBase;
 import lombok.Getter;
 

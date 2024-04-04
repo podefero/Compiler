@@ -9,16 +9,16 @@ import compilers.ast.kxi_nodes.expressions.binary.arithmic.KxiPlus;
 import compilers.ast.kxi_nodes.expressions.binary.arithmic.KxiSubtract;
 import compilers.ast.kxi_nodes.expressions.binary.assignment.*;
 import compilers.ast.kxi_nodes.expressions.binary.conditional.*;
-import compilers.ast.kxi_nodes.expressions.token_expression.*;
+import compilers.ast.kxi_nodes.expressions.literals.*;
 import compilers.ast.kxi_nodes.expressions.uni.KxiNot;
 import compilers.ast.kxi_nodes.expressions.uni.KxiUniPlus;
 import compilers.ast.kxi_nodes.expressions.uni.KxiUniSubtract;
 import compilers.ast.kxi_nodes.helper.KxiInvalidNode;
+import compilers.ast.kxi_nodes.token_literals.*;
 import compilers.util.KxiParseHelper;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
-import java.util.Optional;
 import java.util.Stack;
 
 import static compilers.antlr.KxiParser.*;
@@ -113,21 +113,21 @@ public class KxiFactoryExpression extends AbstractKxiFactory {
                 case SUBTRACT:
                     return new KxiUniSubtract(pop(stack));
                 case INTLIT:
-                    return new IntLitToken(getTokenText(expressionContext.INTLIT()));
+                    return new ExpressionIntLit(new IntLitToken(getTokenText(expressionContext.INTLIT())));
                 case CHARLIT:
-                    return new CharLitToken(getTokenText(expressionContext.CHARLIT()));
+                    return new ExpressionCharLit(new CharLitToken(getTokenText(expressionContext.CHARLIT())));
                 case STRINGLIT:
-                    return new StringLitToken(getTokenText(expressionContext.STRINGLIT()));
+                    return new ExpressionStringLit(new StringLitToken(getTokenText(expressionContext.STRINGLIT())));
                 case TRUE:
-                    return new BoolToken(getTokenText(expressionContext.TRUE()));
+                    return new ExpressionBoolLit(new BoolToken(getTokenText(expressionContext.TRUE())));
                 case FALSE:
-                    return new BoolToken(getTokenText(expressionContext.FALSE()));
+                    return new ExpressionBoolLit(new BoolToken(getTokenText(expressionContext.FALSE())));
                 case NULL:
-                    return new NullToken(getTokenText(expressionContext.NULL()));
+                    return new ExpressionNullLit(new NullToken(getTokenText(expressionContext.NULL())));
                 case THIS:
-                    return new ThisToken(getTokenText(expressionContext.THIS()));
+                    return new ExpressionThisLit(new ThisToken(getTokenText(expressionContext.THIS())));
                 case IDENTIFIER:
-                    return new IdentifierToken(getTokenText(expressionContext.IDENTIFIER()));
+                    return new ExpressionIdLit(new IdentifierToken(getTokenText(expressionContext.IDENTIFIER())));
                 default:
                     break;
             }

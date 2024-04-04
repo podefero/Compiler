@@ -1,0 +1,3 @@
+void main() {
+   i = 1.d = false.d = null.d = this.d = 'k'.d = "hello".d = d.d;
+}

@@ -18,9 +18,5 @@ public abstract class AbstractKxiUniOperation extends AbstractKxiExpression {
         visitChildren(visit);
     }
 
-    @Override
-    protected void visitChildren(KxiVisitorBase visit) {
-        expression.accept(visit);
-    }
 }
 

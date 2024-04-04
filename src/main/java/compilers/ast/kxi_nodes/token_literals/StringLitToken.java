@@ -1,19 +1,20 @@
-package compilers.ast.kxi_nodes.expressions.token_expression;
+package compilers.ast.kxi_nodes.token_literals;
 
 import compilers.ast.kxi_nodes.ScalarType;
 import compilers.visitor.kxi.KxiVisitorBase;
 
-public class ThisToken extends TokenType<String> {
-
-    public ThisToken(String tokenText) {
+public class StringLitToken extends TokenLiteral<String> {
+    public StringLitToken(String tokenText) {
         super(tokenText);
-        scalarType = ScalarType.THIS;
+        scalarType = ScalarType.STRING;
         value = tokenText;
     }
 
+
     @Override
     public String getTokenText() {
-        return value;
+        EncodeCharacters encodeCharacters = new EncodeCharacters();
+        return encodeCharacters.encodeText(value);
     }
 
     @Override
@@ -21,4 +22,8 @@ public class ThisToken extends TokenType<String> {
         visit.preVisit(this);
         visit.visit(this);
     }
+
+
+
+
 }

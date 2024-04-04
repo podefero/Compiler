@@ -1,17 +1,11 @@
 package compilers.transform.kxi;
 
 import compilers.ast.GenericListNode;
-import compilers.ast.kxi_nodes.AbstractKxiNode;
-import compilers.ast.kxi_nodes.Modifier;
-import compilers.ast.kxi_nodes.ScalarType;
 import compilers.ast.kxi_nodes.*;
 import compilers.ast.kxi_nodes.class_members.KxiConstructor;
 import compilers.ast.kxi_nodes.class_members.KxiDataMember;
 import compilers.ast.kxi_nodes.class_members.KxiMethod;
 import compilers.ast.kxi_nodes.expressions.AbstractKxiExpression;
-import compilers.ast.kxi_nodes.expressions.token_expression.CharLitToken;
-import compilers.ast.kxi_nodes.expressions.token_expression.IdentifierToken;
-import compilers.ast.kxi_nodes.expressions.token_expression.IntLitToken;
 import compilers.ast.kxi_nodes.helper.KxiInvalidNode;
 import compilers.ast.kxi_nodes.helper.KxiMethodSuffixHelper;
 import compilers.ast.kxi_nodes.helper.KxiModifierHelper;
@@ -19,9 +13,11 @@ import compilers.ast.kxi_nodes.helper.KxiStaticHelper;
 import compilers.ast.kxi_nodes.scope.KxiBlock;
 import compilers.ast.kxi_nodes.scope.KxiCaseBlockInt;
 import compilers.ast.kxi_nodes.scope.KxiClass;
+import compilers.ast.kxi_nodes.token_literals.CharLitToken;
+import compilers.ast.kxi_nodes.token_literals.IdentifierToken;
+import compilers.ast.kxi_nodes.token_literals.IntLitToken;
 import org.antlr.v4.runtime.ParserRuleContext;
 
-import java.util.Optional;
 import java.util.Stack;
 
 import static compilers.antlr.KxiParser.*;

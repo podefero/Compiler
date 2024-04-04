@@ -1,13 +1,13 @@
 package compilers;
 
+import compilers.antlr.KxiLexer;
 import compilers.antlr.KxiParser;
 import compilers.ast.kxi_nodes.KxiMain;
 import compilers.commandargs.ArgumentFlags;
-import compilers.antlr.KxiLexer;
 import compilers.util.InputHandler;
 import compilers.util.OutputHandler;
-import compilers.visitor.generic.GraphVizVisitor;
 import compilers.visitor.antlr.AntlrToKxiVisitor;
+import compilers.visitor.generic.GraphVizVisitor;
 import org.antlr.v4.runtime.CommonTokenStream;
 
 import java.io.IOException;

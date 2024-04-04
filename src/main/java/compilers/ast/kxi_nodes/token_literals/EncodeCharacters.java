@@ -1,4 +1,4 @@
-package compilers.ast.kxi_nodes.expressions.token_expression;
+package compilers.ast.kxi_nodes.token_literals;
 
 public class EncodeCharacters {
 

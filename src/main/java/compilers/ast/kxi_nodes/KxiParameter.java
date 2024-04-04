@@ -1,7 +1,6 @@
 package compilers.ast.kxi_nodes;
 
-import compilers.ast.kxi_nodes.expressions.token_expression.IdentifierToken;
-import lombok.AllArgsConstructor;
+import compilers.ast.kxi_nodes.token_literals.IdentifierToken;
 import lombok.Getter;
 
 @Getter
