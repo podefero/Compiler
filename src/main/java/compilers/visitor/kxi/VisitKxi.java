@@ -176,4 +176,7 @@ public interface VisitKxi {
     void preVisit(KxiArguments kxiArguments);
     void visit(KxiArguments kxiArguments);
 
+    void preVisit(KxiIndex kxiIndex);
+    void visit(KxiIndex kxiIndex);
+
 }

@@ -1,15 +1,16 @@
 package compilers.ast.kxi_nodes.expressions;
 
+import compilers.ast.kxi_nodes.KxiIndex;
 import compilers.visitor.kxi.KxiVisitorBase;
 import lombok.Getter;
 
 @Getter
 public
 class KxiExpressionIndex extends AbstractKxiExpression {
-    private AbstractKxiExpression index;
+    private KxiIndex index;
     private AbstractKxiExpression expression;
 
-    public KxiExpressionIndex(AbstractKxiExpression index, AbstractKxiExpression expression) {
+    public KxiExpressionIndex(KxiIndex index, AbstractKxiExpression expression) {
         super(index, expression);
         this.index = index;
         this.expression = expression;

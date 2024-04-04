@@ -3,6 +3,7 @@ package compilers.transform.kxi;
 
 import compilers.ast.kxi_nodes.AbstractKxiNode;
 import compilers.ast.kxi_nodes.KxiArguments;
+import compilers.ast.kxi_nodes.KxiIndex;
 import compilers.ast.kxi_nodes.expressions.*;
 import compilers.ast.kxi_nodes.expressions.binary.arithmic.KxiDiv;
 import compilers.ast.kxi_nodes.expressions.binary.arithmic.KxiMult;
@@ -34,7 +35,7 @@ public class KxiFactoryExpression extends AbstractKxiFactory {
 
         //Expression with only non-terminals
         if (expressionContext.expression(0) != null && expressionContext.index() != null)
-            return new KxiExpressionIndex(pop(stack), pop(stack));
+            return new KxiExpressionIndex(new KxiIndex(pop(stack)), pop(stack));
         else if (expressionContext.expression(0) != null && expressionContext.arguments() != null) {
             if (expressionContext.arguments().argumentList() != null)
                 return new KxiMethodExpression(new KxiArguments(popList(stack, getListSizeFromCtx(expressionContext.arguments().argumentList().expression())))
@@ -90,7 +91,7 @@ public class KxiFactoryExpression extends AbstractKxiFactory {
                     return new KxiParenthExpression(pop(stack));
                 case NEW:
                     if (expressionContext.index() != null)
-                        return new KxiNewExpressionIndex(pop(stack), pop(stack));
+                        return new KxiNewExpressionIndex(new KxiIndex(pop(stack)), pop(stack));
                     else {
                         if (expressionContext.arguments().argumentList() != null)
                             return new KxiNewExpressionArgument(new KxiArguments(popList(stack, getListSizeFromCtx(expressionContext.arguments().argumentList().expression())))
