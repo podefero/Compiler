@@ -9,9 +9,9 @@ import lombok.Getter;
 public class KxiVariableDeclaration extends AbstractKxiNode {
     private AbstractKxiExpression initializer;
     private IdentifierToken id;
-    private KxiType type;
+    private KxiAbstractType type;
 
-    public KxiVariableDeclaration(AbstractKxiExpression initializer, IdentifierToken id, KxiType type) {
+    public KxiVariableDeclaration(AbstractKxiExpression initializer, IdentifierToken id, KxiAbstractType type) {
         super(initializer, id, type);
         this.initializer = initializer;
         this.id = id;

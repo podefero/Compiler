@@ -1,6 +1,7 @@
 package compilers.ast.kxi_nodes.class_members;
 
 
+import compilers.ast.kxi_nodes.KxiAbstractType;
 import compilers.ast.kxi_nodes.KxiParameter;
 import compilers.ast.kxi_nodes.KxiType;
 import compilers.ast.kxi_nodes.Modifier;
@@ -20,11 +21,11 @@ public class KxiMethod extends KxiAbstractKxiClassMember {
     private KxiBlock block;
     private List<KxiParameter> parameters;
     private IdentifierToken id;
-    private KxiType returnType;
+    private KxiAbstractType returnType;
     private Modifier modifier;
     private boolean isStatic;
 
-    public KxiMethod(KxiMethodSuffixHelper suffixHelper, KxiType type, KxiModifierHelper kxiModifierHelper, KxiStaticHelper kxiStaticHelper) {
+    public KxiMethod(KxiMethodSuffixHelper suffixHelper, KxiAbstractType type, KxiModifierHelper kxiModifierHelper, KxiStaticHelper kxiStaticHelper) {
         super(suffixHelper.getBlock(), suffixHelper.getParameters(), suffixHelper.getId(), type, kxiModifierHelper, kxiStaticHelper);
         this.block = suffixHelper.getBlock();
         this.parameters = getNodeList(suffixHelper.getParameters());

@@ -36,6 +36,7 @@ public class AntlrToKxiVisitor<Void> extends AbstractParseTreeVisitor<Void> impl
             nodeStack.push(node);
         } catch (ClassCastException ex) {
             nodeStack.push(new KxiInvalidNode(ctx, nodeStack, ex));
+            System.out.println(ex.getStackTrace());
         }
     }
 

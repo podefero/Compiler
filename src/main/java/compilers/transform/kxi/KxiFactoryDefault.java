@@ -59,7 +59,18 @@ public class KxiFactoryDefault extends AbstractKxiFactory {
                 scalarType = ScalarType.ID;
                 id = new IdentifierToken(getTokenText(((TypeContext) ctx).scalarType().IDENTIFIER()));
             }
-            return new KxiType(scalarType, numArrays, id);
+            KxiType kxiType = new KxiType(scalarType, id);
+            if(numArrays > 0) {
+                KxiArrayType curArray = new KxiArrayType(scalarType, kxiType);
+                KxiArrayType nextArray;
+                for(int i = 1; i < numArrays; i++) {
+                    nextArray = new KxiArrayType(scalarType, curArray);
+                    curArray = nextArray;
+                }
+                return curArray;
+            }
+
+            return kxiType;
 
         } else if (ctx instanceof ClassDefinitionContext) {
             return new KxiClass(popList(stack, getListSizeFromCtx(((ClassDefinitionContext) ctx).classMemberDefinition()))

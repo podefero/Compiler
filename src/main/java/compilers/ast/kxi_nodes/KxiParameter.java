@@ -6,9 +6,9 @@ import lombok.Getter;
 @Getter
 public class KxiParameter extends AbstractKxiNode {
     private IdentifierToken id;
-    private KxiType type;
+    private KxiAbstractType type;
 
-    public KxiParameter(IdentifierToken id, KxiType type) {
+    public KxiParameter(IdentifierToken id, KxiAbstractType type) {
         super(id);
         this.id = id;
         this.type = type;
