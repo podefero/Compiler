@@ -1,9 +1,6 @@
 package compilers.visitor.kxi;
 
-import compilers.ast.kxi_nodes.KxiCaseChar;
-import compilers.ast.kxi_nodes.KxiCaseInt;
-import compilers.ast.kxi_nodes.KxiMain;
-import compilers.ast.kxi_nodes.KxiVariableDeclaration;
+import compilers.ast.kxi_nodes.*;
 import compilers.ast.kxi_nodes.class_members.KxiConstructor;
 import compilers.ast.kxi_nodes.class_members.KxiDataMember;
 import compilers.ast.kxi_nodes.class_members.KxiMethod;
@@ -86,7 +83,7 @@ public interface VisitKxi {
     void visit(KxiNewExpressionArgument kxiNewExpressionArgument);
     void visit(KxiDotExpression kxiDotExpression);
     void visit(KxiExpressionIndex kxiExpressionIndex);
-    void visit(KxiExpressionArguments kxiExpressionArguments);
+    void visit(KxiMethodExpression kxiMethodExpression);
 
 
     //Previsit
@@ -144,7 +141,7 @@ public interface VisitKxi {
     void preVisit(KxiNewExpressionArgument kxiNewExpressionArgument);
     void preVisit(KxiDotExpression kxiDotExpression);
     void preVisit(KxiExpressionIndex kxiExpressionIndex);
-    void preVisit(KxiExpressionArguments kxiExpressionArguments);
+    void preVisit(KxiMethodExpression kxiMethodExpression);
 
     void preVisit(KxiCaseBlockChar kxiCaseBlockChar);
 
@@ -175,5 +172,8 @@ public interface VisitKxi {
 
     void preVisit(ExpressionThisLit expressionLit);
     void visit(ExpressionThisLit expressionLit);
+
+    void preVisit(KxiArguments kxiArguments);
+    void visit(KxiArguments kxiArguments);
 
 }

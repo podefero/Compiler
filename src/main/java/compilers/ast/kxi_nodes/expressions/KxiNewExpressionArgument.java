@@ -1,21 +1,19 @@
 package compilers.ast.kxi_nodes.expressions;
 
-import compilers.ast.GenericListNode;
+import compilers.ast.kxi_nodes.KxiArguments;
 import compilers.ast.kxi_nodes.token_literals.IdentifierToken;
 import compilers.visitor.kxi.KxiVisitorBase;
 import lombok.Getter;
 
-import java.util.List;
-
 @Getter
 public
 class KxiNewExpressionArgument extends AbstractKxiExpression{
-    private List<AbstractKxiExpression> arguments;
+    private KxiArguments arguments;
     private IdentifierToken id;
 
-    public KxiNewExpressionArgument(GenericListNode arguments, IdentifierToken id) {
+    public KxiNewExpressionArgument(KxiArguments arguments, IdentifierToken id) {
         super(arguments, id);
-        this.arguments = getNodeList(arguments);
+        this.arguments = arguments;
         this.id = id;
     }
 

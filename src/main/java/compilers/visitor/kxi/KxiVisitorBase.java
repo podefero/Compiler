@@ -295,7 +295,7 @@ public abstract class KxiVisitorBase implements VisitKxi {
     }
 
     @Override
-    public void visit(KxiExpressionArguments kxiExpressionArguments) {
+    public void visit(KxiMethodExpression kxiMethodExpression) {
 
     }
 
@@ -565,7 +565,7 @@ public abstract class KxiVisitorBase implements VisitKxi {
     }
 
     @Override
-    public void preVisit(KxiExpressionArguments kxiExpressionArguments) {
+    public void preVisit(KxiMethodExpression kxiMethodExpression) {
 
     }
 

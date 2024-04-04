@@ -2,6 +2,7 @@ package compilers.transform.kxi;
 
 
 import compilers.ast.kxi_nodes.AbstractKxiNode;
+import compilers.ast.kxi_nodes.KxiArguments;
 import compilers.ast.kxi_nodes.expressions.*;
 import compilers.ast.kxi_nodes.expressions.binary.arithmic.KxiDiv;
 import compilers.ast.kxi_nodes.expressions.binary.arithmic.KxiMult;
@@ -36,10 +37,10 @@ public class KxiFactoryExpression extends AbstractKxiFactory {
             return new KxiExpressionIndex(pop(stack), pop(stack));
         else if (expressionContext.expression(0) != null && expressionContext.arguments() != null) {
             if (expressionContext.arguments().argumentList() != null)
-                return new KxiExpressionArguments(popList(stack, getListSizeFromCtx(expressionContext.arguments().argumentList().expression()))
+                return new KxiMethodExpression(new KxiArguments(popList(stack, getListSizeFromCtx(expressionContext.arguments().argumentList().expression())))
                         , pop(stack));
             else
-                return new KxiExpressionArguments(popList(stack, 0), pop(stack));
+                return new KxiMethodExpression(null, pop(stack));
         }
 
         KxiParseHelper parseHelper = new KxiParseHelper();
@@ -92,10 +93,10 @@ public class KxiFactoryExpression extends AbstractKxiFactory {
                         return new KxiNewExpressionIndex(pop(stack), pop(stack));
                     else {
                         if (expressionContext.arguments().argumentList() != null)
-                            return new KxiNewExpressionArgument(popList(stack, getListSizeFromCtx(expressionContext.arguments().argumentList().expression()))
+                            return new KxiNewExpressionArgument(new KxiArguments(popList(stack, getListSizeFromCtx(expressionContext.arguments().argumentList().expression())))
                                     , new IdentifierToken(getTokenText(expressionContext.IDENTIFIER())));
                         else
-                            return new KxiNewExpressionArgument(popList(stack, 0), new IdentifierToken(getTokenText(expressionContext.IDENTIFIER())));
+                            return new KxiNewExpressionArgument(null, new IdentifierToken(getTokenText(expressionContext.IDENTIFIER())));
 
 
                     }
