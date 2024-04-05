@@ -1,9 +1,6 @@
 package compilers.visitor.kxi;
 
-import compilers.ast.kxi_nodes.KxiCaseChar;
-import compilers.ast.kxi_nodes.KxiCaseInt;
-import compilers.ast.kxi_nodes.KxiMain;
-import compilers.ast.kxi_nodes.KxiVariableDeclaration;
+import compilers.ast.kxi_nodes.*;
 import compilers.ast.kxi_nodes.class_members.KxiConstructor;
 import compilers.ast.kxi_nodes.class_members.KxiDataMember;
 import compilers.ast.kxi_nodes.class_members.KxiMethod;
@@ -14,6 +11,7 @@ import compilers.ast.kxi_nodes.expressions.binary.arithmic.KxiPlus;
 import compilers.ast.kxi_nodes.expressions.binary.arithmic.KxiSubtract;
 import compilers.ast.kxi_nodes.expressions.binary.assignment.*;
 import compilers.ast.kxi_nodes.expressions.binary.conditional.*;
+import compilers.ast.kxi_nodes.expressions.literals.*;
 import compilers.ast.kxi_nodes.expressions.uni.KxiNot;
 import compilers.ast.kxi_nodes.expressions.uni.KxiUniPlus;
 import compilers.ast.kxi_nodes.expressions.uni.KxiUniSubtract;
@@ -34,7 +32,11 @@ import java.util.Stack;
 @Getter
 public abstract class KxiVisitorBase implements VisitKxi {
 
-    private Stack<CompilerException> exceptionStack;
+    protected Stack<CompilerException> exceptionStack;
+
+    public KxiVisitorBase() {
+        exceptionStack = new Stack<>();
+    }
 
     @Override
     public void visit(KxiMain kxiMain) {
@@ -593,6 +595,96 @@ public abstract class KxiVisitorBase implements VisitKxi {
 
     @Override
     public void visit(KxiSwitchStatementChar kxiSwitchStatementChar) {
+
+    }
+
+    @Override
+    public void preVisit(ExpressionBoolLit expressionLit) {
+
+    }
+
+    @Override
+    public void visit(ExpressionBoolLit expressionLit) {
+
+    }
+
+    @Override
+    public void preVisit(ExpressionCharLit expressionLit) {
+
+    }
+
+    @Override
+    public void visit(ExpressionCharLit expressionLit) {
+
+    }
+
+    @Override
+    public void preVisit(ExpressionIntLit expressionLit) {
+
+    }
+
+    @Override
+    public void visit(ExpressionIntLit expressionLit) {
+
+    }
+
+    @Override
+    public void preVisit(ExpressionIdLit expressionLit) {
+
+    }
+
+    @Override
+    public void visit(ExpressionIdLit expressionLit) {
+
+    }
+
+    @Override
+    public void preVisit(ExpressionNullLit expressionLit) {
+
+    }
+
+    @Override
+    public void visit(ExpressionNullLit expressionLit) {
+
+    }
+
+    @Override
+    public void preVisit(ExpressionStringLit expressionLit) {
+
+    }
+
+    @Override
+    public void visit(ExpressionStringLit expressionLit) {
+
+    }
+
+    @Override
+    public void preVisit(ExpressionThisLit expressionLit) {
+
+    }
+
+    @Override
+    public void visit(ExpressionThisLit expressionLit) {
+
+    }
+
+    @Override
+    public void preVisit(KxiArguments kxiArguments) {
+
+    }
+
+    @Override
+    public void visit(KxiArguments kxiArguments) {
+
+    }
+
+    @Override
+    public void preVisit(KxiIndex kxiIndex) {
+
+    }
+
+    @Override
+    public void visit(KxiIndex kxiIndex) {
 
     }
 
