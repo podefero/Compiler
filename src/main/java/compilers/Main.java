@@ -4,6 +4,8 @@ import compilers.antlr.KxiLexer;
 import compilers.antlr.KxiParser;
 import compilers.ast.kxi_nodes.KxiMain;
 import compilers.commandargs.ArgumentFlags;
+import compilers.exceptions.ParseException;
+import compilers.exceptions.ParserErrorListener;
 import compilers.util.InputHandler;
 import compilers.util.OutputHandler;
 import compilers.visitor.antlr.AntlrToKxiVisitor;
@@ -40,14 +42,25 @@ public class Main {
     }
 
     static void parseTree(CommonTokenStream tokenStream, ArgumentFlags argumentFlags, OutputHandler outputHandler) {
-        KxiParser parser = new KxiParser(tokenStream);
         System.out.println("Parsing");
+        KxiParser parser = new KxiParser(tokenStream);
+        parser.removeErrorListeners();
+        parser.addErrorListener(new ParserErrorListener());
+
+        //catch any syntax errors
+        try {
+            parser.compilationUnit();
+        }catch (ParseException ex) {
+            System.out.println(ex.getMessage());
+            return;
+        }
+
         AntlrToKxiVisitor antlrToKxiVisitor = new AntlrToKxiVisitor();
         antlrToKxiVisitor.visitCompilationUnit(parser.compilationUnit());
-        KxiMain kxiMain = (KxiMain) antlrToKxiVisitor.getRootNode();
 
         if(argumentFlags.printASTDiagram) {
             try {
+                KxiMain kxiMain = (KxiMain) antlrToKxiVisitor.getRootNode();
                 printASTDiagram(kxiMain, outputHandler);
             } catch (IOException e) {
                 throw new RuntimeException(e);

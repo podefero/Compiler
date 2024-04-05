@@ -30,9 +30,10 @@ public class AntlrToKxiVisitor<Void> extends AbstractParseTreeVisitor<Void> impl
 //        nodeStack.push(factory.build(ctx, nodeStack));
         try {
             AbstractKxiNode node = factory.build(ctx, nodeStack);
-            if(node instanceof KxiInvalidNode) {
-                System.out.println("break");
-            }
+            node.setLineInfo("Line#: "
+                    + ctx.getStart().getLine() + ":" + ctx.getStart().getCharPositionInLine()
+                    + " to " + ctx.getStop().getLine() + ":" + ctx.getStop().getCharPositionInLine()
+                    + " " + ctx.getText());
             nodeStack.push(node);
         } catch (ClassCastException ex) {
             nodeStack.push(new KxiInvalidNode(ctx, nodeStack, ex));
@@ -76,7 +77,7 @@ public class AntlrToKxiVisitor<Void> extends AbstractParseTreeVisitor<Void> impl
     @Override
     public Void visitClassMemberDefinition(KxiParser.ClassMemberDefinitionContext ctx) {
         visitChildren(ctx);
-       // transformNode(ctx);
+        // transformNode(ctx);
         return null;
     }
 

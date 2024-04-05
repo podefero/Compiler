@@ -26,8 +26,15 @@ import compilers.ast.kxi_nodes.statements.conditional.KxiForStatement;
 import compilers.ast.kxi_nodes.statements.conditional.KxiIfStatement;
 import compilers.ast.kxi_nodes.statements.conditional.KxiWhileStatement;
 import compilers.ast.kxi_nodes.token_literals.*;
+import compilers.exceptions.CompilerException;
+import lombok.Getter;
 
+import java.util.Stack;
+
+@Getter
 public abstract class KxiVisitorBase implements VisitKxi {
+
+    private Stack<CompilerException> exceptionStack;
 
     @Override
     public void visit(KxiMain kxiMain) {
