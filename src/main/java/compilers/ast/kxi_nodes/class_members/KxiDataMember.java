@@ -24,7 +24,7 @@ public class KxiDataMember extends KxiAbstractKxiClassMember {
     @Override
     public void accept(KxiVisitorBase visit) {
         visit.preVisit(this);
-        visitChildren(visit);
+        //visitChildren(visit);
         visit.visit(this);
     }
 }

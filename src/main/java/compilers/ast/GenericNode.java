@@ -29,6 +29,7 @@ public abstract class GenericNode {
         List<GenericNode> genericNodeList = new ArrayList<>();
         if(nodes.length == 0) return genericNodeList;
         for (GenericNode node : nodes) {
+            if (node == null) continue;
             genericNodeList.add(node);
         }
 

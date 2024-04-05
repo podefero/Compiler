@@ -179,4 +179,7 @@ public interface VisitKxi {
     void preVisit(KxiIndex kxiIndex);
     void visit(KxiIndex kxiIndex);
 
+    void preVisit(KxiParameter node);
+    void visit(KxiParameter node);
+
 }

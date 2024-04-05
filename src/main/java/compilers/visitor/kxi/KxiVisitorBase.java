@@ -688,4 +688,14 @@ public abstract class KxiVisitorBase implements VisitKxi {
 
     }
 
+    @Override
+    public void preVisit(KxiParameter node) {
+
+    }
+
+    @Override
+    public void visit(KxiParameter node) {
+
+    }
+
 }

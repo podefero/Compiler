@@ -1,13 +1,19 @@
 package compilers.visitor.kxi.symboltable;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.util.List;
 
 @Getter
-@AllArgsConstructor
-public class MethodScope extends BlockScope{
+public class MethodScope  {
     private SymbolData returnType;
     private List<SymbolData> params;
+    private BlockScope blockScope;
+
+    public MethodScope(SymbolData returnType, List<SymbolData> params, BlockScope blockScope) {
+        this.returnType = returnType;
+        this.params = params;
+        this.blockScope = blockScope;
+    }
+
 }

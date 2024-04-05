@@ -1,7 +1,7 @@
 package compilers.exceptions;
 
 public class SymbolTableException extends CompilerException{
-    public SymbolTableException(String message) {
-        super(message);
+    public SymbolTableException(String line, String message) {
+        super(line, message);
     }
 }

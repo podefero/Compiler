@@ -33,7 +33,7 @@ public class AntlrToKxiVisitor<Void> extends AbstractParseTreeVisitor<Void> impl
             node.setLineInfo("Line#: "
                     + ctx.getStart().getLine() + ":" + ctx.getStart().getCharPositionInLine()
                     + " to " + ctx.getStop().getLine() + ":" + ctx.getStop().getCharPositionInLine()
-                    + " " + ctx.getText());
+                    + " " + ctx.getStart().getText());
             nodeStack.push(node);
         } catch (ClassCastException ex) {
             nodeStack.push(new KxiInvalidNode(ctx, nodeStack, ex));

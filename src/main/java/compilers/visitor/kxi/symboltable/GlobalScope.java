@@ -1,8 +1,8 @@
 package compilers.visitor.kxi.symboltable;
 
-import lombok.Getter;
+import lombok.Data;
 
-@Getter
+@Data
 public class GlobalScope extends SymbolTable {
-    private MainScope mainScope;
+    private BlockScope mainScope;
 }

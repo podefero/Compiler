@@ -8,6 +8,6 @@ public class ParserErrorListener extends BaseErrorListener {
     @Override
     public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line, int charPositionInLine, String msg, RecognitionException e) {
         super.syntaxError(recognizer, offendingSymbol, line, charPositionInLine, msg, e);
-        throw new ParseException("Syntax error at line " + line + ":" + charPositionInLine + " " + msg);
+        throw new ParseException("Syntax error at line " + line + ":" + charPositionInLine + " " + msg, "");
     }
 }

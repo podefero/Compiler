@@ -1,7 +1,7 @@
 package compilers.exceptions;
 
 public class TypeCheckException extends CompilerException{
-    public TypeCheckException(String message) {
-        super(message);
+    public TypeCheckException(String line, String message) {
+        super(line, message);
     }
 }

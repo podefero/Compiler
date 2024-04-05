@@ -6,5 +6,6 @@ public enum ScopeType {
     While,
     Switch,
     Method,
+    Main,
     Constructor
 }
