@@ -15,21 +15,24 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class SymbolTableTest {
 
 
-    @Test
-    void testAntlrToKxiVisitor() {
-        AntlrToKxiVisitor visitor = new AntlrToKxiVisitor();
-        compilationUnitContext("class Test{}", "").accept(visitor);
-    }
 
     @Test
     void testSymbolTableVisitor() {
         SymbolTableVisitor symbolTableVisitor = new SymbolTableVisitor();
         kxiRootNode("testKXI.kxi").accept(symbolTableVisitor);
+        symbolTableVisitor.dumpErrorStack();
+    }
+
+    @Test
+    void testSymbolTableVisitorStressTest() {
+        SymbolTableVisitor symbolTableVisitor = new SymbolTableVisitor();
+        kxiRootNode("StressTest.kxi").accept(symbolTableVisitor);
     }
 
 

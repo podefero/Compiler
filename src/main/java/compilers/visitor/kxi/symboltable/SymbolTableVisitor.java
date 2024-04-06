@@ -5,6 +5,8 @@ import compilers.ast.kxi_nodes.class_members.KxiConstructor;
 import compilers.ast.kxi_nodes.class_members.KxiDataMember;
 import compilers.ast.kxi_nodes.class_members.KxiMethod;
 import compilers.ast.kxi_nodes.scope.KxiBlock;
+import compilers.ast.kxi_nodes.scope.KxiCaseBlockChar;
+import compilers.ast.kxi_nodes.scope.KxiCaseBlockInt;
 import compilers.ast.kxi_nodes.scope.KxiClass;
 import compilers.ast.kxi_nodes.statements.KxiSwitchStatementChar;
 import compilers.ast.kxi_nodes.statements.KxiSwitchStatementInt;
@@ -25,12 +27,28 @@ public class SymbolTableVisitor extends KxiVisitorBase {
     private Stack<SymbolTable> tableStack;
     private GlobalScope globalScope;
     private SymbolTable currentSymbolTable;
+    private int nameCounter;
 
     public SymbolTableVisitor() {
         super();
         scopeHandler = new ScopeHandler();
         tableStack = new Stack<>();
         globalScope = new GlobalScope();
+        nameCounter = 0;
+    }
+
+    private void setScopeUniqueName() {
+        if (currentSymbolTable instanceof ClassScope) {
+            currentSymbolTable.setUniqueName(((ClassScope) currentSymbolTable).getClassId());
+        } else if (currentSymbolTable instanceof BlockScope) {
+            if (!tableStack.empty()) {
+                nameCounter++;
+                currentSymbolTable.setUniqueName(tableStack.peek().getUniqueName() + nameCounter);
+            } else {
+                currentSymbolTable.setUniqueName("Main");
+            }
+
+        }
     }
 
     private void scopeNodePreVisit(SymbolTable symbolTable) {
@@ -38,29 +56,47 @@ public class SymbolTableVisitor extends KxiVisitorBase {
             tableStack.push(currentSymbolTable);
         }
         currentSymbolTable = symbolTable;
+        setScopeUniqueName();
     }
 
     private void scopeNodeVisit() {
         if (tableStack.empty()) {
             currentSymbolTable.parent = globalScope;
         } else {
-            currentSymbolTable.parent = tableStack.peek();
+            SymbolTable parent = tableStack.peek();
+            currentSymbolTable.parent = parent;
             currentSymbolTable = tableStack.pop();
         }
     }
 
+    private void checkForDuplicateId(SymbolTable symbolTable, String key) {
+        if (symbolTable.getScope().containsKey(key)) {
+            SymbolData symbolData = symbolTable.getScope().get(key);
+            KxiAbstractType type = symbolData.getType();
+            exceptionStack.push(new SymbolTableException(type.getLineInfo(), "Duplicate ID name " + key));
+        }
+    }
+
+
     private void addSymbolDataToCurrentScope(String id, SymbolData symbolData) {
-        currentSymbolTable.getScope().put(id, symbolData);
+        ScalarType scalarType = symbolData.getType().getScalarType();
+        boolean isStatic = symbolData.isStatic();
+
+        if (isStatic || scalarType == ScalarType.STRING) {
+            globalScope.getScope().put(currentSymbolTable.getUniqueName() + id, symbolData);
+        } else {
+            checkForDuplicateId(currentSymbolTable, id);
+            currentSymbolTable.getScope().put(id, symbolData);
+        }
     }
 
     private void addMethodScopeToClassScope(MethodScope methodScope, ClassScope classScope, String id) {
         classScope.getMethodScopeMap().put(id, methodScope);
     }
 
-    private void createMethodForClassScope(SymbolData returnType, List<KxiParameter> parameters, ScopeType scopeType, String id) {
+    private void createMethodForClassScope(SymbolData returnType, List<KxiParameter> parameters, String id) {
         ClassScope classScope = (ClassScope) tableStack.peek();
         BlockScope blockScope = (BlockScope) currentSymbolTable;
-        blockScope.setScopeType(scopeType);
 
         //make params for method scope
         List<SymbolData> params = new ArrayList<>();
@@ -73,6 +109,7 @@ public class SymbolTableVisitor extends KxiVisitorBase {
         addMethodScopeToClassScope(methodScope, classScope, id);
     }
 
+
     private void setBlockScopeType(ScopeType scopeType) {
         BlockScope blockScope = (BlockScope) currentSymbolTable;
         blockScope.setScopeType(scopeType);
@@ -81,13 +118,12 @@ public class SymbolTableVisitor extends KxiVisitorBase {
     @Override
     public void visit(KxiMain kxiMain) {
         //check if id is 'main'
-        if (kxiMain.getId().getValue() != "main") {
+        if (!kxiMain.getId().getValue().equals("main")) {
             exceptionStack.push(new SymbolTableException(kxiMain.getLineInfo(), "main must be named 'main'"));
         }
         setBlockScopeType(ScopeType.Main);
         globalScope.setMainScope((BlockScope) currentSymbolTable);
         scopeNodeVisit();
-
     }
 
     @Override
@@ -101,11 +137,27 @@ public class SymbolTableVisitor extends KxiVisitorBase {
     @Override
     public void visit(KxiClass kxiClass) {
         scopeHandler.addClassScope(kxiClass.getId().getValue(), (ClassScope) kxiClass.getScope());
+        nameCounter = 0;
         scopeNodeVisit();
     }
 
     @Override
     public void preVisit(KxiBlock kxiBlock) {
+        BlockScope blockScope = new BlockScope();
+        kxiBlock.setScope(blockScope);
+        scopeNodePreVisit(blockScope);
+    }
+
+    @Override
+    public void preVisit(KxiCaseBlockInt kxiBlock) {
+        BlockScope blockScope = new BlockScope();
+        kxiBlock.setScope(blockScope);
+
+        scopeNodePreVisit(blockScope);
+    }
+
+    @Override
+    public void preVisit(KxiCaseBlockChar kxiBlock) {
         BlockScope blockScope = new BlockScope();
         kxiBlock.setScope(blockScope);
         scopeNodePreVisit(blockScope);
@@ -119,7 +171,9 @@ public class SymbolTableVisitor extends KxiVisitorBase {
 
         String id = kxiMethod.getId().getValue();
 
-        createMethodForClassScope(returnData, kxiMethod.getParameters(), ScopeType.Method, id);
+        createMethodForClassScope(returnData, kxiMethod.getParameters(), id);
+
+        setBlockScopeType(ScopeType.Method);
 
         scopeNodeVisit();
 
@@ -133,11 +187,13 @@ public class SymbolTableVisitor extends KxiVisitorBase {
         String id = kxiConstructor.getId().getValue();
 
         //check if constructor matches class name
-        if (id != ((ClassScope) tableStack.peek()).getClassId()) {
+        if (!id.equals(((ClassScope) tableStack.peek()).getClassId())) {
             exceptionStack.push(new SymbolTableException(kxiConstructor.getLineInfo(), "Constructor ID does not match class ID"));
         }
 
-        createMethodForClassScope(symbolData, kxiConstructor.getParameters(), ScopeType.Constructor, id);
+        createMethodForClassScope(symbolData, kxiConstructor.getParameters(), id);
+
+        setBlockScopeType(ScopeType.Constructor);
 
         scopeNodeVisit();
     }
@@ -162,13 +218,13 @@ public class SymbolTableVisitor extends KxiVisitorBase {
 
     @Override
     public void visit(KxiSwitchStatementChar kxiSwitchStatementChar) {
-        setBlockScopeType(ScopeType.Switch);
+        setBlockScopeType(ScopeType.SwitchChar);
         scopeNodeVisit();
     }
 
     @Override
     public void visit(KxiSwitchStatementInt kxiSwitchStatementInt) {
-        setBlockScopeType(ScopeType.Switch);
+        setBlockScopeType(ScopeType.SwitchInt);
         scopeNodeVisit();
     }
 

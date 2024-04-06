@@ -38,6 +38,17 @@ public abstract class KxiVisitorBase implements VisitKxi {
         exceptionStack = new Stack<>();
     }
 
+    public boolean hasErrors() {
+        return !exceptionStack.empty();
+    }
+
+    public void dumpErrorStack() {
+        while(hasErrors()) {
+            System.out.println(exceptionStack.pop().getMessage());
+        }
+    }
+
+
     @Override
     public void visit(KxiMain kxiMain) {
 
