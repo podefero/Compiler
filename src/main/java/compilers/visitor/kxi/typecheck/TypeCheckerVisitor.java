@@ -2,7 +2,12 @@ package compilers.visitor.kxi.typecheck;
 
 import compilers.ast.kxi_nodes.KxiType;
 import compilers.ast.kxi_nodes.ScalarType;
+import compilers.ast.kxi_nodes.expressions.binary.arithmic.KxiDiv;
+import compilers.ast.kxi_nodes.expressions.binary.arithmic.KxiMult;
+import compilers.ast.kxi_nodes.expressions.binary.arithmic.KxiPlus;
+import compilers.ast.kxi_nodes.expressions.binary.arithmic.KxiSubtract;
 import compilers.ast.kxi_nodes.expressions.binary.assignment.*;
+import compilers.ast.kxi_nodes.expressions.binary.conditional.KxiAnd;
 import compilers.ast.kxi_nodes.expressions.literals.*;
 import compilers.ast.kxi_nodes.scope.KxiBlock;
 import compilers.ast.kxi_nodes.scope.KxiClass;
@@ -39,9 +44,9 @@ public class TypeCheckerVisitor extends KxiVisitorBase {
             ScalarType right = resultR.getTypeData().getType().getScalarType();
 
             if (left != right)
-                exceptionStack.push(new TypeCheckException(codeLine, "provided: " + right + " expected: " + left));
+                exceptionStack.push(new TypeCheckException(codeLine, "Mismatched Types provided: " + right + " expected: " + left));
             else if (arrayDepthL != arrayDepthR)
-                exceptionStack.push(new TypeCheckException(codeLine, "providedDimension: " + arrayDepthR + " expectedDimension: " + arrayDepthL));
+                exceptionStack.push(new TypeCheckException(codeLine, "Mismatched ArrayDim providedDimension: " + arrayDepthR + " expectedDimension: " + arrayDepthL));
 
             resultTypeStack.push(resultR);
         }
@@ -55,13 +60,34 @@ public class TypeCheckerVisitor extends KxiVisitorBase {
             ScalarType right = resultR.getTypeData().getType().getScalarType();
             ScalarType expected = ScalarType.INT;
             if (right != expected)
-                exceptionStack.push(new TypeCheckException(codeLine, "provided: " + right + " expected: " + expected));
+                exceptionStack.push(new TypeCheckException(codeLine, "Mismatched Types provided: " + right + " expected: " + expected));
             else if (left != expected)
-                exceptionStack.push(new TypeCheckException(codeLine, "provided: " + left + " expected: " + expected));
+                exceptionStack.push(new TypeCheckException(codeLine, "Mismatched Types provided: " + left + " expected: " + expected));
 
             resultTypeStack.push(resultR);
         }
     }
+
+    private void matchResultsOnRelational(String codeLine) {
+        if (resultTypeStack.size() >= 2) {
+            ResultType resultR = resultTypeStack.pop();
+            ResultType resultL = resultTypeStack.pop();
+            ScalarType left = resultL.getTypeData().getType().getScalarType();
+            ScalarType right = resultR.getTypeData().getType().getScalarType();
+            if (right != ScalarType.INT || right != ScalarType.CHAR)
+                exceptionStack.push(new TypeCheckException(codeLine, "Mismatched Types provided: " + right + " expected: INT or CHAR"));
+            else if (left != ScalarType.INT || left != ScalarType.CHAR)
+                exceptionStack.push(new TypeCheckException(codeLine, "Mismatched Types provided: " + left + " expected: INT or CHAR"));
+            else if (left != right)
+                exceptionStack.push(new TypeCheckException(codeLine, "Mismatched Types provided: " + right + " expected: " + left));
+
+            //update result to bool
+            KxiType updatedType = new KxiType(ScalarType.BOOL, null);
+            resultR.getTypeData().setType(updatedType);
+            resultTypeStack.push(resultR);
+        }
+    }
+
 
     private ResultType pushNewResult(String id, SymbolData typeData, SymbolTable scope) {
         return resultTypeStack.push(new ResultType(id, typeData, scope));
@@ -153,7 +179,7 @@ public class TypeCheckerVisitor extends KxiVisitorBase {
      */
 
         /*
-    EXPRESSIONS ASSIGNMENT
+    EXPRESSIONS ARITHMIC ASSIGNMENT
      */
 
     @Override
@@ -183,5 +209,39 @@ public class TypeCheckerVisitor extends KxiVisitorBase {
         matchResultsOnInt(expression.getLineInfo());
 
     }
+
+      /*
+    EXPRESSIONS ASSIGNMENT
+     */
+
+    @Override
+    public void visit(KxiDiv expression) {
+        matchResultsOnInt(expression.getLineInfo());
+    }
+
+    @Override
+    public void visit(KxiMult expression) {
+        matchResultsOnInt(expression.getLineInfo());
+    }
+
+    @Override
+    public void visit(KxiPlus expression) {
+        matchResultsOnInt(expression.getLineInfo());
+    }
+
+    @Override
+    public void visit(KxiSubtract expression) {
+        matchResultsOnInt(expression.getLineInfo());
+    }
+
+    /*
+ EXPRESSIONS CONDITIONAL
+  */
+    @Override
+    public void visit(KxiAnd expression) {
+        matchResultsOnRelational(expression.getLineInfo());
+    }
+
+
 }
 

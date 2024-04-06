@@ -1,6 +1,0 @@
-void main() {
-    'k' = 1;
-    1 = 'k';
-    "je;;" = false;
-
-}
