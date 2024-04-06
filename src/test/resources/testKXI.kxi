@@ -1,20 +1,6 @@
-class Test {
-    static public int i;
-    static private bool k;
-    private string p;
-    private int l;
-    private bool l;
-    Test(int p) {
-
-    }
-    public int f(int i) {
-        string hello;
-    }
- public int f(int i) {
-        string hello;
-    }
-}
 void main() {
-    if(i = 0) i = 1;
-    while(i = 0) i = 1;
+    'k' = 1;
+    1 = 'k';
+    "je;;" = false;
+
 }

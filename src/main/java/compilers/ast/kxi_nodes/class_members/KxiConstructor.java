@@ -17,7 +17,7 @@ public class KxiConstructor extends KxiAbstractKxiClassMember {
     private IdentifierToken id;
 
     public KxiConstructor(KxiMethodSuffixHelper methodSuffixHelper) {
-        super(methodSuffixHelper.getBlock(), methodSuffixHelper.getParameters(), methodSuffixHelper.getId());
+        super(methodSuffixHelper.getParameters(), methodSuffixHelper.getBlock(), methodSuffixHelper.getId());
         this.block = methodSuffixHelper.getBlock();
         this.parameters = getNodeList(methodSuffixHelper.getParameters());
         this.id = methodSuffixHelper.getId();

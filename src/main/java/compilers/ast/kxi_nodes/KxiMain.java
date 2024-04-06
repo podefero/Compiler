@@ -16,7 +16,7 @@ public class KxiMain extends AbstractKxiNode {
     private List<KxiClass> classList;
 
     public KxiMain(KxiBlock block, IdentifierToken id, GenericListNode classList) {
-        super(block, id, classList);
+        super(block, classList);
         this.block = block;
         this.id = id;
         this.classList = getNodeList(classList);

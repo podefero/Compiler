@@ -10,6 +10,16 @@ public abstract class KxiAbstractType extends AbstractKxiNode {
         this.scalarType = scalarType;
     }
 
+    public int getArrayDepth() {
+        int depth = 0;
+        KxiAbstractType current = this;
+        while(current instanceof KxiArrayType) {
+            current = ((KxiArrayType) current).getType();
+            depth++;
+        }
+        return depth;
+    }
+
     public String getName(String dim, KxiAbstractType kxiAbstractType) {
         while (kxiAbstractType instanceof KxiArrayType) {
             dim += "[]";

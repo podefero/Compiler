@@ -5,6 +5,7 @@ import compilers.visitor.kxi.KxiVisitorBase;
 import lombok.Getter;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Getter
@@ -14,7 +15,7 @@ public abstract class GenericNode {
     public GenericNode(GenericNode... children) {
         this.children = createList(children);
         //left to right order
-        //Collections.reverse(this.children);
+        Collections.reverse(this.children);
     }
 
     protected <T extends GenericNode> List<T> getNodeList(GenericListNode genericListNode) {

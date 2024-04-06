@@ -4,6 +4,7 @@ import compilers.ast.GenericNode;
 import compilers.ast.kxi_nodes.AbstractKxiNode;
 import compilers.ast.kxi_nodes.KxiAbstractType;
 import compilers.ast.kxi_nodes.token_literals.TokenLiteral;
+import guru.nidi.graphviz.attribute.Rank;
 import guru.nidi.graphviz.model.MutableGraph;
 import lombok.Getter;
 

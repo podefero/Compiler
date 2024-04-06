@@ -12,11 +12,11 @@ public class ScopeHandler {
     }
 
     public ClassScope getClassScope(String id) {
-        return null;
+        return classScopeMap.get(id);
     }
 
     public SymbolData Identify(SymbolTable symbolTable, String id) {
-        return null;
+        return symbolTable.getScope().get(id);
     }
 
     public MethodScope getMethodScope(String classId, String methodId) {
@@ -24,6 +24,16 @@ public class ScopeHandler {
     }
 
     public ClassScope bubbleToClassScope(SymbolTable symbolTable) {
+        //check current scope
+        if (symbolTable instanceof ClassScope) return (ClassScope) symbolTable;
+
+        //otherwise traverse up nested scope
+        while (!(symbolTable instanceof GlobalScope)) {
+            symbolTable = symbolTable.parent;
+            if (symbolTable instanceof ClassScope)
+                return (ClassScope) symbolTable;
+        }
+
         return null;
     }
 
@@ -38,4 +48,5 @@ public class ScopeHandler {
     public void addClassScope(String id, ClassScope classScope) {
         classScopeMap.put(id, classScope);
     }
+
 }

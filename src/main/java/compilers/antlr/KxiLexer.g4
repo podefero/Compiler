@@ -5,8 +5,8 @@ fragment ALPHA  :   [A-Za-z] ;
 fragment DIGIT  :   [0-9] ;
 fragment UNDER_SCORE    :   '_' ;
 fragment LINE_ENDING    :  '\r\n' | '\n' | '\r' ;
-fragment UNESCAPED_CHAR : [\u0020-\u0022\u0027-\u005B\u005D-\u005E\u0060-\u007E] ;
-fragment ESCAPED_CHAR : '\\' [rtn] ;
+fragment UNESCAPED_CHAR : [\u0020-\u0021\u0028-\u005B\u005D-\u007E];
+fragment ESCAPED_CHAR : '\\' [\\rtn] ;
 fragment CHAR   :   UNESCAPED_CHAR | ESCAPED_CHAR ;
 //Bool
 fragment B  :   'b' ;
@@ -120,8 +120,8 @@ COMMA   :   ',' ;
 COLON   : ':' ;
 
 IDENTIFIER :    (ALPHA | UNDER_SCORE) (ALPHA | DIGIT | UNDER_SCORE)* ;
-CHARLIT : '\'' (UNESCAPED_CHAR | ESCAPED_CHAR | '\\' | '\'' | '\\' | '"') '\'' ;
-STRINGLIT : '"' (UNESCAPED_CHAR | ESCAPED_CHAR | '\\' | '\'' | '\\' | '"')* '"' ;
+CHARLIT : '\'' (CHAR | '\'' | '"') '\'' ;
+STRINGLIT : '"' (CHAR | '\'' | '\\"')* '"' ;
 INTLIT     :    DIGIT+ ;
 COMMENT : '//' ~[\r\n]* LINE_ENDING -> skip;
 MULTI_COMMENT    : '/*' .* '*/' -> skip ;

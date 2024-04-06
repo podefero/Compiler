@@ -26,7 +26,7 @@ public class KxiMethod extends KxiAbstractKxiClassMember {
     private boolean isStatic;
 
     public KxiMethod(KxiMethodSuffixHelper suffixHelper, KxiAbstractType type, KxiModifierHelper kxiModifierHelper, KxiStaticHelper kxiStaticHelper) {
-        super(suffixHelper.getBlock(), suffixHelper.getParameters(), suffixHelper.getId(), type, kxiModifierHelper, kxiStaticHelper);
+        super(suffixHelper.getParameters(),suffixHelper.getBlock(), suffixHelper.getId(), type, kxiModifierHelper, kxiStaticHelper);
         this.block = suffixHelper.getBlock();
         this.parameters = getNodeList(suffixHelper.getParameters());
         this.id = suffixHelper.getId();

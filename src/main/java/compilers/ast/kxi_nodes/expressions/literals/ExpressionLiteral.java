@@ -2,7 +2,9 @@ package compilers.ast.kxi_nodes.expressions.literals;
 
 import compilers.ast.kxi_nodes.expressions.AbstractKxiExpression;
 import compilers.ast.kxi_nodes.token_literals.TokenLiteral;
+import lombok.Getter;
 
+@Getter
 public abstract class ExpressionLiteral<T extends TokenLiteral> extends AbstractKxiExpression {
     T tokenLiteral;
     public ExpressionLiteral(T tokenLiteral) {

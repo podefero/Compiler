@@ -62,6 +62,7 @@ public class SymbolTableVisitor extends KxiVisitorBase {
     private void scopeNodeVisit() {
         if (tableStack.empty()) {
             currentSymbolTable.parent = globalScope;
+            currentSymbolTable = globalScope;
         } else {
             SymbolTable parent = tableStack.peek();
             currentSymbolTable.parent = parent;
@@ -236,9 +237,11 @@ public class SymbolTableVisitor extends KxiVisitorBase {
 
     @Override
     public void visit(KxiDataMember kxiDataMember) {
-        //does not visit its child variable declaration, this way we can have them separate
         SymbolData symbolData = new SymbolData(kxiDataMember.isStatic(), kxiDataMember.getModifier(), kxiDataMember.getVariableDeclaration().getType());
-        addSymbolDataToCurrentScope(kxiDataMember.getVariableDeclaration().getId().getValue(), symbolData);
+        String id = kxiDataMember.getVariableDeclaration().getId().getValue();
+        //updates key
+        currentSymbolTable.getScope().put(id, symbolData);
+        //addSymbolDataToCurrentScope(kxiDataMember.getVariableDeclaration().getId().getValue(), symbolData);
     }
 
     @Override
