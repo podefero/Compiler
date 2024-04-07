@@ -14,16 +14,21 @@ public abstract class KxiAbstractType extends AbstractKxiNode {
         int depth = 0;
         KxiAbstractType current = this;
         while (current instanceof KxiArrayType) {
-            current = ((KxiArrayType) current).getType();
+            current = ((KxiArrayType) current).getInsideType();
             depth++;
         }
         return depth;
     }
 
+    @Override
+    public String getLineInfo() {
+        return getKxiType().lineInfo;
+    }
+
     public KxiType getKxiType() {
         KxiAbstractType current = this;
         while (current instanceof KxiArrayType) {
-            current = ((KxiArrayType) current).getType();
+            current = ((KxiArrayType) current).getInsideType();
             if (current instanceof KxiType)
                 return (KxiType) current;
         }
@@ -33,7 +38,7 @@ public abstract class KxiAbstractType extends AbstractKxiNode {
     public String getName(String dim, KxiAbstractType kxiAbstractType) {
         while (kxiAbstractType instanceof KxiArrayType) {
             dim += "[]";
-            kxiAbstractType = ((KxiArrayType) kxiAbstractType).getType();
+            kxiAbstractType = ((KxiArrayType) kxiAbstractType).getInsideType();
         }
         if (kxiAbstractType instanceof KxiType) {
             if (((KxiType) kxiAbstractType).getIdName() != null)

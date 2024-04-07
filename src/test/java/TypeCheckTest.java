@@ -20,7 +20,9 @@ public class TypeCheckTest {
         rootNode.accept(symbolTableVisitor);
         symbolTableVisitor.dumpErrorStack();
 
-        TypeCheckerVisitor typeCheckerVisitor = new TypeCheckerVisitor(symbolTableVisitor.getScopeHandler(), new Stack<>(), symbolTableVisitor.getGlobalScope().getMainScope());
+        TypeCheckerVisitor typeCheckerVisitor =
+                new TypeCheckerVisitor(symbolTableVisitor.getScopeHandler()
+                        , new Stack<>(), symbolTableVisitor.getGlobalScope().getMainScope().getBlockScope());
         rootNode.accept(typeCheckerVisitor);
         typeCheckerVisitor.dumpErrorStack();
     }

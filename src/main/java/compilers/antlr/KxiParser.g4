@@ -31,15 +31,19 @@ block : LCURLY statement* RCURLY ;
 caseBlock : LCURLY case* DEFAULT COLON statement* RCURLY ;
 case : CASE (INTLIT | CHARLIT) COLON statement* ;
 expression :
+            //l to r
             LPARENTH expression RPARENTH
             | expression index
+            | expression arguments
             | expression DOT IDENTIFIER
+            //r to l
             | NOT expression
             | PLUS expression
             | SUBTRACT expression
+            //r to l
             | NEW IDENTIFIER arguments
             | NEW type index
-            | expression arguments
+            //l to r
             | expression MULT expression
             | expression DIVIDE expression
             | expression PLUS expression
@@ -52,6 +56,7 @@ expression :
             | expression NOTEQUALS expression
             | expression AND expression
             | expression OR expression
+            // r to l
             | expression EQUALS expression
             | expression PLUSEQUALS expression
             | expression SUBEQUALS expression

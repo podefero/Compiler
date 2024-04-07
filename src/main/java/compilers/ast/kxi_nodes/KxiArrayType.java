@@ -5,11 +5,11 @@ import lombok.Getter;
 @Getter
 public class KxiArrayType extends KxiAbstractType {
 
-    private KxiAbstractType type;
+    private KxiAbstractType insideType;
 
-    public KxiArrayType(ScalarType scalarType, KxiAbstractType type) {
+    public KxiArrayType(ScalarType scalarType, KxiAbstractType insideType) {
         super(scalarType);
-        this.type = type;
+        this.insideType = insideType;
     }
 
 }

@@ -123,8 +123,13 @@ public class SymbolTableVisitor extends KxiVisitorBase {
             exceptionStack.push(new SymbolTableException(kxiMain.getLineInfo(), "main must be named 'main'"));
         }
         setBlockScopeType(ScopeType.Main);
-        globalScope.setMainScope((BlockScope) currentSymbolTable);
+        MethodScope methodScope =
+                new MethodScope(new SymbolData(false, null, new KxiType(ScalarType.VOID, kxiMain.getId()))
+                        , new ArrayList<>(), (BlockScope) currentSymbolTable);
+
+        globalScope.setMainScope(methodScope);
         scopeNodeVisit();
+        scopeHandler.setGlobalScope(globalScope);
     }
 
     @Override

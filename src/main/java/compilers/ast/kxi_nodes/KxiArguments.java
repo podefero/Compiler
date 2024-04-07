@@ -3,9 +3,11 @@ package compilers.ast.kxi_nodes;
 import compilers.ast.GenericListNode;
 import compilers.ast.kxi_nodes.expressions.AbstractKxiExpression;
 import compilers.visitor.kxi.KxiVisitorBase;
+import lombok.Getter;
 
 import java.util.List;
 
+@Getter
 public class KxiArguments extends AbstractKxiNode {
     private List<AbstractKxiExpression> arguments;
 

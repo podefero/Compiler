@@ -2,7 +2,9 @@ package compilers.ast.kxi_nodes;
 
 import compilers.ast.kxi_nodes.expressions.AbstractKxiExpression;
 import compilers.visitor.kxi.KxiVisitorBase;
+import lombok.Getter;
 
+@Getter
 public class KxiIndex extends AbstractKxiNode {
     private AbstractKxiExpression index;
 

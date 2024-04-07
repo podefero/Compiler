@@ -4,5 +4,5 @@ import lombok.Data;
 
 @Data
 public class GlobalScope extends SymbolTable {
-    private BlockScope mainScope;
+    private MethodScope mainScope;
 }

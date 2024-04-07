@@ -1,11 +1,11 @@
 package compilers.visitor.kxi.symboltable;
 
-import lombok.Getter;
+import lombok.Data;
 
 import java.util.HashMap;
 import java.util.Map;
 
-@Getter
+@Data
 public class ScopeHandler {
     private Map<String, ClassScope> classScopeMap;
     private GlobalScope globalScope;
@@ -54,12 +54,24 @@ public class ScopeHandler {
         return null;
     }
 
-    public boolean isIdClass(String id) {
-        return false;
+    public MethodScope bubbleToMethodScope(SymbolTable symbolTable, String id) {
+        //traverse up nested scope
+        while (symbolTable != null) {
+            if (symbolTable instanceof ClassScope) {
+                MethodScope methodScope;
+                methodScope = ((ClassScope) symbolTable).getMethodScopeMap().get(id);
+                if (methodScope != null) return methodScope;
+            } else if (symbolTable instanceof GlobalScope) {
+                if (id.equals("main")) return ((GlobalScope) symbolTable).getMainScope();
+            }
+            symbolTable = symbolTable.parent;
+        }
+
+        return null;
     }
 
-    public GlobalScope getGlobalScope() {
-        return globalScope;
+    public boolean isIdClass(String id) {
+        return false;
     }
 
     public void addClassScope(String id, ClassScope classScope) {

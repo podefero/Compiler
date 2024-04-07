@@ -2,8 +2,7 @@ package compilers.visitor.kxi.typecheck;
 
 import compilers.ast.kxi_nodes.*;
 import compilers.ast.kxi_nodes.class_members.KxiMethod;
-import compilers.ast.kxi_nodes.expressions.KxiDotExpression;
-import compilers.ast.kxi_nodes.expressions.KxiNewExpressionArgument;
+import compilers.ast.kxi_nodes.expressions.*;
 import compilers.ast.kxi_nodes.expressions.binary.arithmic.KxiDiv;
 import compilers.ast.kxi_nodes.expressions.binary.arithmic.KxiMult;
 import compilers.ast.kxi_nodes.expressions.binary.arithmic.KxiPlus;
@@ -21,12 +20,12 @@ import compilers.exceptions.TypeCheckException;
 import compilers.visitor.kxi.KxiVisitorBase;
 import compilers.visitor.kxi.result.ResultFlag;
 import compilers.visitor.kxi.result.ResultType;
-import compilers.visitor.kxi.symboltable.ClassScope;
-import compilers.visitor.kxi.symboltable.ScopeHandler;
-import compilers.visitor.kxi.symboltable.SymbolData;
-import compilers.visitor.kxi.symboltable.SymbolTable;
+import compilers.visitor.kxi.symboltable.*;
 import lombok.AllArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Stack;
 
 
@@ -73,6 +72,30 @@ public class TypeCheckerVisitor extends KxiVisitorBase {
 
             resultTypeStack.push(resultR);
         }
+    }
+
+    private void matchParamArg(SymbolData left, SymbolData right) {
+
+        int arrayDepthL = right.getType().getArrayDepth();
+        int arrayDepthR = left.getType().getArrayDepth();
+
+        ScalarType leftType = left.getType().getScalarType();
+        ScalarType rightType = right.getType().getScalarType();
+
+        String codeLine = left.getType().getLineInfo();
+
+        if (leftType == ScalarType.ID && rightType == ScalarType.ID) {
+            String IdL = left.getType().getKxiType().getIdName().getValue();
+            String IdR = right.getType().getKxiType().getIdName().getValue();
+
+            if (!IdL.equals(IdR))
+                exceptionStack.push(new TypeCheckException(codeLine, "Mismatched Types arg: " + IdR + " param: " + IdL));
+        }
+        if (leftType != rightType)
+            exceptionStack.push(new TypeCheckException(codeLine, "Mismatched Types arg: " + rightType + " param: " + leftType));
+        else if (arrayDepthL != arrayDepthR)
+            exceptionStack.push(new TypeCheckException(codeLine, "Mismatched ArrayDim arg Dimension: " + arrayDepthR + " param Dimension: " + arrayDepthL));
+
     }
 
     private void matchResultsOnInt(String codeLine) {
@@ -125,6 +148,15 @@ public class TypeCheckerVisitor extends KxiVisitorBase {
         resultType.getTypeData().setType(updatedType);
     }
 
+    private List<ResultType> popList(int size) {
+        List<ResultType> resultTypeList = new ArrayList<>();
+        for (int i = 0; i < size; i++) {
+            resultTypeList.add(resultTypeStack.pop());
+        }
+        Collections.reverse(resultTypeList);
+        return resultTypeList;
+    }
+
 
     private ResultType pushNewResult(String id, SymbolData typeData, SymbolTable scope) {
         return resultTypeStack.push(new ResultType(id, typeData, scope));
@@ -137,7 +169,9 @@ public class TypeCheckerVisitor extends KxiVisitorBase {
     }
 
     private KxiType getLiteralAsDataType(ExpressionLiteral expressionLiteral, IdentifierToken id) {
-        return new KxiType(expressionLiteral.getTokenLiteral().getScalarType(), id);
+        KxiType kxiType = new KxiType(expressionLiteral.getTokenLiteral().getScalarType(), id);
+        kxiType.setLineInfo(expressionLiteral.getLineInfo());
+        return kxiType;
     }
 
     /*
@@ -159,17 +193,24 @@ public class TypeCheckerVisitor extends KxiVisitorBase {
         String id = expressionLiteral.getTokenLiteral().getValue();
         SymbolData typeData = scopeHandler.Identify(currentScope, id);
 
+        //check if main
+        if (id.equals("main")) {
+            typeData = scopeHandler.getGlobalScope().getMainScope().getReturnType();
+        }
+
         //not found, check for class level
         if (typeData == null) {
             ClassScope classScope = scopeHandler.getClassScope(id);
             if (classScope != null) {
                 typeData = classScope.getClassData();
+                typeData.getType().setLineInfo(expressionLiteral.getLineInfo());
                 pushNewResult(id, typeData, currentScope).getResultFlagList().add(ResultFlag.ClassLevel);
             } else {
                 exceptionStack.push(new TypeCheckException(expressionLiteral.getLineInfo(), "ID not found: " + id));
                 pushFailedResult();
             }
         } else {
+            typeData.getType().setLineInfo(expressionLiteral.getLineInfo());
             pushNewResult(id, typeData, currentScope);
         }
 
@@ -384,20 +425,26 @@ EXPRESSIONS DOT
                 //get dataType from result scope using childID
                 String childID = expression.getId().getValue();
                 SymbolData resultSymbolData = scopeHandler.Identify(resultClassScope, childID);
-                resultType.setTypeData(resultSymbolData);
 
-                //check for static and public modifier
-                if (resultType.containsFlag(ResultFlag.ClassLevel)) {
-                    if (!resultSymbolData.isStatic())
-                        exceptionStack.push(new TypeCheckException(expression.getLineInfo(), "Can't access non-static member " + childID));
-                } else if (resultSymbolData.isStatic())
-                    exceptionStack.push(new TypeCheckException(expression.getLineInfo(), "Instance object can't access static member " + childID));
+                if (resultSymbolData != null) {
+                    resultType.setTypeData(resultSymbolData);
+                    resultType.setReferenceId(childID);
+
+                    //check for static and public modifier
+                    if (resultType.containsFlag(ResultFlag.ClassLevel)) {
+                        if (!resultSymbolData.isStatic())
+                            exceptionStack.push(new TypeCheckException(expression.getLineInfo(), "Can't access non-static member " + childID));
+                    } else if (resultSymbolData.isStatic())
+                        exceptionStack.push(new TypeCheckException(expression.getLineInfo(), "Instance object can't access static member " + childID));
 
 
-                if (resultType.containsFlag(ResultFlag.OutOfScope))
-                    if (resultSymbolData.getModifier() == null || resultSymbolData.getModifier() == Modifier.PRIVATE)
-                        exceptionStack.push(new TypeCheckException(expression.getLineInfo(), "Can't access private or local member " + childID));
+                    if (resultType.containsFlag(ResultFlag.OutOfScope))
+                        if (resultSymbolData.getModifier() == null || resultSymbolData.getModifier() == Modifier.PRIVATE)
+                            exceptionStack.push(new TypeCheckException(expression.getLineInfo(), "Can't access private or local member " + childID));
+                } else {
+                    exceptionStack.push(new TypeCheckException(expression.getLineInfo(), "invalid member access " + childID));
 
+                }
 
             } else {
                 exceptionStack.push(new TypeCheckException(expression.getLineInfo(), "DOT expression cant access arrayType"));
@@ -406,13 +453,110 @@ EXPRESSIONS DOT
             exceptionStack.push(new TypeCheckException(expression.getLineInfo(), "DOT expression must start with ID"));
         }
 
-        //result has updated scope and dataType
+        //result has updated scope, refId and dataType
         resultTypeStack.push(resultType);
     }
 
     @Override
     public void preVisit(KxiNewExpressionArgument expression) {
-        pushNewResult(null, new SymbolData(false, null, new KxiType(ScalarType.ID, expression.getId())), currentScope);
+        //previsit so we arguments can have the context needed
+        KxiType kxiType = new KxiType(ScalarType.ID, expression.getId());
+        kxiType.setLineInfo(expression.getLineInfo());
+        String id = kxiType.getIdName().getValue();
+        ClassScope classScope = scopeHandler.getClassScope(id);
+
+        //childId needs to be a class
+        if (classScope == null)
+            exceptionStack.push(new TypeCheckException(expression.getLineInfo(), "Class does not exist for new " + id));
+
+        pushNewResult(id, new SymbolData(false, null, kxiType), classScope);
+
+    }
+
+    @Override
+    public void visit(KxiMethodExpression expression) {
+        //check if it's a method, no changes
+        ResultType result = resultTypeStack.pop();
+        if (result.getReferenceId() == null || scopeHandler.bubbleToMethodScope(result.getScope(), result.getReferenceId()) == null)
+            exceptionStack.push(new TypeCheckException(expression.getLineInfo(), "Can't find method "));
+        resultTypeStack.push(result);
+    }
+
+    @Override
+    public void visit(KxiArguments expression) {
+        List<ResultType> rightList = popList(expression.getArguments().size());
+        ResultType left = resultTypeStack.pop();
+        //left result has to have ref id
+        if (left.getReferenceId() != null) {
+            //access method from result scope
+            MethodScope methodScope = scopeHandler.bubbleToMethodScope(left.getScope(), left.getReferenceId());
+            if (methodScope != null) {
+                //make sure number of args match number of params
+                int leastSize = 0;
+                int argSize = expression.getArguments().size();
+                int paramSize = methodScope.getParams().size();
+                if (argSize != paramSize) {
+                    exceptionStack.push(new TypeCheckException(left.getTypeData().getType().getLineInfo()
+                            , "Number of args and params don't match. args: " + argSize + " params: " + paramSize));
+                    if (argSize < paramSize) leastSize = argSize;
+                    else leastSize = paramSize;
+
+                }
+
+                //compare params and args
+                for (int i = 0; i < leastSize; i++) {
+                    SymbolData param = methodScope.getParams().get(i);
+                    SymbolData arg = rightList.get(i).getTypeData();
+
+                    //argument can't be class level and expressionLit. Only dot expression will work with class level
+                    if (rightList.get(i).containsFlag(ResultFlag.ClassLevel) && expression.getArguments().get(i) instanceof ExpressionLiteral)
+                        exceptionStack.push(new TypeCheckException(rightList.get(i).getTypeData().getType().getLineInfo(), "Can't use class as argument"));
+                    matchParamArg(param, arg);
+                }
+            }
+        } else
+            exceptionStack.push(new TypeCheckException(left.getTypeData().getType().getLineInfo(), "Invalid Id for method access "));
+        resultTypeStack.push(left);
+    }
+
+    @Override
+    public void visit(KxiNewExpressionIndex expression) {
+        KxiArrayType kxiArrayType = new KxiArrayType(expression.getType().getScalarType(), expression.getType());
+
+        //if ID needs to be class
+        String id = null;
+        if (expression.getType().getScalarType() == ScalarType.ID) {
+            id = expression.getType().getKxiType().getIdName().getValue();
+            ClassScope classScope = scopeHandler.getClassScope(id);
+            if (classScope == null) {
+                exceptionStack.push(new TypeCheckException(expression.getLineInfo(), "Class does not exist for new " + id));
+            }
+        }
+        pushNewResult(id, new SymbolData(false, null, kxiArrayType), currentScope);
+    }
+
+    @Override
+    public void visit(KxiIndex expression) {
+        matchResultOnType(expression.getIndex().getLineInfo(), ScalarType.INT);
+        resultTypeStack.pop();
+    }
+
+    @Override
+    public void visit(KxiExpressionIndex expression) {
+        //has to have reference
+        ResultType resultType = resultTypeStack.pop();
+        if (resultType.getReferenceId() != null) {
+            //has to be an array
+            if (resultType.getTypeData().getType() instanceof KxiArrayType) {
+                KxiAbstractType kxiAbstractType = ((KxiArrayType) resultType.getTypeData().getType()).getInsideType();
+                resultType.getTypeData().setType(kxiAbstractType);
+            } else
+                exceptionStack.push(new TypeCheckException(expression.getLineInfo(), "index expression must have an array " + resultType.getReferenceId()));
+        } else
+            exceptionStack.push(new TypeCheckException(expression.getLineInfo(), "invalid array access member"));
+
+        //changed typeData, has one array unwrapped
+        resultTypeStack.push(resultType);
     }
 }
 
