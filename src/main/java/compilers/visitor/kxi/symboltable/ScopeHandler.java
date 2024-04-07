@@ -16,7 +16,21 @@ public class ScopeHandler {
     }
 
     public SymbolData Identify(SymbolTable symbolTable, String id) {
-        return symbolTable.getScope().get(id);
+        String uniqueName = symbolTable.getUniqueName();
+
+        while (symbolTable != null) {
+            SymbolData symbolData;
+
+            if (symbolTable instanceof GlobalScope)
+                symbolData = symbolTable.getScope().get(uniqueName + id);
+            else
+                symbolData = symbolTable.getScope().get(id);
+
+            if (symbolData != null) return symbolData;
+
+            symbolTable = symbolTable.parent;
+        }
+        return null;
     }
 
     public MethodScope getMethodScope(String classId, String methodId) {
