@@ -1,14 +1,20 @@
 package compilers.visitor.kxi.typecheck;
 
+import compilers.ast.kxi_nodes.KxiArrayType;
 import compilers.ast.kxi_nodes.KxiType;
+import compilers.ast.kxi_nodes.Modifier;
 import compilers.ast.kxi_nodes.ScalarType;
+import compilers.ast.kxi_nodes.expressions.KxiDotExpression;
 import compilers.ast.kxi_nodes.expressions.binary.arithmic.KxiDiv;
 import compilers.ast.kxi_nodes.expressions.binary.arithmic.KxiMult;
 import compilers.ast.kxi_nodes.expressions.binary.arithmic.KxiPlus;
 import compilers.ast.kxi_nodes.expressions.binary.arithmic.KxiSubtract;
 import compilers.ast.kxi_nodes.expressions.binary.assignment.*;
-import compilers.ast.kxi_nodes.expressions.binary.conditional.KxiAnd;
+import compilers.ast.kxi_nodes.expressions.binary.conditional.*;
 import compilers.ast.kxi_nodes.expressions.literals.*;
+import compilers.ast.kxi_nodes.expressions.uni.KxiNot;
+import compilers.ast.kxi_nodes.expressions.uni.KxiUniPlus;
+import compilers.ast.kxi_nodes.expressions.uni.KxiUniSubtract;
 import compilers.ast.kxi_nodes.scope.KxiBlock;
 import compilers.ast.kxi_nodes.scope.KxiClass;
 import compilers.ast.kxi_nodes.token_literals.IdentifierToken;
@@ -74,23 +80,42 @@ public class TypeCheckerVisitor extends KxiVisitorBase {
             ResultType resultL = resultTypeStack.pop();
             ScalarType left = resultL.getTypeData().getType().getScalarType();
             ScalarType right = resultR.getTypeData().getType().getScalarType();
-            if (right != ScalarType.INT || right != ScalarType.CHAR)
+            if (right != ScalarType.INT && right != ScalarType.CHAR)
                 exceptionStack.push(new TypeCheckException(codeLine, "Mismatched Types provided: " + right + " expected: INT or CHAR"));
-            else if (left != ScalarType.INT || left != ScalarType.CHAR)
+            else if (left != ScalarType.INT && left != ScalarType.CHAR)
                 exceptionStack.push(new TypeCheckException(codeLine, "Mismatched Types provided: " + left + " expected: INT or CHAR"));
             else if (left != right)
                 exceptionStack.push(new TypeCheckException(codeLine, "Mismatched Types provided: " + right + " expected: " + left));
 
-            //update result to bool
-            KxiType updatedType = new KxiType(ScalarType.BOOL, null);
-            resultR.getTypeData().setType(updatedType);
             resultTypeStack.push(resultR);
+            updatedResultScalarType(ScalarType.BOOL);
         }
+    }
+
+    private void matchResultOnType(String codeLine, ScalarType matchType) {
+        ResultType resultType = resultTypeStack.pop();
+        ScalarType type = resultType.getTypeData().getType().getScalarType();
+        if (type != matchType)
+            exceptionStack.push(new TypeCheckException(codeLine, "Mismatched Type provided: " + type + " expected: " + matchType));
+        resultTypeStack.push(resultType);
+    }
+
+    private void updatedResultScalarType(ScalarType scalarType) {
+        //update result to bool
+        ResultType resultType = resultTypeStack.peek();
+        KxiType updatedType = new KxiType(ScalarType.BOOL, null);
+        resultType.getTypeData().setType(updatedType);
     }
 
 
     private ResultType pushNewResult(String id, SymbolData typeData, SymbolTable scope) {
         return resultTypeStack.push(new ResultType(id, typeData, scope));
+    }
+
+    private ResultType pushFailedResult() {
+        String id = "Failed";
+        SymbolData typeData = new SymbolData(false, null, new KxiType(ScalarType.UNKNOWN, null));
+        return resultTypeStack.push(new ResultType(id, typeData, currentScope));
     }
 
     private KxiType getLiteralAsDataType(ExpressionLiteral expressionLiteral, IdentifierToken id) {
@@ -124,6 +149,7 @@ public class TypeCheckerVisitor extends KxiVisitorBase {
                 pushNewResult(id, typeData, currentScope).getResultFlagList().add(ResultFlag.ClassLevel);
             } else {
                 exceptionStack.push(new TypeCheckException(expressionLiteral.getLineInfo(), "ID not found: " + id));
+                pushFailedResult();
             }
         } else {
             pushNewResult(id, typeData, currentScope);
@@ -152,9 +178,10 @@ public class TypeCheckerVisitor extends KxiVisitorBase {
     @Override
     public void visit(ExpressionThisLit expressionLiteral) {
         ClassScope classScope = scopeHandler.bubbleToClassScope(currentScope);
-        if (classScope == null)
+        if (classScope == null) {
             exceptionStack.push(new TypeCheckException(expressionLiteral.getLineInfo(), "'this' must be used in a class"));
-        else {
+            pushFailedResult();
+        } else {
             SymbolData typeData = classScope.getClassData();
             pushNewResult(null, typeData, currentScope);
         }
@@ -240,6 +267,113 @@ public class TypeCheckerVisitor extends KxiVisitorBase {
     @Override
     public void visit(KxiAnd expression) {
         matchResultsOnRelational(expression.getLineInfo());
+    }
+
+    @Override
+    public void visit(KxiEqualsEquals expression) {
+        matchResults(expression.getLineInfo());
+        updatedResultScalarType(ScalarType.BOOL);
+    }
+
+    @Override
+    public void visit(KxiGreaterEqualsThen expression) {
+        matchResultsOnRelational(expression.getLineInfo());
+    }
+
+    @Override
+    public void visit(KxiGreaterThen expression) {
+        matchResultsOnRelational(expression.getLineInfo());
+    }
+
+    @Override
+    public void visit(KxiLessEqualsThen expression) {
+        matchResultsOnRelational(expression.getLineInfo());
+    }
+
+    @Override
+    public void visit(KxiLessThen expression) {
+        matchResultsOnRelational(expression.getLineInfo());
+    }
+
+    @Override
+    public void visit(KxiNotEquals expression) {
+        matchResults(expression.getLineInfo());
+        updatedResultScalarType(ScalarType.BOOL);
+    }
+
+    @Override
+    public void visit(KxiOr expression) {
+        matchResultsOnRelational(expression.getLineInfo());
+    }
+
+    /*
+EXPRESSIONS UNARY
+*/
+    @Override
+    public void visit(KxiNot expression) {
+        matchResultOnType(expression.getLineInfo(), ScalarType.BOOL);
+    }
+
+    @Override
+    public void visit(KxiUniPlus expression) {
+        matchResultOnType(expression.getLineInfo(), ScalarType.CHAR);
+        updatedResultScalarType(ScalarType.INT);
+    }
+
+    @Override
+    public void visit(KxiUniSubtract expression) {
+        matchResultOnType(expression.getLineInfo(), ScalarType.INT);
+    }
+
+    /*
+EXPRESSIONS DOT
+*/
+    @Override
+    public void visit(KxiDotExpression expression) {
+        ResultType resultType = resultTypeStack.pop();
+        //check if type is ID
+        if (resultType.getTypeData().getType().getScalarType() == ScalarType.ID) {
+            //check for  array
+            if (resultType.getTypeData().getType() instanceof KxiType) {
+                //get its type
+                KxiType kxiType = (KxiType) resultType.getTypeData().getType();
+
+                //set result class scope
+                ClassScope resultClassScope = scopeHandler.getClassScope(kxiType.getIdName().getValue());
+                resultType.setScope(resultClassScope);
+
+                //get class scope from current scope
+                //compare to make sure we are out of scope
+                ClassScope currentClassScope = scopeHandler.bubbleToClassScope(currentScope);
+                if (currentClassScope == null || !currentClassScope.equals(resultClassScope))
+                    resultType.getResultFlagList().add(ResultFlag.OutOfScope);
+
+                //get dataType from result scope using childID
+                String childID = expression.getId().getValue();
+                SymbolData resultSymbolData = scopeHandler.Identify(resultClassScope, childID);
+                resultType.setTypeData(resultSymbolData);
+
+                //check for static and public modifier
+                if (resultType.containsFlag(ResultFlag.ClassLevel)) {
+                    if (!resultSymbolData.isStatic())
+                        exceptionStack.push(new TypeCheckException(expression.getLineInfo(), "Can't access non-static member " + childID));
+                } else if (resultSymbolData.isStatic())
+                    exceptionStack.push(new TypeCheckException(expression.getLineInfo(), "Instance object can't access static member " + childID));
+
+
+                if (resultType.containsFlag(ResultFlag.OutOfScope))
+                    if (resultSymbolData.getModifier() == null || resultSymbolData.getModifier() == Modifier.PRIVATE)
+                        exceptionStack.push(new TypeCheckException(expression.getLineInfo(), "Can't access private or local member " + childID));
+
+
+            } else {
+                exceptionStack.push(new TypeCheckException(expression.getLineInfo(), "DOT expression cant access array"));
+            }
+        } else {
+            exceptionStack.push(new TypeCheckException(expression.getLineInfo(), "DOT expression must start with ID"));
+        }
+
+        resultTypeStack.push(resultType);
     }
 
 

@@ -30,8 +30,7 @@ statement : IF LPARENTH expression RPARENTH statement (ELSE statement)?
 block : LCURLY statement* RCURLY ;
 caseBlock : LCURLY case* DEFAULT COLON statement* RCURLY ;
 case : CASE (INTLIT | CHARLIT) COLON statement* ;
-expression : expression EQUALS expression
-            | expression PLUSEQUALS expression
+expression : expression PLUSEQUALS expression
             | expression SUBEQUALS expression
             | expression MULTEQUALS expression
             | expression DIVEQUALS expression
@@ -63,7 +62,8 @@ expression : expression EQUALS expression
             | NEW IDENTIFIER arguments
             | expression DOT IDENTIFIER
             | expression index
-            | expression arguments ;
+            | expression arguments
+            | expression EQUALS expression;
 arguments : LPARENTH argumentList? RPARENTH ;
 argumentList : expression (COMMA expression)* ;
 index : LBRACKET expression RBRACKET ;

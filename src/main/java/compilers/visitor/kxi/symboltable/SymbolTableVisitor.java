@@ -231,7 +231,7 @@ public class SymbolTableVisitor extends KxiVisitorBase {
 
     @Override
     public void visit(KxiVariableDeclaration kxiVariableDeclaration) {
-        SymbolData symbolData = new SymbolData(false, Modifier.LOCAL, kxiVariableDeclaration.getType());
+        SymbolData symbolData = new SymbolData(false,null, kxiVariableDeclaration.getType());
         addSymbolDataToCurrentScope(kxiVariableDeclaration.getId().getValue(), symbolData);
     }
 
@@ -246,7 +246,7 @@ public class SymbolTableVisitor extends KxiVisitorBase {
 
     @Override
     public void visit(KxiParameter kxiParameter) {
-        SymbolData symbolData = new SymbolData(false, Modifier.LOCAL, kxiParameter.getType());
+        SymbolData symbolData = new SymbolData(false, null, kxiParameter.getType());
         addSymbolDataToCurrentScope(kxiParameter.getId().getValue(), symbolData);
     }
 
