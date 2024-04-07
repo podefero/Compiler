@@ -1,10 +1,9 @@
 package compilers.visitor.kxi.typecheck;
 
-import compilers.ast.kxi_nodes.KxiArrayType;
-import compilers.ast.kxi_nodes.KxiType;
-import compilers.ast.kxi_nodes.Modifier;
-import compilers.ast.kxi_nodes.ScalarType;
+import compilers.ast.kxi_nodes.*;
+import compilers.ast.kxi_nodes.class_members.KxiMethod;
 import compilers.ast.kxi_nodes.expressions.KxiDotExpression;
+import compilers.ast.kxi_nodes.expressions.KxiNewExpressionArgument;
 import compilers.ast.kxi_nodes.expressions.binary.arithmic.KxiDiv;
 import compilers.ast.kxi_nodes.expressions.binary.arithmic.KxiMult;
 import compilers.ast.kxi_nodes.expressions.binary.arithmic.KxiPlus;
@@ -38,6 +37,22 @@ public class TypeCheckerVisitor extends KxiVisitorBase {
     private SymbolTable currentScope;
 
 
+    private void matchId(ResultType resultL, ResultType resultR, String codeLine) {
+
+        ScalarType left = resultL.getTypeData().getType().getScalarType();
+        ScalarType right = resultR.getTypeData().getType().getScalarType();
+
+        if (left == ScalarType.ID && right == ScalarType.ID) {
+            String IdL = resultL.getTypeData().getType().getKxiType().getIdName().getValue();
+            String IdR = resultR.getTypeData().getType().getKxiType().getIdName().getValue();
+
+
+            if (!IdL.equals(IdR))
+                exceptionStack.push(new TypeCheckException(codeLine, "Mismatched Types provided: " + IdR + " expected: " + IdL));
+        }
+
+    }
+
     private void matchResults(String codeLine) {
         if (resultTypeStack.size() >= 2) {
             ResultType resultR = resultTypeStack.pop();
@@ -48,6 +63,8 @@ public class TypeCheckerVisitor extends KxiVisitorBase {
 
             ScalarType left = resultL.getTypeData().getType().getScalarType();
             ScalarType right = resultR.getTypeData().getType().getScalarType();
+
+            matchId(resultL, resultR, codeLine);
 
             if (left != right)
                 exceptionStack.push(new TypeCheckException(codeLine, "Mismatched Types provided: " + right + " expected: " + left));
@@ -80,6 +97,7 @@ public class TypeCheckerVisitor extends KxiVisitorBase {
             ResultType resultL = resultTypeStack.pop();
             ScalarType left = resultL.getTypeData().getType().getScalarType();
             ScalarType right = resultR.getTypeData().getType().getScalarType();
+            matchId(resultL, resultR, codeLine);
             if (right != ScalarType.INT && right != ScalarType.CHAR)
                 exceptionStack.push(new TypeCheckException(codeLine, "Mismatched Types provided: " + right + " expected: INT or CHAR"));
             else if (left != ScalarType.INT && left != ScalarType.CHAR)
@@ -208,6 +226,21 @@ public class TypeCheckerVisitor extends KxiVisitorBase {
         /*
     EXPRESSIONS ARITHMIC ASSIGNMENT
      */
+
+    @Override
+    public void visit(KxiVariableDeclaration expression) {
+        //this handles thar var = exp case (instead of exp = exp)
+        if (expression.getInitializer() != null) {
+            ResultType leftOver = resultTypeStack.pop(); // pop to preserve order
+            pushNewResult(expression.getId().getValue(), new SymbolData(false, null, expression.getType()), currentScope);
+            resultTypeStack.push(leftOver);
+            matchResults(expression.getLineInfo());
+        } else if (expression.getType().getScalarType() == ScalarType.ID) {
+            ClassScope classScope = scopeHandler.getClassScope(expression.getType().getKxiType().getIdName().getValue());
+            if (classScope == null)
+                exceptionStack.push(new TypeCheckException(expression.getLineInfo(), expression.getId().getValue() + " does not refer to a valid class"));
+        }
+    }
 
     @Override
     public void visit(KxiDivEquals expression) {
@@ -367,15 +400,19 @@ EXPRESSIONS DOT
 
 
             } else {
-                exceptionStack.push(new TypeCheckException(expression.getLineInfo(), "DOT expression cant access array"));
+                exceptionStack.push(new TypeCheckException(expression.getLineInfo(), "DOT expression cant access arrayType"));
             }
         } else {
             exceptionStack.push(new TypeCheckException(expression.getLineInfo(), "DOT expression must start with ID"));
         }
 
+        //result has updated scope and dataType
         resultTypeStack.push(resultType);
     }
 
-
+    @Override
+    public void preVisit(KxiNewExpressionArgument expression) {
+        pushNewResult(null, new SymbolData(false, null, new KxiType(ScalarType.ID, expression.getId())), currentScope);
+    }
 }
 

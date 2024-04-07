@@ -30,26 +30,33 @@ statement : IF LPARENTH expression RPARENTH statement (ELSE statement)?
 block : LCURLY statement* RCURLY ;
 caseBlock : LCURLY case* DEFAULT COLON statement* RCURLY ;
 case : CASE (INTLIT | CHARLIT) COLON statement* ;
-expression : expression PLUSEQUALS expression
-            | expression SUBEQUALS expression
-            | expression MULTEQUALS expression
-            | expression DIVEQUALS expression
+expression :
+            LPARENTH expression RPARENTH
+            | expression index
+            | expression DOT IDENTIFIER
+            | NOT expression
+            | PLUS expression
+            | SUBTRACT expression
+            | NEW IDENTIFIER arguments
+            | NEW type index
+            | expression arguments
             | expression MULT expression
             | expression DIVIDE expression
             | expression PLUS expression
             | expression SUBTRACT expression
+            | expression LESSTHEN expression
+            | expression LESSEQUALS expression
+            | expression GREATERTHEN expression
+            | expression GREATEREQUALS expression
             | expression EQUALSEQUALS expression
             | expression NOTEQUALS expression
-            | expression LESSTHEN expression
-            | expression GREATERTHEN expression
-            | expression LESSEQUALS expression
-            | expression GREATEREQUALS expression
             | expression AND expression
             | expression OR expression
-            | NOT expression
-            | PLUS expression
-            | SUBTRACT expression
-            | LPARENTH expression RPARENTH
+            | expression EQUALS expression
+            | expression PLUSEQUALS expression
+            | expression SUBEQUALS expression
+            | expression MULTEQUALS expression
+            | expression DIVEQUALS expression
             | INTLIT
             | CHARLIT
             | STRINGLIT
@@ -57,13 +64,7 @@ expression : expression PLUSEQUALS expression
             | FALSE
             | NULL
             | THIS
-            | IDENTIFIER
-            | NEW type index
-            | NEW IDENTIFIER arguments
-            | expression DOT IDENTIFIER
-            | expression index
-            | expression arguments
-            | expression EQUALS expression;
+            | IDENTIFIER ;
 arguments : LPARENTH argumentList? RPARENTH ;
 argumentList : expression (COMMA expression)* ;
 index : LBRACKET expression RBRACKET ;

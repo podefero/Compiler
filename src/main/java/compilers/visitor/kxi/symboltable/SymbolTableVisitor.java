@@ -137,7 +137,10 @@ public class SymbolTableVisitor extends KxiVisitorBase {
 
     @Override
     public void visit(KxiClass kxiClass) {
-        scopeHandler.addClassScope(kxiClass.getId().getValue(), (ClassScope) kxiClass.getScope());
+        String id = kxiClass.getId().getValue();
+        if (scopeHandler.getClassScopeMap().containsKey(id))
+            exceptionStack.push(new SymbolTableException(kxiClass.getLineInfo(), "Duplicate Class name " + id));
+        scopeHandler.addClassScope(id, (ClassScope) kxiClass.getScope());
         nameCounter = 0;
         scopeNodeVisit();
     }
@@ -231,7 +234,7 @@ public class SymbolTableVisitor extends KxiVisitorBase {
 
     @Override
     public void visit(KxiVariableDeclaration kxiVariableDeclaration) {
-        SymbolData symbolData = new SymbolData(false,null, kxiVariableDeclaration.getType());
+        SymbolData symbolData = new SymbolData(false, null, kxiVariableDeclaration.getType());
         addSymbolDataToCurrentScope(kxiVariableDeclaration.getId().getValue(), symbolData);
     }
 

@@ -1,8 +1,11 @@
 package compilers.visitor.kxi.symboltable;
 
+import lombok.Getter;
+
 import java.util.HashMap;
 import java.util.Map;
 
+@Getter
 public class ScopeHandler {
     private Map<String, ClassScope> classScopeMap;
     private GlobalScope globalScope;

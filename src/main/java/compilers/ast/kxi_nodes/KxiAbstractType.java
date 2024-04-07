@@ -13,11 +13,21 @@ public abstract class KxiAbstractType extends AbstractKxiNode {
     public int getArrayDepth() {
         int depth = 0;
         KxiAbstractType current = this;
-        while(current instanceof KxiArrayType) {
+        while (current instanceof KxiArrayType) {
             current = ((KxiArrayType) current).getType();
             depth++;
         }
         return depth;
+    }
+
+    public KxiType getKxiType() {
+        KxiAbstractType current = this;
+        while (current instanceof KxiArrayType) {
+            current = ((KxiArrayType) current).getType();
+            if (current instanceof KxiType)
+                return (KxiType) current;
+        }
+        return (KxiType) current;
     }
 
     public String getName(String dim, KxiAbstractType kxiAbstractType) {
