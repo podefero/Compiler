@@ -26,14 +26,17 @@ public class AntlrToKxiVisitor<Void> extends AbstractParseTreeVisitor<Void> impl
         factory = new KxiFactoryBase();
     }
 
+    private String buildLineInfo(ParserRuleContext ctx) {
+        return "Line#: "
+                + ctx.getStart().getLine() + ":" + ctx.getStart().getCharPositionInLine()
+                + " to " + ctx.getStop().getLine() + ":" + ctx.getStop().getCharPositionInLine();
+    }
+
     private void transformNode(ParserRuleContext ctx) {
 //        nodeStack.push(factory.build(ctx, nodeStack));
         try {
             AbstractKxiNode node = factory.build(ctx, nodeStack);
-            node.setLineInfo("Line#: "
-                    + ctx.getStart().getLine() + ":" + ctx.getStart().getCharPositionInLine()
-                    + " to " + ctx.getStop().getLine() + ":" + ctx.getStop().getCharPositionInLine()
-                    + " " + ctx.getStart().getText());
+            node.setLineInfo(buildLineInfo(ctx));
             nodeStack.push(node);
         } catch (ClassCastException ex) {
             nodeStack.push(new KxiInvalidNode(ctx, nodeStack, ex));

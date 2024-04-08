@@ -80,15 +80,13 @@ public class TypeCheckerVisitor extends KxiVisitorBase {
         }
     }
 
-    private void matchParamArg(SymbolData left, SymbolData right) {
+    private void matchParamArg(SymbolData left, SymbolData right, String codeLine) {
 
         int arrayDepthL = right.getType().getArrayDepth();
         int arrayDepthR = left.getType().getArrayDepth();
 
         ScalarType leftType = left.getType().getScalarType();
         ScalarType rightType = right.getType().getScalarType();
-
-        String codeLine = left.getType().getLineInfo();
 
         if (leftType == ScalarType.ID && rightType == ScalarType.ID) {
             String IdL = left.getType().getKxiType().getIdName().getValue();
@@ -151,7 +149,7 @@ public class TypeCheckerVisitor extends KxiVisitorBase {
         //update result to bool
         ResultType resultType = resultTypeStack.peek();
         KxiType updatedType = new KxiType(ScalarType.BOOL, null);
-        resultType.getTypeData().setType(updatedType);
+        resultType.setTypeData(new SymbolData(false, null, updatedType));
     }
 
     private List<ResultType> popList(int size) {
@@ -212,7 +210,7 @@ public class TypeCheckerVisitor extends KxiVisitorBase {
                 typeData.getType().setLineInfo(expressionLiteral.getLineInfo());
                 pushNewResult(id, typeData, currentScope).getResultFlagList().add(ResultFlag.ClassLevel);
             } else {
-                exceptionStack.push(new TypeCheckException(expressionLiteral.getLineInfo(), "ID not found: " + id));
+                exceptionStack.push(new TypeCheckException(expressionLiteral.getLineInfo(), "Variable not declared: " + id));
                 pushFailedResult();
             }
         } else {
@@ -442,11 +440,10 @@ EXPRESSIONS DOT
 
                     //check for static and public modifier
                     if (resultType.containsFlag(ResultFlag.ClassLevel)) {
+                        resultType.getResultFlagList().remove(ResultFlag.ClassLevel);
                         if (!resultSymbolData.isStatic())
                             exceptionStack.push(new TypeCheckException(expression.getLineInfo(), "Can't access non-static member " + childID));
-                    } else if (resultSymbolData.isStatic())
-                        exceptionStack.push(new TypeCheckException(expression.getLineInfo(), "Instance object can't access static member " + childID));
-
+                    }
 
                     if (resultType.containsFlag(ResultFlag.OutOfScope))
                         if (resultSymbolData.getModifier() == null || resultSymbolData.getModifier() == Modifier.PRIVATE)
@@ -470,6 +467,7 @@ EXPRESSIONS DOT
     @Override
     public void preVisit(KxiNewExpressionArgument expression) {
         //previsit so we arguments can have the context needed
+        expression.getArguments().setLineInfo(expression.getLineInfo()); //cuz
         KxiType kxiType = new KxiType(ScalarType.ID, expression.getId());
         kxiType.setLineInfo(expression.getLineInfo());
         String id = kxiType.getIdName().getValue();
@@ -486,6 +484,7 @@ EXPRESSIONS DOT
     @Override
     public void visit(KxiMethodExpression expression) {
         //check if it's a method, no changes
+        expression.getArguments().setLineInfo(expression.getLineInfo()); //cuz
         ResultType result = resultTypeStack.pop();
         if (result.getReferenceId() == null || scopeHandler.bubbleToMethodScope(result.getScope(), result.getReferenceId()) == null)
             exceptionStack.push(new TypeCheckException(expression.getLineInfo(), "Can't find method "));
@@ -511,7 +510,8 @@ EXPRESSIONS DOT
                     if (argSize < paramSize) leastSize = argSize;
                     else leastSize = paramSize;
 
-                }
+                } else
+                    leastSize = paramSize;
 
                 //compare params and args
                 for (int i = 0; i < leastSize; i++) {
@@ -519,9 +519,9 @@ EXPRESSIONS DOT
                     SymbolData arg = rightList.get(i).getTypeData();
 
                     //argument can't be class level and expressionLit. Only dot expression will work with class level
-                    if (rightList.get(i).containsFlag(ResultFlag.ClassLevel) && expression.getArguments().get(i) instanceof ExpressionLiteral)
+                    if (rightList.get(i).containsFlag(ResultFlag.ClassLevel))
                         exceptionStack.push(new TypeCheckException(rightList.get(i).getTypeData().getType().getLineInfo(), "Can't use class as argument"));
-                    matchParamArg(param, arg);
+                    matchParamArg(param, arg, expression.getLineInfo());
                 }
             }
         } else
@@ -559,7 +559,7 @@ EXPRESSIONS DOT
             //has to be an array
             if (resultType.getTypeData().getType() instanceof KxiArrayType) {
                 KxiAbstractType kxiAbstractType = ((KxiArrayType) resultType.getTypeData().getType()).getInsideType();
-                resultType.getTypeData().setType(kxiAbstractType);
+                resultType.setTypeData(new SymbolData(false, null, kxiAbstractType));
             } else
                 exceptionStack.push(new TypeCheckException(expression.getLineInfo(), "index expression must have an array " + resultType.getReferenceId()));
         } else
@@ -634,7 +634,7 @@ EXPRESSIONS DOT
         ResultType result = resultTypeStack.pop();
         //check if int, char, or string
         ScalarType resultType = result.getScalarType();
-        if(resultType != ScalarType.CHAR && resultType != ScalarType.INT)
+        if (resultType != ScalarType.CHAR && resultType != ScalarType.INT)
             exceptionStack.push(new TypeCheckException(statement.getLineInfo(), "CIN does not support type: " + resultType));
 
     }
@@ -644,7 +644,7 @@ EXPRESSIONS DOT
         ResultType result = resultTypeStack.pop();
         //check if int, char, or string
         ScalarType resultType = result.getScalarType();
-        if(resultType != ScalarType.CHAR && resultType != ScalarType.INT && resultType != ScalarType.STRING)
+        if (resultType != ScalarType.CHAR && resultType != ScalarType.INT && resultType != ScalarType.STRING)
             exceptionStack.push(new TypeCheckException(statement.getLineInfo(), "COUT does not support type: " + resultType));
 
     }
@@ -680,6 +680,17 @@ EXPRESSIONS DOT
     @Override
     public void visit(KxiCaseChar statement) {
         matchResultOnType(statement.getLineInfo(), ScalarType.CHAR);
+    }
+
+    @Override
+    public void visit(KxiParameter parameter) {
+        if (parameter.getType().getKxiType().getScalarType() == ScalarType.ID) {
+            String id = parameter.getType().getKxiType().getIdName().getValue();
+            if (scopeHandler.getClassScope(id) == null)
+                exceptionStack.push(new TypeCheckException(parameter.getLineInfo(), "Invalid Parameter: (missing class) " + parameter.getId().getValue()));
+
+
+        }
     }
 }
 
