@@ -70,6 +70,25 @@ public class ScopeHandler {
         return null;
     }
 
+    public MethodScope bubbleToNearestMethodScope(SymbolTable symbolTable) {
+        //traverse up nested scope
+        while (symbolTable != null) {
+            if (symbolTable instanceof BlockScope) {
+                if (((BlockScope) symbolTable).scopeType == ScopeType.Method) {
+                    ClassScope classScope = bubbleToClassScope(symbolTable);
+                    if (classScope != null) {
+                        return classScope.getMethodScopeMap().get(((BlockScope) symbolTable).getMethodId());
+                    } else {
+                        return null;
+                    }
+                }
+            }
+            symbolTable = symbolTable.parent;
+        }
+
+        return null;
+    }
+
     public boolean isIdClass(String id) {
         return false;
     }

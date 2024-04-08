@@ -70,12 +70,17 @@ public class SymbolTableVisitor extends KxiVisitorBase {
         }
     }
 
-    private void checkForDuplicateId(SymbolTable symbolTable, String key) {
+    private void checkForDuplicateId(SymbolTable symbolTable, String key, String lineInfo) {
+        //make sure class name does not exist
+
         if (symbolTable.getScope().containsKey(key)) {
             SymbolData symbolData = symbolTable.getScope().get(key);
             KxiAbstractType type = symbolData.getType();
-            exceptionStack.push(new SymbolTableException(type.getLineInfo(), "Duplicate ID name " + key));
+            exceptionStack.push(new SymbolTableException(lineInfo, "Duplicate ID name " + key));
         }
+        ClassScope classScope = scopeHandler.getClassScope(key);
+        if(classScope != null)
+            exceptionStack.push(new SymbolTableException(lineInfo, "Duplicate class name " + key));
     }
 
 
@@ -86,7 +91,7 @@ public class SymbolTableVisitor extends KxiVisitorBase {
         if (isStatic || scalarType == ScalarType.STRING) {
             globalScope.getScope().put(currentSymbolTable.getUniqueName() + id, symbolData);
         } else {
-            checkForDuplicateId(currentSymbolTable, id);
+            checkForDuplicateId(currentSymbolTable, id, symbolData.getType().getLineInfo());
             currentSymbolTable.getScope().put(id, symbolData);
         }
     }
@@ -107,6 +112,7 @@ public class SymbolTableVisitor extends KxiVisitorBase {
         }
 
         MethodScope methodScope = new MethodScope(returnType, params, blockScope);
+        blockScope.setMethodId(id);
         addMethodScopeToClassScope(methodScope, classScope, id);
     }
 
@@ -137,15 +143,13 @@ public class SymbolTableVisitor extends KxiVisitorBase {
         ClassScope classScope = new ClassScope();
         classScope.setClassId(kxiClass.getId().getValue());
         kxiClass.setScope(classScope);
+        scopeHandler.addClassScope(classScope.getClassId(), (ClassScope) kxiClass.getScope());
         scopeNodePreVisit(classScope);
     }
 
     @Override
     public void visit(KxiClass kxiClass) {
         String id = kxiClass.getId().getValue();
-        if (scopeHandler.getClassScopeMap().containsKey(id))
-            exceptionStack.push(new SymbolTableException(kxiClass.getLineInfo(), "Duplicate Class name " + id));
-        scopeHandler.addClassScope(id, (ClassScope) kxiClass.getScope());
         nameCounter = 0;
         scopeNodeVisit();
     }

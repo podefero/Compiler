@@ -22,6 +22,7 @@ src/main/java/compilers/antlr/KxiLexer.tokens
 dot
 png
 src/test/resources/
+src/main/java/test_p
 ### Eclipse ###
 .apt_generated
 .classpath

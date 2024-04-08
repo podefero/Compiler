@@ -1,6 +1,7 @@
 package compilers.transform.kxi;
 
 
+import compilers.ast.GenericListNode;
 import compilers.ast.kxi_nodes.AbstractKxiNode;
 import compilers.ast.kxi_nodes.KxiArguments;
 import compilers.ast.kxi_nodes.KxiIndex;
@@ -21,6 +22,7 @@ import compilers.util.KxiParseHelper;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
+import java.util.ArrayList;
 import java.util.Stack;
 
 import static compilers.antlr.KxiParser.*;
@@ -41,7 +43,7 @@ public class KxiFactoryExpression extends AbstractKxiFactory {
                 return new KxiMethodExpression(new KxiArguments(popList(stack, getListSizeFromCtx(expressionContext.arguments().argumentList().expression())))
                         , pop(stack));
             else
-                return new KxiMethodExpression(null, pop(stack));
+                return new KxiMethodExpression(new KxiArguments(new GenericListNode(new ArrayList<>())), pop(stack));
         }
 
         KxiParseHelper parseHelper = new KxiParseHelper();
@@ -97,7 +99,7 @@ public class KxiFactoryExpression extends AbstractKxiFactory {
                             return new KxiNewExpressionArgument(new KxiArguments(popList(stack, getListSizeFromCtx(expressionContext.arguments().argumentList().expression())))
                                     , new IdentifierToken(getTokenText(expressionContext.IDENTIFIER())));
                         else
-                            return new KxiNewExpressionArgument(null, new IdentifierToken(getTokenText(expressionContext.IDENTIFIER())));
+                            return new KxiNewExpressionArgument(new KxiArguments(new GenericListNode(new ArrayList<>())), new IdentifierToken(getTokenText(expressionContext.IDENTIFIER())));
 
 
                     }

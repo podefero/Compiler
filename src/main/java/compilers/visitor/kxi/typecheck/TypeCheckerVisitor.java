@@ -14,7 +14,13 @@ import compilers.ast.kxi_nodes.expressions.uni.KxiNot;
 import compilers.ast.kxi_nodes.expressions.uni.KxiUniPlus;
 import compilers.ast.kxi_nodes.expressions.uni.KxiUniSubtract;
 import compilers.ast.kxi_nodes.scope.KxiBlock;
+import compilers.ast.kxi_nodes.scope.KxiCaseBlockChar;
+import compilers.ast.kxi_nodes.scope.KxiCaseBlockInt;
 import compilers.ast.kxi_nodes.scope.KxiClass;
+import compilers.ast.kxi_nodes.statements.*;
+import compilers.ast.kxi_nodes.statements.conditional.KxiForStatement;
+import compilers.ast.kxi_nodes.statements.conditional.KxiIfStatement;
+import compilers.ast.kxi_nodes.statements.conditional.KxiWhileStatement;
 import compilers.ast.kxi_nodes.token_literals.IdentifierToken;
 import compilers.exceptions.TypeCheckException;
 import compilers.visitor.kxi.KxiVisitorBase;
@@ -276,11 +282,15 @@ public class TypeCheckerVisitor extends KxiVisitorBase {
             pushNewResult(expression.getId().getValue(), new SymbolData(false, null, expression.getType()), currentScope);
             resultTypeStack.push(leftOver);
             matchResults(expression.getLineInfo());
+            resultTypeStack.pop(); //don't need to keep results maybe
         } else if (expression.getType().getScalarType() == ScalarType.ID) {
             ClassScope classScope = scopeHandler.getClassScope(expression.getType().getKxiType().getIdName().getValue());
             if (classScope == null)
                 exceptionStack.push(new TypeCheckException(expression.getLineInfo(), expression.getId().getValue() + " does not refer to a valid class"));
+        } else if (expression.getType().getScalarType() == ScalarType.VOID) {
+            exceptionStack.push(new TypeCheckException(expression.getLineInfo(), expression.getId().getValue() + " can't be void"));
         }
+
     }
 
     @Override
@@ -557,6 +567,119 @@ EXPRESSIONS DOT
 
         //changed typeData, has one array unwrapped
         resultTypeStack.push(resultType);
+    }
+
+    @Override
+    public void visit(KxiExpressionStatement statement) {
+        resultTypeStack.pop();
+    }
+
+    @Override
+    public void visit(KxiIfStatement statement) {
+        if (resultTypeStack.pop().getScalarType() != ScalarType.BOOL)
+            exceptionStack.push(new TypeCheckException(statement.getLineInfo(), "If statement requires bool expression"));
+
+    }
+
+    @Override
+    public void visit(KxiWhileStatement statement) {
+        if (resultTypeStack.pop().getScalarType() != ScalarType.BOOL)
+            exceptionStack.push(new TypeCheckException(statement.getLineInfo(), "While statement requires bool expression"));
+
+    }
+
+    @Override
+    public void visit(KxiForStatement statement) {
+        if (statement.getPostExpression() != null) {
+            if (resultTypeStack.pop().getScalarType() != ScalarType.INT)
+                exceptionStack.push(new TypeCheckException(statement.getLineInfo(), "For statement PostExpression requires INT"));
+        }
+
+        if (resultTypeStack.pop().getScalarType() != ScalarType.BOOL)
+            exceptionStack.push(new TypeCheckException(statement.getLineInfo(), "For statement requires bool expression"));
+
+        if (statement.getPreExpression() != null) {
+            if (resultTypeStack.pop().getScalarType() != ScalarType.INT)
+                exceptionStack.push(new TypeCheckException(statement.getLineInfo(), "For statement PreExpression requires INT"));
+        }
+
+    }
+
+    @Override
+    public void visit(KxiReturnStatement statement) {
+        //has to be in a method scope
+        MethodScope methodScope = scopeHandler.bubbleToNearestMethodScope(currentScope);
+        if (methodScope != null) {
+            //if method return type is not void and return does not have expression
+            ScalarType methodReturnType = methodScope.getReturnType().getScalarType();
+            if (methodReturnType != ScalarType.VOID && statement.getExpression() != null) {
+                //if return had expression then result will be on stack
+                //use that to match on method type
+                matchResultOnType(statement.getLineInfo(), methodReturnType);
+                resultTypeStack.pop();
+                //method is void, but return is not
+            } else if (methodReturnType == ScalarType.VOID && statement.getExpression() != null) {
+                exceptionStack.push(new TypeCheckException(statement.getLineInfo(), "Invalid Return Type. Expecting VOID"));
+                resultTypeStack.pop();
+
+            } else if (methodReturnType != ScalarType.VOID && statement.getExpression() == null) {
+                exceptionStack.push(new TypeCheckException(statement.getLineInfo(), "Invalid Return Type. Expecting NON-VOID"));
+            }
+        } else
+            exceptionStack.push(new TypeCheckException(statement.getLineInfo(), "Return statement must be used in a method context"));
+    }
+
+    @Override
+    public void visit(KxiCinStatement statement) {
+        ResultType result = resultTypeStack.pop();
+        //check if int, char, or string
+        ScalarType resultType = result.getScalarType();
+        if(resultType != ScalarType.CHAR && resultType != ScalarType.INT)
+            exceptionStack.push(new TypeCheckException(statement.getLineInfo(), "CIN does not support type: " + resultType));
+
+    }
+
+    @Override
+    public void visit(KxiCoutStatement statement) {
+        ResultType result = resultTypeStack.pop();
+        //check if int, char, or string
+        ScalarType resultType = result.getScalarType();
+        if(resultType != ScalarType.CHAR && resultType != ScalarType.INT && resultType != ScalarType.STRING)
+            exceptionStack.push(new TypeCheckException(statement.getLineInfo(), "COUT does not support type: " + resultType));
+
+    }
+
+
+    @Override
+    public void preVisit(KxiCaseBlockInt caseBlock) {
+        currentScope = caseBlock.getScope();
+    }
+
+    @Override
+    public void preVisit(KxiCaseBlockChar caseBlock) {
+        currentScope = caseBlock.getScope();
+    }
+
+    @Override
+    public void visit(KxiSwitchStatementInt statement) {
+        matchResultOnType(statement.getLineInfo(), ScalarType.INT);
+        resultTypeStack.pop();
+    }
+
+    @Override
+    public void visit(KxiSwitchStatementChar statement) {
+        matchResultOnType(statement.getLineInfo(), ScalarType.CHAR);
+        resultTypeStack.pop();
+    }
+
+    @Override
+    public void visit(KxiCaseInt statement) {
+        matchResultOnType(statement.getLineInfo(), ScalarType.INT);
+    }
+
+    @Override
+    public void visit(KxiCaseChar statement) {
+        matchResultOnType(statement.getLineInfo(), ScalarType.CHAR);
     }
 }
 
