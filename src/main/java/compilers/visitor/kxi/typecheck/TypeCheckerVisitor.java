@@ -39,7 +39,6 @@ import java.util.Stack;
 public class TypeCheckerVisitor extends KxiVisitorBase {
     private ScopeHandler scopeHandler;
     private Stack<ResultType> resultTypeStack;
-    private SymbolTable currentScope;
 
 
     private void matchId(ResultType resultL, ResultType resultR, String codeLine) {
@@ -248,20 +247,6 @@ public class TypeCheckerVisitor extends KxiVisitorBase {
             SymbolData typeData = classScope.getClassData();
             pushNewResult(null, typeData, currentScope);
         }
-    }
-
-    /*
-    SCOPE TRAVERSAL
-     */
-
-    @Override
-    public void preVisit(KxiClass scopeNode) {
-        currentScope = scopeNode.getScope();
-    }
-
-    @Override
-    public void preVisit(KxiBlock scopeNode) {
-        currentScope = scopeNode.getScope();
     }
 
       /*
@@ -647,17 +632,6 @@ EXPRESSIONS DOT
         if (resultType != ScalarType.CHAR && resultType != ScalarType.INT && resultType != ScalarType.STRING)
             exceptionStack.push(new TypeCheckException(statement.getLineInfo(), "COUT does not support type: " + resultType));
 
-    }
-
-
-    @Override
-    public void preVisit(KxiCaseBlockInt caseBlock) {
-        currentScope = caseBlock.getScope();
-    }
-
-    @Override
-    public void preVisit(KxiCaseBlockChar caseBlock) {
-        currentScope = caseBlock.getScope();
     }
 
     @Override

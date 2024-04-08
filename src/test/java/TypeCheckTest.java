@@ -21,8 +21,7 @@ public class TypeCheckTest {
         symbolTableVisitor.dumpErrorStack();
 
         TypeCheckerVisitor typeCheckerVisitor =
-                new TypeCheckerVisitor(symbolTableVisitor.getScopeHandler()
-                        , new Stack<>(), symbolTableVisitor.getGlobalScope().getMainScope().getBlockScope());
+                new TypeCheckerVisitor(symbolTableVisitor.getScopeHandler(), new Stack<>());
         rootNode.accept(typeCheckerVisitor);
         typeCheckerVisitor.dumpErrorStack();
     }

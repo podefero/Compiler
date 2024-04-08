@@ -25,6 +25,7 @@ import compilers.ast.kxi_nodes.statements.conditional.KxiIfStatement;
 import compilers.ast.kxi_nodes.statements.conditional.KxiWhileStatement;
 import compilers.ast.kxi_nodes.token_literals.*;
 import compilers.exceptions.CompilerException;
+import compilers.visitor.kxi.symboltable.SymbolTable;
 import lombok.Getter;
 
 import java.util.Stack;
@@ -33,6 +34,7 @@ import java.util.Stack;
 public abstract class KxiVisitorBase implements VisitKxi {
 
     protected Stack<CompilerException> exceptionStack;
+    protected SymbolTable currentScope;
 
     public KxiVisitorBase() {
         exceptionStack = new Stack<>();
@@ -326,7 +328,7 @@ public abstract class KxiVisitorBase implements VisitKxi {
 
     @Override
     public void preVisit(KxiClass kxiClass) {
-
+        currentScope = kxiClass.getScope();
     }
 
     @Override
@@ -406,12 +408,13 @@ public abstract class KxiVisitorBase implements VisitKxi {
 
     @Override
     public void preVisit(KxiBlock kxiBlock) {
+        currentScope = kxiBlock.getScope();
 
     }
 
     @Override
     public void preVisit(KxiCaseBlockInt kxiCaseBlockInt) {
-
+        currentScope = kxiCaseBlockInt.getScope();
     }
 
     @Override
@@ -591,7 +594,7 @@ public abstract class KxiVisitorBase implements VisitKxi {
 
     @Override
     public void preVisit(KxiCaseBlockChar kxiCaseBlockChar) {
-
+        currentScope = kxiCaseBlockChar.getScope();
     }
 
     @Override
