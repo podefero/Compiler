@@ -7,5 +7,7 @@ public enum ResultFlag {
     Method,
     Class,
     Keyword,
+    Literal,
+    ID,
     This
 }

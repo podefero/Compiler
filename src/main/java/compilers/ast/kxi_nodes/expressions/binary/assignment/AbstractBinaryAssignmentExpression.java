@@ -13,7 +13,13 @@ public abstract class AbstractBinaryAssignmentExpression extends AbstractKxiBina
     }
 
     @Override
+    public void acceptAbstractKxi(KxiVisitorBase kxiVisitorBase) {
+        kxiVisitorBase.visitAssignment(this);
+    }
+
+    @Override
     public void accept(KxiVisitorBase visit) {
         super.accept(visit);
+        acceptAbstractKxi(visit);
     }
 }

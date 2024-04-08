@@ -50,6 +50,10 @@ public abstract class KxiVisitorBase implements VisitKxi {
         }
     }
 
+    public void visitAssignment(AbstractBinaryAssignmentExpression assignmentExpression) {}
+
+    public void visitStatement(AbstractKxiStatement abstractKxiStatement) {}
+
 
     @Override
     public void visit(KxiMain kxiMain) {

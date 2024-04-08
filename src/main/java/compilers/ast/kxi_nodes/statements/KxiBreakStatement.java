@@ -7,6 +7,7 @@ public class KxiBreakStatement extends AbstractKxiStatement{
     public void accept(KxiVisitorBase visit) {
         visit.preVisit(this);
         visit.visit(this);
+        acceptAbstractKxi(visit);
     }
 
 }

@@ -17,6 +17,7 @@ public class KxiBlockStatement extends AbstractKxiStatement {
     public void accept(KxiVisitorBase visit) {
         visit.preVisit(this);
         visitChildren(visit);
+        acceptAbstractKxi(visit);
         visit.visit(this);
     }
 

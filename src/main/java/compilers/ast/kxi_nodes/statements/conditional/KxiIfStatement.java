@@ -23,6 +23,7 @@ public class KxiIfStatement extends AbstractKxiConditionalStatement {
     public void accept(KxiVisitorBase visit) {
         visit.preVisit(this);
         visitChildren(visit);
+        acceptAbstractKxi(visit);
         visit.visit(this);
     }
 
