@@ -28,6 +28,7 @@ public class SymbolTableVisitor extends KxiVisitorBase {
     private Stack<SymbolTable> tableStack;
     private GlobalScope globalScope;
     private SymbolTable currentSymbolTable;
+    private List<String> allIds;
     private int nameCounter;
 
     public SymbolTableVisitor() {
@@ -35,6 +36,7 @@ public class SymbolTableVisitor extends KxiVisitorBase {
         scopeHandler = new ScopeHandler();
         tableStack = new Stack<>();
         globalScope = new GlobalScope();
+        allIds = new ArrayList<>();
         nameCounter = 0;
     }
 
@@ -84,11 +86,13 @@ public class SymbolTableVisitor extends KxiVisitorBase {
         }
         ClassScope classScope = scopeHandler.getClassScope(key);
         if (classScope != null)
-            exceptionStack.push(new SymbolTableException(lineInfo, "Duplicate class name " + key));
+            exceptionStack.push(new SymbolTableException(lineInfo, "ID can't be same as class name " + key));
     }
 
 
     private void addSymbolDataToCurrentScope(String id, SymbolData symbolData) {
+        if (!allIds.contains(id)) allIds.add(id);
+
         ScalarType scalarType = symbolData.getType().getScalarType();
         boolean isStatic = symbolData.isStatic();
 
@@ -100,11 +104,14 @@ public class SymbolTableVisitor extends KxiVisitorBase {
         }
     }
 
-    private void addMethodScopeToClassScope(MethodScope methodScope, ClassScope classScope, String id) {
+    private void addMethodScopeToClassScope(MethodScope methodScope, ClassScope classScope, String id, String lineInfo) {
+        if (classScope.getMethodScopeMap().containsKey(id))
+            exceptionStack.push(new SymbolTableException(lineInfo, "Duplicate Method/Constructor name " + id));
+
         classScope.getMethodScopeMap().put(id, methodScope);
     }
 
-    private void createMethodForClassScope(SymbolData returnType, List<KxiParameter> parameters, String id) {
+    private void createMethodForClassScope(SymbolData returnType, List<KxiParameter> parameters, String id, String lineInfo) {
         ClassScope classScope = (ClassScope) tableStack.peek();
         BlockScope blockScope = (BlockScope) currentSymbolTable;
 
@@ -117,7 +124,7 @@ public class SymbolTableVisitor extends KxiVisitorBase {
 
         MethodScope methodScope = new MethodScope(returnType, params, blockScope);
         blockScope.setMethodId(id);
-        addMethodScopeToClassScope(methodScope, classScope, id);
+        addMethodScopeToClassScope(methodScope, classScope, id, lineInfo);
     }
 
 
@@ -147,6 +154,12 @@ public class SymbolTableVisitor extends KxiVisitorBase {
         ClassScope classScope = new ClassScope();
         classScope.setClassId(kxiClass.getId().getValue());
         kxiClass.setScope(classScope);
+        if (scopeHandler.getClassScopeMap().containsKey(classScope.getClassId()))
+            exceptionStack.push(new SymbolTableException(kxiClass.getLineInfo(), "Duplicate class " + classScope.getClassId()));
+
+        if (allIds.contains(classScope.getClassId()))
+            exceptionStack.push(new SymbolTableException(kxiClass.getLineInfo(), "ID exists " + classScope.getClassId()));
+
         scopeHandler.addClassScope(classScope.getClassId(), (ClassScope) kxiClass.getScope());
         scopeNodePreVisit(classScope);
     }
@@ -188,7 +201,7 @@ public class SymbolTableVisitor extends KxiVisitorBase {
 
         String id = kxiMethod.getId().getValue();
 
-        createMethodForClassScope(returnData, kxiMethod.getParameters(), id);
+        createMethodForClassScope(returnData, kxiMethod.getParameters(), id, kxiMethod.getLineInfo());
 
         setBlockScopeType(ScopeType.Method);
 
@@ -208,7 +221,7 @@ public class SymbolTableVisitor extends KxiVisitorBase {
             exceptionStack.push(new SymbolTableException(kxiConstructor.getLineInfo(), "Constructor ID does not match class ID"));
         }
 
-        createMethodForClassScope(symbolData, kxiConstructor.getParameters(), id);
+        createMethodForClassScope(symbolData, kxiConstructor.getParameters(), id, kxiConstructor.getLineInfo());
 
         setBlockScopeType(ScopeType.Constructor);
 

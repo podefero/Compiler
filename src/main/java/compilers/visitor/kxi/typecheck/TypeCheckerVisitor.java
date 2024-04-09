@@ -1,7 +1,7 @@
 package compilers.visitor.kxi.typecheck;
 
 import compilers.ast.kxi_nodes.*;
-import compilers.ast.kxi_nodes.class_members.KxiMethod;
+import compilers.ast.kxi_nodes.class_members.KxiDataMember;
 import compilers.ast.kxi_nodes.expressions.*;
 import compilers.ast.kxi_nodes.expressions.binary.arithmic.KxiDiv;
 import compilers.ast.kxi_nodes.expressions.binary.arithmic.KxiMult;
@@ -13,10 +13,6 @@ import compilers.ast.kxi_nodes.expressions.literals.*;
 import compilers.ast.kxi_nodes.expressions.uni.KxiNot;
 import compilers.ast.kxi_nodes.expressions.uni.KxiUniPlus;
 import compilers.ast.kxi_nodes.expressions.uni.KxiUniSubtract;
-import compilers.ast.kxi_nodes.scope.KxiBlock;
-import compilers.ast.kxi_nodes.scope.KxiCaseBlockChar;
-import compilers.ast.kxi_nodes.scope.KxiCaseBlockInt;
-import compilers.ast.kxi_nodes.scope.KxiClass;
 import compilers.ast.kxi_nodes.statements.*;
 import compilers.ast.kxi_nodes.statements.conditional.KxiForStatement;
 import compilers.ast.kxi_nodes.statements.conditional.KxiIfStatement;
@@ -70,7 +66,11 @@ public class TypeCheckerVisitor extends KxiVisitorBase {
 
             matchId(resultL, resultR, codeLine);
 
-            if (left != right)
+            //check if left is pointer
+            if(resultR.getScalarType() == ScalarType.NULL)  {
+
+            }
+            else if (left != right)
                 exceptionStack.push(new TypeCheckException(codeLine, "Mismatched Types provided: " + right + " expected: " + left));
             else if (arrayDepthL != arrayDepthR)
                 exceptionStack.push(new TypeCheckException(codeLine, "Mismatched ArrayDim providedDimension: " + arrayDepthR + " expectedDimension: " + arrayDepthL));
@@ -245,7 +245,7 @@ public class TypeCheckerVisitor extends KxiVisitorBase {
             pushFailedResult();
         } else {
             SymbolData typeData = classScope.getClassData();
-            pushNewResult(null, typeData, currentScope);
+            pushNewResult(null, typeData, currentScope).getResultFlagList().add(ResultFlag.This);
         }
     }
 
@@ -665,6 +665,11 @@ EXPRESSIONS DOT
 
 
         }
+    }
+
+    @Override
+    public void visit(KxiDataMember dataMember) {
+
     }
 }
 

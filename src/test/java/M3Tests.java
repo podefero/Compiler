@@ -267,7 +267,7 @@ public class M3Tests {
     }
 
     @Test
-    void validUnaryOperators() {
+    void validUnaryOperatorsOne() {
         test("void main() {\n" +
                 "      int x = 5;\n" +
                 "      x = -x;\n" +
@@ -831,6 +831,699 @@ public class M3Tests {
                 "            bool b = true;\n" +
                 "            int c = -b;\n" +
                 "        }", true);
+    }
+
+    @Test
+    void invalidAssignmentTypeCheckLHS() {
+        test(" class Cheese {}\n" +
+                "        void main() {\n" +
+                "            Cheese x = 4;\n" +
+                "        }", true);
+    }
+
+    @Test
+    void invalidAssignmentTypeCheckRHS() {
+        test(" class Cheese {}\n" +
+                "        void main() {\n" +
+                "            Cheese c = true;\n" +
+                "        }", true);
+    }
+
+    @Test
+    void invalidIfStatementType() {
+        test(" void main() {\n" +
+                "            if (null) {\n" +
+                "                int x = 5;\n" +
+                "            }\n" +
+                "        }", true);
+    }
+
+    @Test
+    void invalidRelationalOperators() {
+        test(" void main() {\n" +
+                "            if (1 < 'a') {\n" +
+                "                int x = 5;\n" +
+                "            }\n" +
+                "        }", true);
+
+        test(" void main() {\n" +
+                "            if (1 > \"lol\") {\n" +
+                "                int x = 5;\n" +
+                "            }\n" +
+                "        }", true);
+
+        test(" void main() {\n" +
+                "            if (true >= 2) {\n" +
+                "                int x = 5;\n" +
+                "            }\n" +
+                "        }", true);
+
+        test(" void main() {\n" +
+                "            if (1 <= null) {\n" +
+                "                int x = 5;\n" +
+                "            }\n" +
+                "        }", true);
+    }
+
+    @Test
+    void invalidLogicalOperators() {
+        test(" void main() {\n" +
+                "            if (1 < 2 && 'a') {\n" +
+                "                return;\n" +
+                "            }\n" +
+                "        }", true);
+    }
+
+    @Test
+    void invalidArithmeticOperators() {
+        test(" void main() {\n" +
+                "            1 + 'a';\n" +
+                "        }", true);
+
+        test(" void main() {\n" +
+                "            null - null;\n" +
+                "        }", true);
+
+        test(" void main() {\n" +
+                "            1 * true;\n" +
+                "        }", true);
+
+        test(" void main() {\n" +
+                "            1 / null;\n" +
+                "        }", true);
+
+        test(" void main() {\n" +
+                "            1 += true;\n" +
+                "        }", true);
+
+        test(" void main() {\n" +
+                "            1 -= null;\n" +
+                "        }", true);
+
+        test(" void main() {\n" +
+                "            1 *= true;\n" +
+                "        }", true);
+    }
+
+    @Test
+    void invalidUnaryOperatorsOne() {
+        test(" void main() {\n" +
+                "            +true;\n" +
+                "        }", true);
+
+        test(" void main() {\n" +
+                "            +\"string\";\n" +
+                "        }", true);
+
+        test(" void main() {\n" +
+                "            -true;\n" +
+                "        }", true);
+
+        test(" void main() {\n" +
+                "            -\"string\";\n" +
+                "        }", true);
+
+        test(" void main() {\n" +
+                "            !1;\n" +
+                "        }", true);
+
+        test(" void main() {\n" +
+                "            !'a';\n" +
+                "        }", true);
+
+        test(" void main() {\n" +
+                "            !null;\n" +
+                "        }", true);
+    }
+
+    @Test
+    void invalidWhileStatement() {
+        test(" void main() {\n" +
+                "            while (1) {\n" +
+                "            }\n" +
+                "        }", true);
+
+        test(" void main() {\n" +
+                "            while ('a') {\n" +
+                "            }\n" +
+                "        }", true);
+
+        test(" void main() {\n" +
+                "            while (null) {\n" +
+                "            }\n" +
+                "        }", true);
+
+        test(" void main() {\n" +
+                "            while (true && 1) {\n" +
+                "            }\n" +
+                "        }", true);
+    }
+
+    @Test
+    void invalidForStatement() {
+        test(" void main() {\n" +
+                "            int i;\n" +
+                "            for (i = 4; \"CHEEEESE\" ; i += 5) {}\n" +
+                "        }", true);
+
+        test(" void main() {\n" +
+                "            int i;\n" +
+                "            for (i = 4; null ;) {}\n" +
+                "        }", true);
+
+        test(" void main() {\n" +
+                "            for (; null ;) {}\n" +
+                "        }", true);
+    }
+
+    @Test
+    void invalidCoutStatements() {
+        test(" void main() {\n" +
+                "            cout << true;\n" +
+                "            cout << false;\n" +
+                "        }", true);
+    }
+
+    @Test
+    void invalidSwitchStatement() {
+        test(" void main() {\n" +
+                "            switch (true) {\n" +
+                "                default:\n" +
+                "                    break;\n" +
+                "            } \n" +
+                "        }", true);
+
+        test(" void main() {\n" +
+                "            switch (null) {\n" +
+                "                default:\n" +
+                "                    break;\n" +
+                "            } \n" +
+                "        }", true);
+
+        test(" void main() {\n" +
+                "            switch (\"string\") {\n" +
+                "                default:\n" +
+                "                    break;\n" +
+                "            } \n" +
+                "        }", true);
+
+        test(" void main() {\n" +
+                "            int x;\n" +
+                "            int y = 2;\n" +
+                "            switch (y) {\n" +
+                "                case 'a': \n" +
+                "                    break;\n" +
+                "                case 2:\n" +
+                "                    break;\n" +
+                "                case 3:\n" +
+                "                    break;\n" +
+                "                default:\n" +
+                "                    break;\n" +
+                "            } \n" +
+                "        }", true);
+    }
+
+    @Test
+    void invalidFunctionReturnTypes() {
+        test(" class Cheese {\n" +
+                "            static public int wee() {\n" +
+                "                return;\n" +
+                "            }\n" +
+                "        }\n" +
+                "        void main() {}", true);
+    }
+
+    @Test
+    void invalidMainReturnType() {
+        test(" void main() {\n" +
+                "            return 4;\n" +
+                "        }", true);
+
+        test(" void main() {\n" +
+                "            return 'a';\n" +
+                "        }", true);
+
+        test(" void main() {\n" +
+                "            return \"string\";\n" +
+                "        }", true);
+
+        test(" void main() {\n" +
+                "            return true;\n" +
+                "        }", true);
+
+        test(" void main() {\n" +
+                "            return null;\n" +
+                "        }", true);
+    }
+
+    @Test
+    void invalidArrayDeclarations() {
+        test(" void main() {\n" +
+                "            int[] x = new int[][5];\n" +
+                "        }", true);
+
+        test(" void main() {\n" +
+                "            int[][][][][][] x = new int[][5];\n" +
+                "        }", true);
+
+        test(" void main() {\n" +
+                "            char[][] x = new int[][5];\n" +
+                "        }", true);
+    }
+
+    @Test
+    void invalidReferenceTypes() {
+        test(" void main() {\n" +
+                "            int x = null;\n" +
+                "        }", true);
+
+        test(" void main() {\n" +
+                "            char x = null;\n" +
+                "        }", true);
+    }
+
+    @Test
+    void invalidIndexAccess() {
+        test(" class Cheese {}\n" +
+                "        void main() {\n" +
+                "            int[] x = new int['a'];\n" +
+                "        }", true);
+
+        test(" class Cheese {}\n" +
+                "        void main() {\n" +
+                "            int[] x = new int[true];\n" +
+                "        }", true);
+    }
+
+    @Test
+    void invalidConstructorParams() {
+        test(" class Cheese {\n" +
+                "            Cheese(int x) {}\n" +
+                "        }\n" +
+                "        void main() {\n" +
+                "            Cheese c = new Cheese('a');\n" +
+                "        }", true);
+    }
+
+    @Test
+    void invalidFunctionCallParams() {
+        test(" class Cheese {\n" +
+                "            public void Func(int y, int x, char b) {\n" +
+                "                return Func(y, x, 7);\n" +
+                "            }\n" +
+                "        }\n" +
+                "        void main() {\n" +
+                "            Cheese c = new Cheese();\n" +
+                "        }", true);
+    }
+
+    @Test
+    void invalidThisInStaticFunction() {
+        test(" class Cheese {\n" +
+                "            private int y = 2;\n" +
+                "            static private int x = this.y;\n" +
+                "            static private void failure() {\n" +
+                "                this.x;\n" +
+                "            }\n" +
+                "        }\n" +
+                "        void main() {}", true);
+    }
+
+    @Test
+    void invalidPrivateFunctionCall() {
+        test(" class Cheese {\n" +
+                "            private void Wee() {}\n" +
+                "        }\n" +
+                "        void main() {\n" +
+                "            Cheese c = new Cheese();\n" +
+                "            c.Wee();\n" +
+                "        }", true);
+    }
+
+    @Test
+    void invalidVoidArrays() {
+        test(" void main() {\n" +
+                "            void x;\n" +
+                "        }", true);
+
+        test(" void main() {\n" +
+                "            void[] x;\n" +
+                "        }", true);
+    }
+
+    @Test
+    void invalidConstructorReturnTypes() {
+        test(" class Cheese {\n" +
+                "            Cheese(int x, char y, string z) {\n" +
+                "                return 4;\n" +
+                "            }\n" +
+                "        }\n" +
+                "        void main() {\n" +
+                "            Cheese c = new Cheese(4, 'a', \"hello\");\n" +
+                "        }", true);
+    }
+
+//    @Test
+//    void invalidConstructorReturnType() {
+//        test(" class Cheese {\n" +
+//                "            private int x;\n" +
+//                "            private char y;\n" +
+//                "            private string z;\n" +
+//                "            Cheese(int x, char y, string z) {\n" +
+//                "                this.x = x;\n" +
+//                "                this.y = y;\n" +
+//                "                this.z = z;\n" +
+//                "                return;\n" +
+//                "            }\n" +
+//                "        }\n" +
+//                "        void main() {\n" +
+//                "            Cheese c = new Cheese(4, 'a', \"hello\");\n" +
+//                "        }", true);
+//    }
+
+    @Test
+    void validIndexAccess() {
+        test(" void main() {\n" +
+                "            int[] x = new int[1200];\n" +
+                "        }", false);
+    }
+
+    @Test
+    void validVariableDeclaration() {
+        test(" void main() {\n" +
+                "     bool y = true;\n" +
+                "}", false);
+
+        test(" class Cheese {}\n" +
+                "        void main() {\n" +
+                "            Cheese c = new Cheese();\n" +
+                "        }", false);
+    }
+
+    @Test
+    void validIfStatement() {
+        test(" void main() {\n" +
+                "            if (true) {\n" +
+                "                int x = 5;\n" +
+                "            }\n" +
+                "        }", false);
+    }
+
+    @Test
+    void validLogicalOperators() {
+        test(" void main() {\n" +
+                "            if (true && true) {\n" +
+                "                int x = 5;\n" +
+                "            }\n" +
+                "        }", false);
+    }
+
+    @Test
+    void validRelationalOperators() {
+        test(" void main() {\n" +
+                "            if (1 < 2) {\n" +
+                "                int x = 5;\n" +
+                "            }\n" +
+                "        }", false);
+
+        test(" void main() {\n" +
+                "            if (1 > 2) {\n" +
+                "                int x = 5;\n" +
+                "            }\n" +
+                "        }", false);
+
+        test(" void main() {\n" +
+                "            if (1 >= 2) {\n" +
+                "                int x = 5;\n" +
+                "            }\n" +
+                "        }", false);
+
+        test(" void main() {\n" +
+                "            if (1 <= 2) {\n" +
+                "                int x = 5;\n" +
+                "            }\n" +
+                "        }", false);
+    }
+
+    @Test
+    void validLogicalOperatorsWithMultipleOperands() {
+        test(" void main() {\n" +
+                "            if (1 < 2 && 2 < 4) {\n" +
+                "                return;\n" +
+                "            }\n" +
+                "        }", false);
+
+        test(" void main() {\n" +
+                "            if (1 < 2 || 2 < 3002) {\n" +
+                "                return;\n" +
+                "            }\n" +
+                "        }", false);
+    }
+
+    @Test
+    void validArithmeticOperators() {
+        test(" void main() {\n" +
+                "            1 + 2;\n" +
+                "        }", false);
+
+        test(" void main() {\n" +
+                "            1 - 2;\n" +
+                "        }", false);
+
+        test(" void main() {\n" +
+                "            1 * 2;\n" +
+                "        }", false);
+
+        test(" void main() {\n" +
+                "            1 / 2;\n" +
+                "        }", false);
+    }
+
+    @Test
+    void validUnaryOperators() {
+        test(" void main() {\n" +
+                "            +'a';\n" +
+                "        }", false);
+
+        test(" void main() {\n" +
+                "            -1;\n" +
+                "        }", false);
+
+        test(" void main() {\n" +
+                "            !true;\n" +
+                "        }", false);
+
+        test(" void main() {\n" +
+                "            !false;\n" +
+                "        }", false);
+    }
+
+    @Test
+    void validWhileStatement() {
+        test(" void main() {\n" +
+                "            while (true) {\n" +
+                "            }\n" +
+                "        }", false);
+
+        test(" void main() {\n" +
+                "            while (3 < 4) {\n" +
+                "            }\n" +
+                "        }", false);
+
+        test(" void main() {\n" +
+                "            while (!(1 < 3) && false) {\n" +
+                "            }\n" +
+                "        }", false);
+    }
+
+    @Test
+    void validForStatement() {
+        test(" void main() {\n" +
+                "            int i;\n" +
+                "            for (i = 4; i < 10; i += 5) {}\n" +
+                "        }", false);
+
+        test(" void main() {\n" +
+                "            for (; false ;) {}\n" +
+                "        }", false);
+    }
+
+    @Test
+    void validCoutStatements() {
+        test(" void main() {\n" +
+                "            cout << 5;\n" +
+                "        }", false);
+
+        test(" void main() {\n" +
+                "            cout << \"Cheese, really getting sick of all this cheese\";\n" +
+                "        }", false);
+
+        test(" void main() {\n" +
+                "            cout << 'o';\n" +
+                "        }", false);
+    }
+
+    @Test
+    void validCinStatements() {
+        test(" void main() {\n" +
+                "            int x;\n" +
+                "            cin >> x;\n" +
+                "        }", false);
+
+        test(" void main() {\n" +
+                "            char x;\n" +
+                "            cin >> x;\n" +
+                "        }", false);
+    }
+
+    @Test
+    void validSwitchStatement() {
+        test(" void main() {\n" +
+                "            switch (4) {\n" +
+                "                default:\n" +
+                "                    break;\n" +
+                "            } \n" +
+                "        }", false);
+
+        test(" void main() {\n" +
+                "            switch ('a') {\n" +
+                "                default:\n" +
+                "                    break;\n" +
+                "            } \n" +
+                "        }", false);
+
+        test(" void main() {\n" +
+                "            int x;\n" +
+                "            int y = 2;\n" +
+                "            switch (y) {\n" +
+                "                case 1: \n" +
+                "                    break;\n" +
+                "                case 2:\n" +
+                "                    break;\n" +
+                "                case 3:\n" +
+                "                    break;\n" +
+                "                default:\n" +
+                "                    break;\n" +
+                "            } \n" +
+                "        }", false);
+    }
+
+    @Test
+    void validFunctionReturnTypes() {
+        test(" class Cheese {\n" +
+                "            static public int Wee() {\n" +
+                "                int x;\n" +
+                "                return x;\n" +
+                "            }\n" +
+                "        }\n" +
+                "        void main() {}", false);
+
+        test(" class Cheese {\n" +
+                "            static public char Wee() {\n" +
+                "                char x;\n" +
+                "                return x;\n" +
+                "            }\n" +
+                "        }\n" +
+                "        void main() {}", false);
+
+        test(" class Cheese {\n" +
+                "            static public void Wee() {\n" +
+                "                return;\n" +
+                "            }\n" +
+                "        }\n" +
+                "        void main() {}", false);
+
+        test(" class Cheese {\n" +
+                "            static public void Wee() {\n" +
+                "            }\n" +
+                "        }\n" +
+                "        void main() {}", false);
+    }
+
+    @Test
+    void validMainReturnType() {
+        test(" void main() {\n" +
+                "            return;\n" +
+                "        }", false);
+
+        test(" void main() {\n" +
+                "        }", false);
+    }
+
+    @Test
+    void validArrayDeclarations() {
+        test(" void main() {\n" +
+                "            int[][] x = new int[][5];\n" +
+                "        }", false);
+    }
+
+    @Test
+    void validReferenceTypes() {
+        test(" void main() {\n" +
+                "            char[][] x = null;\n" +
+                "        }", false);
+
+        test(" void main() {\n" +
+                "            string x = null;\n" +
+                "        }", false);
+
+        test(" class Cheese {}\n" +
+                "        void main() {\n" +
+                "            Cheese x = null;\n" +
+                "        }", false);
+    }
+
+    @Test
+    void validIndexAccessReturnsEnclosedType() {
+        test(" void main() {\n" +
+                "            char[][] y = new char[][3];\n" +
+                "            char[] x = y[5];\n" +
+                "        }", false);
+
+        test(" void main() {\n" +
+                "            char[] y = new char[3];\n" +
+                "            char x = y[5];\n" +
+                "        }", false);
+    }
+
+    @Test
+    void validFunctionCalls() {
+        test(" class Cheese {\n" +
+                "            public int Motz() {\n" +
+                "                return 4;\n" +
+                "            }\n" +
+                "        }\n" +
+                "        void main() {\n" +
+                "            Cheese c = new Cheese();\n" +
+                "            int x = c.Motz();\n" +
+                "        }", false);
+
+        test(" class Motz {\n" +
+                "            public int Yeet() {\n" +
+                "                return 4;\n" +
+                "            }\n" +
+                "        }\n" +
+                "\n" +
+                "        class Cheese {\n" +
+                "            private void Yeet() {\n" +
+                "                Motz m = new Motz();\n" +
+                "                int x = m.Yeet();\n" +
+                "            }\n" +
+                "        }\n" +
+                "        void main() {}", false);
+    }
+
+    @Test
+    void validFunctionCallParams() {
+        test(" class Cheese {\n" +
+                "            public int Motz(int x, int y) {\n" +
+                "                return x + y;\n" +
+                "            }\n" +
+                "        }\n" +
+                "        void main() {\n" +
+                "            Cheese c = new Cheese();\n" +
+                "            int x = c.Motz(4, 5);\n" +
+                "        }", false);
     }
 
 

@@ -2,6 +2,8 @@ package compilers.visitor.kxi.invalid_write;
 
 import compilers.ast.kxi_nodes.KxiArguments;
 import compilers.ast.kxi_nodes.KxiIndex;
+import compilers.ast.kxi_nodes.KxiVariableDeclaration;
+import compilers.ast.kxi_nodes.class_members.KxiDataMember;
 import compilers.ast.kxi_nodes.class_members.KxiMethod;
 import compilers.ast.kxi_nodes.expressions.KxiDotExpression;
 import compilers.ast.kxi_nodes.expressions.KxiMethodExpression;
@@ -109,26 +111,31 @@ public class InvalidWriteVisitor extends KxiVisitorBase {
     @Override
     public void visitAssignment(AbstractBinaryAssignmentExpression assignmentExpression) {
         ResultFlag right = pop(); //remove what's on right hand side
-        flagCheck(assignmentExpression.getLineInfo(), "Can't write to", hasFlag(
-                ResultFlag.Method
-                , ResultFlag.Class
-                , ResultFlag.Keyword
-                , ResultFlag.Literal
-                , ResultFlag.New
-        ));
+        ResultFlag left = pop();
+        if (left != ResultFlag.ID)
+            flagCheck(assignmentExpression.getLineInfo(), "Can't write to", hasFlag(
+                    ResultFlag.Method
+                    , ResultFlag.Class
+                    , ResultFlag.Keyword
+                    , ResultFlag.This
+                    , ResultFlag.Literal
+                    , ResultFlag.New
+            ));
         resultFlagStack.clear();
         resultFlagStack.push(right);
     }
 
     @Override
     public void visit(KxiCinStatement statement) {
-        flagCheck(statement.getLineInfo(), "CIN Can't write to", hasFlag(
-                ResultFlag.Method
-                , ResultFlag.Class
-                , ResultFlag.Keyword
-                , ResultFlag.Literal
-                , ResultFlag.New
-        ));
+        if (resultFlagStack.peek() != ResultFlag.ID)
+            flagCheck(statement.getLineInfo(), "CIN Can't write to", hasFlag(
+                    ResultFlag.Method
+                    , ResultFlag.Class
+                    , ResultFlag.Keyword
+                    , ResultFlag.This
+                    , ResultFlag.Literal
+                    , ResultFlag.New
+            ));
     }
 
     @Override
@@ -136,6 +143,10 @@ public class InvalidWriteVisitor extends KxiVisitorBase {
         resultFlagStack.clear();
     }
 
+    @Override
+    public void visit(KxiVariableDeclaration variableDeclaration) {
+        if (!resultFlagStack.empty() && !variableDeclaration.isPartOfDataMember()) pop();
+    }
 
     @Override
     public void visit(KxiFordSemi kxiMethod) {
@@ -144,7 +155,7 @@ public class InvalidWriteVisitor extends KxiVisitorBase {
 
     @Override
     public void visit(KxiDotExpression expression) {
-        removeFlag(ResultFlag.Method, ResultFlag.Class, ResultFlag.This);
+        resultFlagStack.push(ResultFlag.ID);
     }
 
     @Override
@@ -172,5 +183,16 @@ public class InvalidWriteVisitor extends KxiVisitorBase {
     @Override
     public void visit(KxiIndex index) {
         pop();
+    }
+
+    @Override
+    public void visit(KxiDataMember dataMember) {
+
+        if (dataMember.getVariableDeclaration().getInitializer() != null) {
+            if (dataMember.isStatic()) {
+                flagCheck(dataMember.getLineInfo(), "Static Data Member Can't write to", hasFlag(ResultFlag.This));
+                resultFlagStack.clear();
+            }
+        }
     }
 }

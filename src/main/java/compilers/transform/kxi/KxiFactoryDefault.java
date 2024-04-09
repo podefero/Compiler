@@ -60,10 +60,10 @@ public class KxiFactoryDefault extends AbstractKxiFactory {
                 id = new IdentifierToken(getTokenText(((TypeContext) ctx).scalarType().IDENTIFIER()));
             }
             KxiType kxiType = new KxiType(scalarType, id);
-            if(numArrays > 0) {
+            if (numArrays > 0) {
                 KxiArrayType curArray = new KxiArrayType(scalarType, kxiType);
                 KxiArrayType nextArray;
-                for(int i = 1; i < numArrays; i++) {
+                for (int i = 1; i < numArrays; i++) {
                     nextArray = new KxiArrayType(scalarType, curArray);
                     curArray = nextArray;
                 }
@@ -78,7 +78,9 @@ public class KxiFactoryDefault extends AbstractKxiFactory {
 
         } else if (ctx instanceof DataMemberDeclarationContext) {
             boolean isStatic = ((DataMemberDeclarationContext) ctx).STATIC() != null;
-            return new KxiDataMember(pop(stack), pop(stack), new KxiStaticHelper(isStatic));
+            KxiVariableDeclaration variableDeclaration = pop(stack);
+            variableDeclaration.setPartOfDataMember(true);
+            return new KxiDataMember(variableDeclaration, pop(stack), new KxiStaticHelper(isStatic));
 
         } else if (ctx instanceof MethodDeclarationContext) {
             boolean isStatic = ((MethodDeclarationContext) ctx).STATIC() != null;

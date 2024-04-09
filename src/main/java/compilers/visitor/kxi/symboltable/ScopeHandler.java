@@ -74,7 +74,10 @@ public class ScopeHandler {
         //traverse up nested scope
         while (symbolTable != null) {
             if (symbolTable instanceof BlockScope) {
-                if (((BlockScope) symbolTable).scopeType == ScopeType.Method) {
+                if (((BlockScope) symbolTable).scopeType == ScopeType.Main) {
+                    return globalScope.getMainScope();
+                }
+                if (((BlockScope) symbolTable).scopeType == ScopeType.Method || ((BlockScope) symbolTable).scopeType == ScopeType.Constructor) {
                     ClassScope classScope = bubbleToClassScope(symbolTable);
                     if (classScope != null) {
                         return classScope.getMethodScopeMap().get(((BlockScope) symbolTable).getMethodId());
