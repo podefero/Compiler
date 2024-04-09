@@ -17,8 +17,7 @@ import compilers.ast.kxi_nodes.expressions.uni.KxiUniPlus;
 import compilers.ast.kxi_nodes.expressions.uni.KxiUniSubtract;
 import compilers.ast.kxi_nodes.helper.KxiFordSemi;
 import compilers.ast.kxi_nodes.scope.KxiBlock;
-import compilers.ast.kxi_nodes.scope.KxiCaseBlockChar;
-import compilers.ast.kxi_nodes.scope.KxiCaseBlockInt;
+import compilers.ast.kxi_nodes.scope.KxiCaseBlock;
 import compilers.ast.kxi_nodes.scope.KxiClass;
 import compilers.ast.kxi_nodes.statements.*;
 import compilers.ast.kxi_nodes.statements.conditional.KxiForStatement;
@@ -40,14 +39,12 @@ public interface VisitKxi {
     void visit(KxiReturnStatement kxiReturnStatement);
     void visit(KxiCoutStatement kxiCoutStatement);
     void visit(KxiCinStatement kxiCinStatement);
-    void visit(KxiSwitchStatementInt kxiSwitchStatementInt);
     void visit(KxiBreakStatement kxiBreakStatement);
     void visit(KxiExpressionStatement kxiExpressionStatement);
     void visit(KxiBlockStatement kxiBlockStatement);
     void visit(KxiVariableDeclarationStatement kxiVariableDeclarationStatement);
 
     void visit(KxiBlock kxiBlock);
-    void visit(KxiCaseBlockInt kxiCaseBlockInt);
     void visit(KxiCaseInt kxiCaseInt);
     void visit(KxiCaseChar kxiCaseChar);
 
@@ -101,13 +98,11 @@ public interface VisitKxi {
     void preVisit(KxiReturnStatement kxiReturnStatement);
     void preVisit(KxiCoutStatement kxiCoutStatement);
     void preVisit(KxiCinStatement kxiCinStatement);
-    void preVisit(KxiSwitchStatementInt kxiSwitchStatementInt);
     void preVisit(KxiBreakStatement kxiBreakStatement);
     void preVisit(KxiExpressionStatement kxiExpressionStatement);
     void preVisit(KxiBlockStatement kxiBlockStatement);
     void preVisit(KxiVariableDeclarationStatement kxiVariableDeclarationStatement);
     void preVisit(KxiBlock kxiBlock);
-    void preVisit(KxiCaseBlockInt kxiCaseBlockInt);
     void preVisit(KxiCaseInt kxiCaseInt);
     void preVisit(KxiCaseChar kxiCaseChar);
     void preVisit(KxiEquals kxiEquals);
@@ -144,14 +139,12 @@ public interface VisitKxi {
     void preVisit(KxiExpressionIndex kxiExpressionIndex);
     void preVisit(KxiMethodExpression kxiMethodExpression);
 
-    void preVisit(KxiCaseBlockChar kxiCaseBlockChar);
 
     // The forgotten Ones
 
-    void visit(KxiCaseBlockChar kxiCaseBlockChar);
 
-    void preVisit(KxiSwitchStatementChar kxiSwitchStatementChar);
-    void visit(KxiSwitchStatementChar kxiSwitchStatementChar);
+    void preVisit(KxiSwitchStatement kxiSwitchStatementChar);
+    void visit(KxiSwitchStatement kxiSwitchStatementChar);
 
     void preVisit(ExpressionBoolLit expressionLit);
     void visit(ExpressionBoolLit expressionLit);
@@ -184,4 +177,8 @@ public interface VisitKxi {
     void visit(KxiParameter node);
 
     void visit(KxiFordSemi kxiFordSemi);
+
+    void preVisit(KxiCaseBlock kxiCaseBlock);
+
+    void visit(KxiCaseBlock kxiCaseBlock);
 }

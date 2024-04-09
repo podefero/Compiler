@@ -1526,6 +1526,147 @@ public class M3Tests {
                 "        }", false);
     }
 
+    @Test
+    void validCallMainInBlockScope() {
+        test(" class Cheese {\n" +
+                "            public void Motz() {\n" +
+                "                main();\n" +
+                "            }\n" +
+                "        }\n" +
+                "        void main() {\n" +
+                "            main();\n" +
+                "        }", false);
+    }
+
+    @Test
+    void validChainedFunctionCalls() {
+        test(" class Baz {\n" +
+                "            public bool Foo(int y) {\n" +
+                "                return true;\n" +
+                "            }\n" +
+                "        }\n" +
+                "\n" +
+                "        class Motz {\n" +
+                "            public Baz baz = new Baz();\n" +
+                "            public Baz Cheeto() {\n" +
+                "                return this.baz;\n" +
+                "            }\n" +
+                "        }\n" +
+                "\n" +
+                "        void main() {\n" +
+                "            Motz m = new Motz();\n" +
+                "            bool continueVar = m.Cheeto().Foo(4);\n" +
+                "        }", false);
+    }
+
+    @Test
+    void validChainedMemberAccessFunctionCall() {
+        test(" class Baz {\n" +
+                "            public int x = 4;\n" +
+                "        }\n" +
+                "\n" +
+                "        class Motz {\n" +
+                "            public Baz baz = new Baz();\n" +
+                "            public Baz Cheeto() {\n" +
+                "                return this.baz;\n" +
+                "            }\n" +
+                "        }\n" +
+                "\n" +
+                "        void main() {\n" +
+                "            Motz m = new Motz();\n" +
+                "            int continueVar = m.Cheeto().x;\n" +
+                "        }", false);
+    }
+
+    @Test
+    void validPrivateMemberAccessWithinClass() {
+        test(" class Cheese {\n" +
+                "    private int x;\n" +
+                "        public int X() {\n" +
+                "            this.x = 7;\n" +
+                "            return this.x;\n" +
+                "        }\n" +
+                "    }\n" +
+                "    void main() {}", false);
+    }
+
+    @Test
+    void validConstructorParams() {
+        test(" class Cheese {\n" +
+                "            Cheese(int x) {}\n" +
+                "        }\n" +
+                "        void main() {\n" +
+                "            Cheese c = new Cheese(4);\n" +
+                "        }", false);
+
+        test(" class Cheese {\n" +
+                "            Cheese(int x, char y) {}\n" +
+                "        }\n" +
+                "        void main() {\n" +
+                "            Cheese c = new Cheese(4, 'a');\n" +
+                "        }", false);
+
+        test(" class Cheese {\n" +
+                "            Cheese(int x, char y, string z) {}\n" +
+                "        }\n" +
+                "        void main() {\n" +
+                "            Cheese c = new Cheese(4, 'a', \"hello\");\n" +
+                "        }", false);
+    }
+
+    @Test
+    void validParamTypesForFunctionCalls() {
+        test(" class Cheese {\n" +
+                "            public int Func2(int x, int y, char b) {}\n" +
+                "            public int Func(int y, int x, char b) {\n" +
+                "                return Func2(y, x, b);\n" +
+                "            }\n" +
+                "        }\n" +
+                "\n" +
+                "        void main() {\n" +
+                "            Cheese c = new Cheese();\n" +
+                "        }", false);
+    }
+
+    @Test
+    void validRecursiveFunctionCallsWithParams() {
+        test(" class Cheese {\n" +
+                "            public int Func(int y, int x, char b) {\n" +
+                "                return Func(y, x, b);\n" +
+                "            }\n" +
+                "        }\n" +
+                "\n" +
+                "        void main() {\n" +
+                "            Cheese c = new Cheese();\n" +
+                "        }", false);
+    }
+
+    @Test
+    void validNullSubstitutionForReferenceTypeString() {
+        test(" void main() {\n" +
+                "            cout << null;\n" +
+                "        }", false);
+    }
+
+    @Test
+    void validSwitchCaseStatement() {
+        test(" void main() {\n" +
+                "            int n = 1;\n" +
+                "            switch(n){\n" +
+                "                case 1:\n" +
+                "                    cout << \"one\";\n" +
+                "                    break;\n" +
+                "                case 2:\n" +
+                "                case 3:\n" +
+                "                    cout << \"two or three\";\n" +
+                "                    break;\n" +
+                "                default:\n" +
+                "                    cout << \"a number not in the range of 1 to 3\";\n" +
+                "                    cout << 1 + 2;\n" +
+                "                    break;\n" +
+                "                }\n" +
+                "    }", false);
+    }
 
     void test(String input, boolean hasErrors) {
         KxiParser parser = kxiParser(input);

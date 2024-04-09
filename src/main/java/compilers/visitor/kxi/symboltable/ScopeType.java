@@ -4,8 +4,7 @@ public enum ScopeType {
     If,
     For,
     While,
-    SwitchInt,
-    SwitchChar,
+    Switch,
     Method,
     Main,
     Constructor

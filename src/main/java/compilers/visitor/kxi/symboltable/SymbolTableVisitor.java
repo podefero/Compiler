@@ -4,13 +4,10 @@ import compilers.ast.kxi_nodes.*;
 import compilers.ast.kxi_nodes.class_members.KxiConstructor;
 import compilers.ast.kxi_nodes.class_members.KxiDataMember;
 import compilers.ast.kxi_nodes.class_members.KxiMethod;
-import compilers.ast.kxi_nodes.expressions.binary.conditional.KxiOr;
 import compilers.ast.kxi_nodes.scope.KxiBlock;
-import compilers.ast.kxi_nodes.scope.KxiCaseBlockChar;
-import compilers.ast.kxi_nodes.scope.KxiCaseBlockInt;
+import compilers.ast.kxi_nodes.scope.KxiCaseBlock;
 import compilers.ast.kxi_nodes.scope.KxiClass;
-import compilers.ast.kxi_nodes.statements.KxiSwitchStatementChar;
-import compilers.ast.kxi_nodes.statements.KxiSwitchStatementInt;
+import compilers.ast.kxi_nodes.statements.KxiSwitchStatement;
 import compilers.ast.kxi_nodes.statements.conditional.KxiForStatement;
 import compilers.ast.kxi_nodes.statements.conditional.KxiIfStatement;
 import compilers.ast.kxi_nodes.statements.conditional.KxiWhileStatement;
@@ -179,19 +176,13 @@ public class SymbolTableVisitor extends KxiVisitorBase {
     }
 
     @Override
-    public void preVisit(KxiCaseBlockInt kxiBlock) {
+    public void preVisit(KxiCaseBlock kxiBlock) {
         BlockScope blockScope = new BlockScope();
         kxiBlock.setScope(blockScope);
 
         scopeNodePreVisit(blockScope);
     }
 
-    @Override
-    public void preVisit(KxiCaseBlockChar kxiBlock) {
-        BlockScope blockScope = new BlockScope();
-        kxiBlock.setScope(blockScope);
-        scopeNodePreVisit(blockScope);
-    }
 
     @Override
     public void visit(KxiMethod kxiMethod) {
@@ -252,16 +243,12 @@ public class SymbolTableVisitor extends KxiVisitorBase {
     }
 
     @Override
-    public void visit(KxiSwitchStatementChar kxiSwitchStatementChar) {
-        setBlockScopeType(ScopeType.SwitchChar);
+    public void visit(KxiSwitchStatement kxiSwitchStatementChar) {
+        setBlockScopeType(ScopeType.Switch);
         scopeNodeVisit();
     }
 
-    @Override
-    public void visit(KxiSwitchStatementInt kxiSwitchStatementInt) {
-        setBlockScopeType(ScopeType.SwitchInt);
-        scopeNodeVisit();
-    }
+
 
     @Override
     public void visit(KxiVariableDeclaration kxiVariableDeclaration) {

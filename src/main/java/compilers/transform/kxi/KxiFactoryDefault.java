@@ -6,12 +6,9 @@ import compilers.ast.kxi_nodes.class_members.KxiConstructor;
 import compilers.ast.kxi_nodes.class_members.KxiDataMember;
 import compilers.ast.kxi_nodes.class_members.KxiMethod;
 import compilers.ast.kxi_nodes.expressions.AbstractKxiExpression;
-import compilers.ast.kxi_nodes.helper.KxiInvalidNode;
-import compilers.ast.kxi_nodes.helper.KxiMethodSuffixHelper;
-import compilers.ast.kxi_nodes.helper.KxiModifierHelper;
-import compilers.ast.kxi_nodes.helper.KxiStaticHelper;
+import compilers.ast.kxi_nodes.helper.*;
 import compilers.ast.kxi_nodes.scope.KxiBlock;
-import compilers.ast.kxi_nodes.scope.KxiCaseBlockInt;
+import compilers.ast.kxi_nodes.scope.KxiCaseBlock;
 import compilers.ast.kxi_nodes.scope.KxiClass;
 import compilers.ast.kxi_nodes.token_literals.CharLitToken;
 import compilers.ast.kxi_nodes.token_literals.IdentifierToken;
@@ -112,7 +109,7 @@ public class KxiFactoryDefault extends AbstractKxiFactory {
 
         } else if (ctx instanceof CaseBlockContext) {
             CaseBlockContext caseBlockContext = (CaseBlockContext) ctx;
-            return new KxiCaseBlockInt(popList(stack, getListSizeFromCtx(caseBlockContext.statement()))
+            return new KxiCaseBlock(popList(stack, getListSizeFromCtx(caseBlockContext.statement()))
                     , popList(stack, getListSizeFromCtx(caseBlockContext.case_())));
 
         } else if (ctx instanceof CaseContext) {

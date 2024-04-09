@@ -1,16 +1,16 @@
 package compilers.ast.kxi_nodes.statements;
 
 import compilers.ast.kxi_nodes.expressions.AbstractKxiExpression;
-import compilers.ast.kxi_nodes.scope.KxiCaseBlockChar;
+import compilers.ast.kxi_nodes.scope.KxiCaseBlock;
 import compilers.visitor.kxi.KxiVisitorBase;
 import lombok.Getter;
 
 @Getter
-public class KxiSwitchStatementChar extends AbstractKxiStatement {
-    private KxiCaseBlockChar caseBlock;
+public class KxiSwitchStatement extends AbstractKxiStatement {
+    private KxiCaseBlock caseBlock;
     private AbstractKxiExpression expression;
 
-    public KxiSwitchStatementChar(KxiCaseBlockChar caseBlock, AbstractKxiExpression expression) {
+    public KxiSwitchStatement(KxiCaseBlock caseBlock, AbstractKxiExpression expression) {
         super(caseBlock, expression);
         this.caseBlock = caseBlock;
         this.expression = expression;

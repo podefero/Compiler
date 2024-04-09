@@ -15,8 +15,7 @@ public class InvalidBreakVisitor extends KxiVisitorBase {
         boolean found = false;
         while (scope != null) {
             if (scope instanceof BlockScope) {
-                if (((BlockScope) scope).getScopeType() == ScopeType.SwitchChar
-                        || ((BlockScope) scope).getScopeType() == ScopeType.SwitchInt
+                if (((BlockScope) scope).getScopeType() == ScopeType.Switch
                         || ((BlockScope) scope).getScopeType() == ScopeType.While
                         || ((BlockScope) scope).getScopeType() == ScopeType.For) {
                     found = true;

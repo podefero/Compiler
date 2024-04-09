@@ -2,6 +2,7 @@ package compilers.visitor.kxi.typecheck;
 
 import compilers.ast.kxi_nodes.*;
 import compilers.ast.kxi_nodes.class_members.KxiDataMember;
+import compilers.ast.kxi_nodes.class_members.KxiMethod;
 import compilers.ast.kxi_nodes.expressions.*;
 import compilers.ast.kxi_nodes.expressions.binary.arithmic.KxiDiv;
 import compilers.ast.kxi_nodes.expressions.binary.arithmic.KxiMult;
@@ -67,10 +68,11 @@ public class TypeCheckerVisitor extends KxiVisitorBase {
             matchId(resultL, resultR, codeLine);
 
             //check if left is pointer
-            if(resultR.getScalarType() == ScalarType.NULL)  {
-
-            }
-            else if (left != right)
+            if (right == ScalarType.NULL) {
+                if (left != ScalarType.ID && arrayDepthL == 0 && left != ScalarType.STRING) {
+                    exceptionStack.push(new TypeCheckException(codeLine, "Mismatched Types provided: " + right + " expected pointer"));
+                }
+            } else if (left != right)
                 exceptionStack.push(new TypeCheckException(codeLine, "Mismatched Types provided: " + right + " expected: " + left));
             else if (arrayDepthL != arrayDepthR)
                 exceptionStack.push(new TypeCheckException(codeLine, "Mismatched ArrayDim providedDimension: " + arrayDepthR + " expectedDimension: " + arrayDepthL));
@@ -334,7 +336,8 @@ public class TypeCheckerVisitor extends KxiVisitorBase {
     @Override
     public void visit(KxiAnd expression) {
         matchResults(expression.getLineInfo());
-        updatedResultScalarType(ScalarType.BOOL);    }
+        updatedResultScalarType(ScalarType.BOOL);
+    }
 
     @Override
     public void visit(KxiEqualsEquals expression) {
@@ -371,7 +374,8 @@ public class TypeCheckerVisitor extends KxiVisitorBase {
     @Override
     public void visit(KxiOr expression) {
         matchResults(expression.getLineInfo());
-        updatedResultScalarType(ScalarType.BOOL);    }
+        updatedResultScalarType(ScalarType.BOOL);
+    }
 
     /*
 EXPRESSIONS UNARY
@@ -629,21 +633,17 @@ EXPRESSIONS DOT
         ResultType result = resultTypeStack.pop();
         //check if int, char, or string
         ScalarType resultType = result.getScalarType();
-        if (resultType != ScalarType.CHAR && resultType != ScalarType.INT && resultType != ScalarType.STRING)
+        if (resultType != ScalarType.CHAR && resultType != ScalarType.INT && resultType != ScalarType.STRING && resultType != ScalarType.NULL)
             exceptionStack.push(new TypeCheckException(statement.getLineInfo(), "COUT does not support type: " + resultType));
 
     }
 
     @Override
-    public void visit(KxiSwitchStatementInt statement) {
-        matchResultOnType(statement.getLineInfo(), ScalarType.INT);
-        resultTypeStack.pop();
-    }
+    public void visit(KxiSwitchStatement switchStatement) {
+        ResultType resultType = resultTypeStack.pop();
+        if (resultType.getScalarType() != ScalarType.INT && resultType.getScalarType() != ScalarType.CHAR)
+            exceptionStack.push(new TypeCheckException(switchStatement.getLineInfo(), "Switch does not support type: " + resultType.getScalarType()));
 
-    @Override
-    public void visit(KxiSwitchStatementChar statement) {
-        matchResultOnType(statement.getLineInfo(), ScalarType.CHAR);
-        resultTypeStack.pop();
     }
 
     @Override

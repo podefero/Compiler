@@ -3,9 +3,7 @@ package compilers.transform.kxi;
 import compilers.ast.GenericListNode;
 import compilers.ast.kxi_nodes.AbstractKxiNode;
 import compilers.ast.kxi_nodes.expressions.AbstractKxiExpression;
-import compilers.ast.kxi_nodes.expressions.binary.conditional.AbstractBinaryConditionalExpression;
 import compilers.ast.kxi_nodes.scope.KxiBlock;
-import compilers.ast.kxi_nodes.scope.KxiCaseBlockInt;
 import compilers.ast.kxi_nodes.statements.*;
 import compilers.ast.kxi_nodes.statements.conditional.KxiForStatement;
 import compilers.ast.kxi_nodes.statements.conditional.KxiIfStatement;
@@ -28,10 +26,7 @@ public class KxiFactoryStatement extends AbstractKxiFactory {
             return new KxiVariableDeclarationStatement(pop(stack));
 
         } else if (statementContext.SWITCH() != null) {
-            if (stack.peek() instanceof KxiCaseBlockInt)
-                return new KxiSwitchStatementInt(pop(stack), pop(stack));
-            else
-                return new KxiSwitchStatementChar(pop(stack), pop(stack));
+            return new KxiSwitchStatement(pop(stack), pop(stack));
 
         } else if (statementContext.BREAK() != null) {
             return new KxiBreakStatement();
