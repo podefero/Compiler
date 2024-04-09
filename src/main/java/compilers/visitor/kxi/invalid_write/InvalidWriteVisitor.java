@@ -2,20 +2,16 @@ package compilers.visitor.kxi.invalid_write;
 
 import compilers.ast.kxi_nodes.KxiArguments;
 import compilers.ast.kxi_nodes.KxiIndex;
-import compilers.ast.kxi_nodes.KxiType;
-import compilers.ast.kxi_nodes.class_members.KxiMethod;
 import compilers.ast.kxi_nodes.expressions.KxiDotExpression;
 import compilers.ast.kxi_nodes.expressions.KxiMethodExpression;
 import compilers.ast.kxi_nodes.expressions.KxiNewExpressionArgument;
 import compilers.ast.kxi_nodes.expressions.binary.assignment.AbstractBinaryAssignmentExpression;
 import compilers.ast.kxi_nodes.expressions.literals.*;
 import compilers.ast.kxi_nodes.statements.AbstractKxiStatement;
-import compilers.ast.kxi_nodes.statements.KxiExpressionStatement;
 import compilers.exceptions.InvalidWriteException;
 import compilers.visitor.kxi.KxiVisitorBase;
 import compilers.visitor.kxi.result.ResultFlag;
 import compilers.visitor.kxi.symboltable.ScopeHandler;
-import compilers.visitor.kxi.symboltable.SymbolData;
 import lombok.Getter;
 
 import java.util.Stack;

@@ -25,6 +25,9 @@ import compilers.ast.kxi_nodes.statements.conditional.KxiIfStatement;
 import compilers.ast.kxi_nodes.statements.conditional.KxiWhileStatement;
 import compilers.ast.kxi_nodes.token_literals.*;
 import compilers.exceptions.CompilerException;
+import compilers.visitor.kxi.symboltable.BlockScope;
+import compilers.visitor.kxi.symboltable.GlobalScope;
+import compilers.visitor.kxi.symboltable.ScopeType;
 import compilers.visitor.kxi.symboltable.SymbolTable;
 import lombok.Getter;
 
@@ -45,14 +48,16 @@ public abstract class KxiVisitorBase implements VisitKxi {
     }
 
     public void dumpErrorStack() {
-        while(hasErrors()) {
+        while (hasErrors()) {
             System.out.println(exceptionStack.pop().getMessage());
         }
     }
 
-    public void visitAssignment(AbstractBinaryAssignmentExpression assignmentExpression) {}
+    public void visitAssignment(AbstractBinaryAssignmentExpression assignmentExpression) {
+    }
 
-    public void visitStatement(AbstractKxiStatement abstractKxiStatement) {}
+    public void visitStatement(AbstractKxiStatement abstractKxiStatement) {
+    }
 
 
     @Override
@@ -62,7 +67,7 @@ public abstract class KxiVisitorBase implements VisitKxi {
 
     @Override
     public void visit(KxiClass kxiClass) {
-
+        currentScope = kxiClass.getScope().getParent();
     }
 
     @Override
@@ -142,12 +147,12 @@ public abstract class KxiVisitorBase implements VisitKxi {
 
     @Override
     public void visit(KxiBlock kxiBlock) {
-
+        currentScope = kxiBlock.getScope().getParent();
     }
 
     @Override
     public void visit(KxiCaseBlockInt kxiCaseBlockInt) {
-
+        currentScope = kxiCaseBlockInt.getScope().getParent();
     }
 
     @Override
@@ -603,7 +608,7 @@ public abstract class KxiVisitorBase implements VisitKxi {
 
     @Override
     public void visit(KxiCaseBlockChar kxiCaseBlockChar) {
-
+        currentScope = kxiCaseBlockChar.getScope().getParent();
     }
 
     @Override

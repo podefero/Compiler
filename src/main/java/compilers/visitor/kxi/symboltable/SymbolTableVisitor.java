@@ -4,6 +4,7 @@ import compilers.ast.kxi_nodes.*;
 import compilers.ast.kxi_nodes.class_members.KxiConstructor;
 import compilers.ast.kxi_nodes.class_members.KxiDataMember;
 import compilers.ast.kxi_nodes.class_members.KxiMethod;
+import compilers.ast.kxi_nodes.expressions.binary.conditional.KxiOr;
 import compilers.ast.kxi_nodes.scope.KxiBlock;
 import compilers.ast.kxi_nodes.scope.KxiCaseBlockChar;
 import compilers.ast.kxi_nodes.scope.KxiCaseBlockInt;
@@ -61,10 +62,12 @@ public class SymbolTableVisitor extends KxiVisitorBase {
 
     private void scopeNodeVisit() {
         if (tableStack.empty()) {
+            //if(currentSymbolTable instanceof BlockScope) System.out.println(((BlockScope) currentSymbolTable).getScopeType());
             currentSymbolTable.parent = globalScope;
             currentSymbolTable = globalScope;
         } else {
             SymbolTable parent = tableStack.peek();
+            //if(currentSymbolTable instanceof BlockScope) System.out.println(((BlockScope) currentSymbolTable).getScopeType());
             currentSymbolTable.parent = parent;
             currentSymbolTable = tableStack.pop();
         }
@@ -79,7 +82,7 @@ public class SymbolTableVisitor extends KxiVisitorBase {
             exceptionStack.push(new SymbolTableException(lineInfo, "Duplicate ID name " + key));
         }
         ClassScope classScope = scopeHandler.getClassScope(key);
-        if(classScope != null)
+        if (classScope != null)
             exceptionStack.push(new SymbolTableException(lineInfo, "Duplicate class name " + key));
     }
 
@@ -213,8 +216,13 @@ public class SymbolTableVisitor extends KxiVisitorBase {
 
     @Override
     public void visit(KxiIfStatement kxiIfStatement) {
+        if (kxiIfStatement.getElseStatement() != null) {
+            setBlockScopeType(ScopeType.If);
+            scopeNodeVisit();
+        }
         setBlockScopeType(ScopeType.If);
         scopeNodeVisit();
+
     }
 
     @Override
