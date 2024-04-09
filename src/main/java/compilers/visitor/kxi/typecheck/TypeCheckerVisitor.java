@@ -147,7 +147,7 @@ public class TypeCheckerVisitor extends KxiVisitorBase {
     private void updatedResultScalarType(ScalarType scalarType) {
         //update result to bool
         ResultType resultType = resultTypeStack.peek();
-        KxiType updatedType = new KxiType(ScalarType.BOOL, null);
+        KxiType updatedType = new KxiType(scalarType, null);
         resultType.setTypeData(new SymbolData(false, null, updatedType));
     }
 
@@ -333,8 +333,8 @@ public class TypeCheckerVisitor extends KxiVisitorBase {
   */
     @Override
     public void visit(KxiAnd expression) {
-        matchResultsOnRelational(expression.getLineInfo());
-    }
+        matchResults(expression.getLineInfo());
+        updatedResultScalarType(ScalarType.BOOL);    }
 
     @Override
     public void visit(KxiEqualsEquals expression) {
@@ -370,8 +370,8 @@ public class TypeCheckerVisitor extends KxiVisitorBase {
 
     @Override
     public void visit(KxiOr expression) {
-        matchResultsOnRelational(expression.getLineInfo());
-    }
+        matchResults(expression.getLineInfo());
+        updatedResultScalarType(ScalarType.BOOL);    }
 
     /*
 EXPRESSIONS UNARY

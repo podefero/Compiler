@@ -15,6 +15,7 @@ import compilers.ast.kxi_nodes.expressions.literals.*;
 import compilers.ast.kxi_nodes.expressions.uni.KxiNot;
 import compilers.ast.kxi_nodes.expressions.uni.KxiUniPlus;
 import compilers.ast.kxi_nodes.expressions.uni.KxiUniSubtract;
+import compilers.ast.kxi_nodes.helper.KxiFordSemi;
 import compilers.ast.kxi_nodes.scope.KxiBlock;
 import compilers.ast.kxi_nodes.scope.KxiCaseBlockChar;
 import compilers.ast.kxi_nodes.scope.KxiCaseBlockInt;
@@ -182,4 +183,5 @@ public interface VisitKxi {
     void preVisit(KxiParameter node);
     void visit(KxiParameter node);
 
+    void visit(KxiFordSemi kxiFordSemi);
 }

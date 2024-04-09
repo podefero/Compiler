@@ -1,6 +1,7 @@
 package compilers.ast.kxi_nodes.statements.conditional;
 
 import compilers.ast.kxi_nodes.expressions.AbstractKxiExpression;
+import compilers.ast.kxi_nodes.helper.KxiFordSemi;
 import compilers.ast.kxi_nodes.scope.KxiBlock;
 import compilers.ast.kxi_nodes.statements.AbstractKxiStatement;
 import compilers.ast.kxi_nodes.statements.KxiBlockStatement;
@@ -12,8 +13,8 @@ public class KxiForStatement extends AbstractKxiConditionalStatement {
     private AbstractKxiExpression postExpression;
     private AbstractKxiExpression preExpression;
 
-    public KxiForStatement(KxiBlock statement, AbstractKxiExpression postExpression, AbstractKxiExpression conditionalExpression, AbstractKxiExpression preExpression ) {
-        super(statement, postExpression, conditionalExpression, preExpression);
+    public KxiForStatement(KxiBlock statement, AbstractKxiExpression postExpression, AbstractKxiExpression conditionalExpression, AbstractKxiExpression preExpression) {
+        super(statement, postExpression, new KxiFordSemi(), conditionalExpression, new KxiFordSemi(), preExpression);
         this.statement = statement;
         this.postExpression = postExpression;
         this.conditionalExpression = conditionalExpression;

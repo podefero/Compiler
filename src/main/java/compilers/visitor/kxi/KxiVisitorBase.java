@@ -15,6 +15,7 @@ import compilers.ast.kxi_nodes.expressions.literals.*;
 import compilers.ast.kxi_nodes.expressions.uni.KxiNot;
 import compilers.ast.kxi_nodes.expressions.uni.KxiUniPlus;
 import compilers.ast.kxi_nodes.expressions.uni.KxiUniSubtract;
+import compilers.ast.kxi_nodes.helper.KxiFordSemi;
 import compilers.ast.kxi_nodes.scope.KxiBlock;
 import compilers.ast.kxi_nodes.scope.KxiCaseBlockChar;
 import compilers.ast.kxi_nodes.scope.KxiCaseBlockInt;
@@ -48,7 +49,9 @@ public abstract class KxiVisitorBase implements VisitKxi {
     }
 
     public void dumpErrorStack() {
+        // StringBuilder body = new StringBuilder();
         while (hasErrors()) {
+            //body.append(exceptionStack.pop().getMessage() + '\n');
             System.out.println(exceptionStack.pop().getMessage());
         }
     }
@@ -64,6 +67,7 @@ public abstract class KxiVisitorBase implements VisitKxi {
     public void visit(KxiMain kxiMain) {
 
     }
+
 
     @Override
     public void visit(KxiClass kxiClass) {
@@ -718,6 +722,11 @@ public abstract class KxiVisitorBase implements VisitKxi {
 
     @Override
     public void visit(KxiParameter node) {
+
+    }
+
+    @Override
+    public void visit(KxiFordSemi kxiFordSemi) {
 
     }
 

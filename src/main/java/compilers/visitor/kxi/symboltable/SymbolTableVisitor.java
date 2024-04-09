@@ -38,6 +38,7 @@ public class SymbolTableVisitor extends KxiVisitorBase {
         nameCounter = 0;
     }
 
+
     private void setScopeUniqueName() {
         if (currentSymbolTable instanceof ClassScope) {
             currentSymbolTable.setUniqueName(((ClassScope) currentSymbolTable).getClassId());

@@ -2,12 +2,16 @@ package compilers.visitor.kxi.invalid_write;
 
 import compilers.ast.kxi_nodes.KxiArguments;
 import compilers.ast.kxi_nodes.KxiIndex;
+import compilers.ast.kxi_nodes.class_members.KxiMethod;
 import compilers.ast.kxi_nodes.expressions.KxiDotExpression;
 import compilers.ast.kxi_nodes.expressions.KxiMethodExpression;
 import compilers.ast.kxi_nodes.expressions.KxiNewExpressionArgument;
 import compilers.ast.kxi_nodes.expressions.binary.assignment.AbstractBinaryAssignmentExpression;
 import compilers.ast.kxi_nodes.expressions.literals.*;
+import compilers.ast.kxi_nodes.helper.KxiFordSemi;
 import compilers.ast.kxi_nodes.statements.AbstractKxiStatement;
+import compilers.ast.kxi_nodes.statements.KxiCinStatement;
+import compilers.ast.kxi_nodes.statements.KxiExpressionStatement;
 import compilers.exceptions.InvalidWriteException;
 import compilers.visitor.kxi.KxiVisitorBase;
 import compilers.visitor.kxi.result.ResultFlag;
@@ -117,8 +121,25 @@ public class InvalidWriteVisitor extends KxiVisitorBase {
     }
 
     @Override
+    public void visit(KxiCinStatement statement) {
+        flagCheck(statement.getLineInfo(), "CIN Can't write to", hasFlag(
+                ResultFlag.Method
+                , ResultFlag.Class
+                , ResultFlag.Keyword
+                , ResultFlag.Literal
+                , ResultFlag.New
+        ));
+    }
+
+    @Override
     public void visitStatement(AbstractKxiStatement abstractKxiStatement) {
         resultFlagStack.clear();
+    }
+
+
+    @Override
+    public void visit(KxiFordSemi kxiMethod) {
+        if (!resultFlagStack.empty()) pop();
     }
 
     @Override

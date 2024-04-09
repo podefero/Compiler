@@ -5,21 +5,29 @@ import compilers.exceptions.InvalidBreakException;
 import compilers.visitor.kxi.KxiVisitorBase;
 import compilers.visitor.kxi.symboltable.BlockScope;
 import compilers.visitor.kxi.symboltable.ScopeType;
+import compilers.visitor.kxi.symboltable.SymbolTable;
 
 public class InvalidBreakVisitor extends KxiVisitorBase {
 
     @Override
     public void visit(KxiBreakStatement breakStatement) {
-        if (currentScope instanceof BlockScope) {
-            if (((BlockScope) currentScope).getScopeType() != ScopeType.If
-                    && ((BlockScope) currentScope).getScopeType() != ScopeType.While
-                    && ((BlockScope) currentScope).getScopeType() != ScopeType.For) {
-                exceptionStack.push(new InvalidBreakException(breakStatement.getLineInfo(),
-                        "break can only be used in If, While or For block"));
+        SymbolTable scope = currentScope;
+        boolean found = false;
+        while (scope != null) {
+            if (scope instanceof BlockScope) {
+                if (((BlockScope) scope).getScopeType() == ScopeType.SwitchChar
+                        || ((BlockScope) scope).getScopeType() == ScopeType.SwitchInt
+                        || ((BlockScope) scope).getScopeType() == ScopeType.While
+                        || ((BlockScope) scope).getScopeType() == ScopeType.For) {
+                    found = true;
+                    break;
+                }
             }
-        } else {
-            exceptionStack.push(new InvalidBreakException(breakStatement.getLineInfo(),
-                    "Invalid break. can only be used in If, While or For block"));
+            scope = scope.getParent();
         }
+
+        if (!found)
+            exceptionStack.push(new InvalidBreakException(breakStatement.getLineInfo(),
+                    "break can only be used in Switch, While or For block"));
     }
 }
