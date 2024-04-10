@@ -1669,7 +1669,7 @@ public class M3Tests {
     }
 
     @Test
-    void InvalidStaticDataMemberInit() {
+    void invalidStaticDataMemberInit() {
         test("class Foo{\n" +
                 "    static public int a = b + c;\n" +
                 "    public int b;\n" +
@@ -1678,6 +1678,20 @@ public class M3Tests {
                 "void main() {\n" +
                 "\n" +
                 "}", true);
+    }
+
+    @Test
+    void validNullReturn() {
+        test("class A {\n" +
+                "    public int[] f() {\n" +
+                "        return null;\n" +
+                "    }\n" +
+                "    public A b() {\n" +
+                "        return null;\n" +
+                "    }\n" +
+                "}\n" +
+                "void main() {\n" +
+                "}", false);
     }
 
     void test(String input, boolean hasErrors) {

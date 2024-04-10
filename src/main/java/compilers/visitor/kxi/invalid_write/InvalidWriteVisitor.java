@@ -188,11 +188,13 @@ public class InvalidWriteVisitor extends KxiVisitorBase {
     @Override
     public void visit(KxiDataMember dataMember) {
 
-        if (dataMember.getVariableDeclaration().getInitializer() != null) {
-            if (dataMember.isStatic()) {
-                flagCheck(dataMember.getLineInfo(), "Static Data Member Can't write to", hasFlag(ResultFlag.This));
-                resultFlagStack.clear();
-            }
-        }
+        resultFlagStack.clear();
+
+//        if (dataMember.getVariableDeclaration().getInitializer() != null) {
+//            if (dataMember.isStatic()) {
+//                flagCheck(dataMember.getLineInfo(), "Static Data Member Can't write to", hasFlag(ResultFlag.This));
+//                resultFlagStack.clear();
+//            }
+//        }
     }
 }

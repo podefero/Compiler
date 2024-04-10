@@ -605,8 +605,14 @@ EXPRESSIONS DOT
             if (methodReturnType != ScalarType.VOID && statement.getExpression() != null) {
                 //if return had expression then result will be on stack
                 //use that to match on method type
-                matchResultOnType(statement.getLineInfo(), methodReturnType);
-                resultTypeStack.pop();
+                SymbolData symbolData = methodScope.getReturnType();
+
+                //fix the order
+                ResultType resultType = resultTypeStack.pop();
+                resultTypeStack.push(new ResultType(methodScope.getBlockScope().getMethodId(), symbolData, currentScope));
+                resultTypeStack.push(resultType);
+
+                matchResults(statement.getLineInfo());
                 //method is void, but return is not
             } else if (methodReturnType == ScalarType.VOID && statement.getExpression() != null) {
                 exceptionStack.push(new TypeCheckException(statement.getLineInfo(), "Invalid Return Type. Expecting VOID"));
