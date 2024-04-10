@@ -267,7 +267,8 @@ public class TypeCheckerVisitor extends KxiVisitorBase {
             pushNewResult(expression.getId().getValue(), new SymbolData(false, null, expression.getType()), currentScope);
             resultTypeStack.push(leftOver);
             matchResults(expression.getLineInfo());
-            resultTypeStack.pop(); //don't need to keep results maybe
+            if (!expression.isPartOfDataMember())
+                resultTypeStack.pop(); //don't keep results if not part of member
         } else if (expression.getType().getScalarType() == ScalarType.ID) {
             ClassScope classScope = scopeHandler.getClassScope(expression.getType().getKxiType().getIdName().getValue());
             if (classScope == null)
@@ -669,7 +670,18 @@ EXPRESSIONS DOT
 
     @Override
     public void visit(KxiDataMember dataMember) {
-
+        //make sure we aren't writing to non-static members
+        if (dataMember.getVariableDeclaration().getInitializer() != null) {
+            ResultType resultType = resultTypeStack.pop();
+            if (dataMember.isStatic()) {
+                if (!resultType.getTypeData().isStatic()) {
+                    exceptionStack.push(new TypeCheckException(dataMember.getLineInfo()
+                            , "Non-static field '"
+                            + dataMember.getVariableDeclaration().getId().getValue()
+                            + "' cannot be referenced from a static context"));
+                }
+            }
+        }
     }
 }
 

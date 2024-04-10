@@ -1668,6 +1668,18 @@ public class M3Tests {
                 "    }", false);
     }
 
+    @Test
+    void InvalidStaticDataMemberInit() {
+        test("class Foo{\n" +
+                "    static public int a = b + c;\n" +
+                "    public int b;\n" +
+                "    public int c;\n" +
+                "}\n" +
+                "void main() {\n" +
+                "\n" +
+                "}", true);
+    }
+
     void test(String input, boolean hasErrors) {
         KxiParser parser = kxiParser(input);
         AntlrToKxiVisitor antlrToKxiVisitor = new AntlrToKxiVisitor();
