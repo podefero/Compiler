@@ -1694,6 +1694,33 @@ public class M3Tests {
                 "}", false);
     }
 
+    @Test
+    void invalidStaticDupIDAccess() {
+        test("class A {\n" +
+                "  static private int x;\n" +
+                "  private int x;\n" +
+                "  \n" +
+                "    public int getX() {\n" +
+                "        return x;\n" +
+                "    }\n" +
+                "}\n" +
+                "void main() {\n" +
+                "}" , true);
+    }
+
+    @Test
+    void invalidStaticMethodReturn() {
+        test("class A {\n" +
+                "  private int x;\n" +
+                "  \n" +
+                "    static public int getX() {\n" +
+                "        return x;\n" +
+                "    }\n" +
+                "}\n" +
+                "void main() {\n" +
+                "}", true);
+    }
+
     void test(String input, boolean hasErrors) {
         KxiParser parser = kxiParser(input);
         AntlrToKxiVisitor antlrToKxiVisitor = new AntlrToKxiVisitor();

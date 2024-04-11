@@ -68,7 +68,9 @@ public class TypeCheckerVisitor extends KxiVisitorBase {
             matchId(resultL, resultR, codeLine);
 
             //check if left is pointer
-            if (right == ScalarType.NULL) {
+            if (resultL.getTypeData().isStatic() && resultR.containsFlag(ResultFlag.This)) {
+                exceptionStack.push(new TypeCheckException(codeLine, "Can't access non-static member " + resultR.getReferenceId() + " in a static context"));
+            } else if (right == ScalarType.NULL) {
                 if (left != ScalarType.ID && arrayDepthL == 0 && left != ScalarType.STRING) {
                     exceptionStack.push(new TypeCheckException(codeLine, "Mismatched Types provided: " + right + " expected pointer"));
                 }
@@ -216,7 +218,10 @@ public class TypeCheckerVisitor extends KxiVisitorBase {
             }
         } else {
             typeData.getType().setLineInfo(expressionLiteral.getLineInfo());
-            pushNewResult(id, typeData, currentScope);
+            if (typeData.getModifier() != null && !typeData.isStatic()) //has to be a data member with non-static context
+                pushNewResult(id, typeData, currentScope).getResultFlagList().add(ResultFlag.This);
+            else
+                pushNewResult(id, typeData, currentScope).getResultFlagList();
         }
 
     }
@@ -260,21 +265,26 @@ public class TypeCheckerVisitor extends KxiVisitorBase {
      */
 
     @Override
-    public void visit(KxiVariableDeclaration expression) {
+    public void visit(KxiVariableDeclaration variableDeclaration) {
         //this handles thar var = exp case (instead of exp = exp)
-        if (expression.getInitializer() != null) {
+
+        if (variableDeclaration.getInitializer() != null) {
             ResultType leftOver = resultTypeStack.pop(); // pop to preserve order
-            pushNewResult(expression.getId().getValue(), new SymbolData(false, null, expression.getType()), currentScope);
+            pushNewResult(variableDeclaration.getId().getValue()
+                    , new SymbolData(false, null, variableDeclaration.getType())
+                    , currentScope);
             resultTypeStack.push(leftOver);
-            matchResults(expression.getLineInfo());
-            if (!expression.isPartOfDataMember())
+            matchResults(variableDeclaration.getLineInfo());
+
+            if (!variableDeclaration.isPartOfDataMember())
                 resultTypeStack.pop(); //don't keep results if not part of member
-        } else if (expression.getType().getScalarType() == ScalarType.ID) {
-            ClassScope classScope = scopeHandler.getClassScope(expression.getType().getKxiType().getIdName().getValue());
+
+        } else if (variableDeclaration.getType().getScalarType() == ScalarType.ID) {
+            ClassScope classScope = scopeHandler.getClassScope(variableDeclaration.getType().getKxiType().getIdName().getValue());
             if (classScope == null)
-                exceptionStack.push(new TypeCheckException(expression.getLineInfo(), expression.getId().getValue() + " does not refer to a valid class"));
-        } else if (expression.getType().getScalarType() == ScalarType.VOID) {
-            exceptionStack.push(new TypeCheckException(expression.getLineInfo(), expression.getId().getValue() + " can't be void"));
+                exceptionStack.push(new TypeCheckException(variableDeclaration.getLineInfo(), variableDeclaration.getId().getValue() + " does not refer to a valid class"));
+        } else if (variableDeclaration.getType().getScalarType() == ScalarType.VOID) {
+            exceptionStack.push(new TypeCheckException(variableDeclaration.getLineInfo(), variableDeclaration.getId().getValue() + " can't be void"));
         }
 
     }
@@ -680,7 +690,7 @@ EXPRESSIONS DOT
         if (dataMember.getVariableDeclaration().getInitializer() != null) {
             ResultType resultType = resultTypeStack.pop();
             if (dataMember.isStatic()) {
-                if (!resultType.getTypeData().isStatic()) {
+                if (resultType.containsFlag(ResultFlag.This)) {
                     exceptionStack.push(new TypeCheckException(dataMember.getLineInfo()
                             , "Non-static field '"
                             + dataMember.getVariableDeclaration().getId().getValue()

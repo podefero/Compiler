@@ -1,11 +1,10 @@
 package compilers.visitor.intermediate;
 
 import compilers.ast.intermediate.AbstractInterNode;
+import compilers.ast.intermediate.InterFunctionNode;
 import compilers.ast.intermediate.InterInstructionNode;
 import compilers.ast.kxi_nodes.AbstractKxiNode;
 import compilers.ast.kxi_nodes.KxiMain;
-import compilers.ast.kxi_nodes.class_members.KxiMethod;
-import compilers.ast.kxi_nodes.helper.KxiInvalidNode;
 import compilers.transform.intermediate.AbstractInterFactory;
 import compilers.transform.intermediate.InterFactoryDefault;
 import compilers.visitor.kxi.KxiVisitorBase;
