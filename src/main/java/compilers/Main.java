@@ -59,13 +59,13 @@ public class Main {
         parser.removeErrorListeners();
         parser.addErrorListener(new ParserErrorListener());
 
-//        //catch any syntax errors
-//        try {
-//            parser.compilationUnit();
-//        } catch (ParseException ex) {
-//            System.out.println(ex.getMessage());
-//            return;
-//        }
+        //catch any syntax errors
+        try {
+            parser.compilationUnit();
+        } catch (ParseException ex) {
+            System.out.println(ex.getMessage());
+            return;
+        }
 
         AntlrToKxiVisitor antlrToKxiVisitor = new AntlrToKxiVisitor();
         antlrToKxiVisitor.visitCompilationUnit(parser.compilationUnit());

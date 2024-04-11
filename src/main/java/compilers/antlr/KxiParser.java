@@ -1386,10 +1386,10 @@ public class KxiParser extends Parser {
 		public TerminalNode AND() { return getToken(KxiParser.AND, 0); }
 		public TerminalNode OR() { return getToken(KxiParser.OR, 0); }
 		public TerminalNode EQUALS() { return getToken(KxiParser.EQUALS, 0); }
-		public TerminalNode PLUSEQUALS() { return getToken(KxiParser.PLUSEQUALS, 0); }
-		public TerminalNode SUBEQUALS() { return getToken(KxiParser.SUBEQUALS, 0); }
 		public TerminalNode MULTEQUALS() { return getToken(KxiParser.MULTEQUALS, 0); }
 		public TerminalNode DIVEQUALS() { return getToken(KxiParser.DIVEQUALS, 0); }
+		public TerminalNode PLUSEQUALS() { return getToken(KxiParser.PLUSEQUALS, 0); }
+		public TerminalNode SUBEQUALS() { return getToken(KxiParser.SUBEQUALS, 0); }
 		public TerminalNode DOT() { return getToken(KxiParser.DOT, 0); }
 		public ExpressionContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
@@ -1698,7 +1698,7 @@ public class KxiParser extends Parser {
 						setState(289);
 						if (!(precpred(_ctx, 12))) throw new FailedPredicateException(this, "precpred(_ctx, 12)");
 						setState(290);
-						match(PLUSEQUALS);
+						match(MULTEQUALS);
 						setState(291);
 						expression(13);
 						}
@@ -1710,7 +1710,7 @@ public class KxiParser extends Parser {
 						setState(292);
 						if (!(precpred(_ctx, 11))) throw new FailedPredicateException(this, "precpred(_ctx, 11)");
 						setState(293);
-						match(SUBEQUALS);
+						match(DIVEQUALS);
 						setState(294);
 						expression(12);
 						}
@@ -1722,7 +1722,7 @@ public class KxiParser extends Parser {
 						setState(295);
 						if (!(precpred(_ctx, 10))) throw new FailedPredicateException(this, "precpred(_ctx, 10)");
 						setState(296);
-						match(MULTEQUALS);
+						match(PLUSEQUALS);
 						setState(297);
 						expression(11);
 						}
@@ -1734,7 +1734,7 @@ public class KxiParser extends Parser {
 						setState(298);
 						if (!(precpred(_ctx, 9))) throw new FailedPredicateException(this, "precpred(_ctx, 9)");
 						setState(299);
-						match(DIVEQUALS);
+						match(SUBEQUALS);
 						setState(300);
 						expression(10);
 						}
@@ -2191,11 +2191,11 @@ public class KxiParser extends Parser {
 		"\u0005(\u0000\u0000\u011a\u0135\u0003$\u0012\u0010\u011b\u011c\n\u000e"+
 		"\u0000\u0000\u011c\u011d\u0005)\u0000\u0000\u011d\u0135\u0003$\u0012\u000f"+
 		"\u011e\u011f\n\r\u0000\u0000\u011f\u0120\u0005!\u0000\u0000\u0120\u0135"+
-		"\u0003$\u0012\u000e\u0121\u0122\n\f\u0000\u0000\u0122\u0123\u0005/\u0000"+
+		"\u0003$\u0012\u000e\u0121\u0122\n\f\u0000\u0000\u0122\u0123\u00051\u0000"+
 		"\u0000\u0123\u0135\u0003$\u0012\r\u0124\u0125\n\u000b\u0000\u0000\u0125"+
-		"\u0126\u00050\u0000\u0000\u0126\u0135\u0003$\u0012\f\u0127\u0128\n\n\u0000"+
-		"\u0000\u0128\u0129\u00051\u0000\u0000\u0129\u0135\u0003$\u0012\u000b\u012a"+
-		"\u012b\n\t\u0000\u0000\u012b\u012c\u00052\u0000\u0000\u012c\u0135\u0003"+
+		"\u0126\u00052\u0000\u0000\u0126\u0135\u0003$\u0012\f\u0127\u0128\n\n\u0000"+
+		"\u0000\u0128\u0129\u0005/\u0000\u0000\u0129\u0135\u0003$\u0012\u000b\u012a"+
+		"\u012b\n\t\u0000\u0000\u012b\u012c\u00050\u0000\u0000\u012c\u0135\u0003"+
 		"$\u0012\n\u012d\u012e\n!\u0000\u0000\u012e\u0135\u0003*\u0015\u0000\u012f"+
 		"\u0130\n \u0000\u0000\u0130\u0135\u0003&\u0013\u0000\u0131\u0132\n\u001f"+
 		"\u0000\u0000\u0132\u0133\u00055\u0000\u0000\u0133\u0135\u00058\u0000\u0000"+

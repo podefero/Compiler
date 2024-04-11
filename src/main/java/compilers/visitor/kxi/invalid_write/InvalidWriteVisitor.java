@@ -127,7 +127,7 @@ public class InvalidWriteVisitor extends KxiVisitorBase {
                     , ResultFlag.Literal
                     , ResultFlag.New
             ));
-        resultFlagStack.clear();
+        //resultFlagStack.clear();
         resultFlagStack.push(right);
     }
 

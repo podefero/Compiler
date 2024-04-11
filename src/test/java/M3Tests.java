@@ -1759,8 +1759,10 @@ public class M3Tests {
                 "}", false);
     }
 
+    //TODO: PLACE THESE TEST IN M4 test when it's ready
+
     @Test
-    void invalidMethodMissingParenth() {
+    void invalidMethodMissingParenthM4() {
         test("class A {\n" +
                 "    static public int f() {\n" +
                 "        int x = 1;\n" +
@@ -1771,9 +1773,143 @@ public class M3Tests {
                 "void main() {\n" +
                 "    int k = 5;\n" +
                 "    int x = 5;\n" +
-                "    int i = (k + x) - A.f; //i = 9\n" +
+                "    int i = (k + x) - A.f; \n" +
+                "    cout << i; //expect 9\n" +
                 "}", true);
     }
+
+
+    @Test
+    void validMethodExpressionTestM4() {
+        test("//FUNCTION CALL\n" +
+                "class A {\n" +
+                "    static public int f() {\n" +
+                "        int x = 1;\n" +
+                "        return x;\n" +
+                "    }\n" +
+                "}\n" +
+                "\n" +
+                "void main() {\n" +
+                "    int k = 5;\n" +
+                "    int x = 5;\n" +
+                "    int i = (k + x) - A.f(); //i = 9\n" +
+                "    cout << i; //expect 9\n" +
+                "}", false);
+    }
+
+    @Test
+    void validDotExpressionTestM4() {
+        test("//DOT CALL\n" +
+                "class A {\n" +
+                "    static public int i;\n" +
+                "}\n" +
+                "\n" +
+                "void main() {\n" +
+                "    int k = 5;\n" +
+                "    int x = 5;\n" +
+                "    int i = (k + x) - A.i; //i = 9\n" +
+                "    cout << i; //expect 9\n" +
+                "}", false);
+    }
+
+    @Test
+    void validNotExpressionTestM4() {
+        test("//NOT\n" +
+                "void main() {\n" +
+                "    bool i; //0 is false for assembly\n" +
+                "    i = !i; //set to one\n" +
+                "    if(i)\n" +
+                "        cout << \"true\"; //should print\n" +
+                "}\n" +
+                "\n", false);
+    }
+
+    @Test
+    void validUnaryPlusExpressionTestM4() {
+        test("//UnaryPLUS\n" +
+                "void main() {\n" +
+                "    char i = 'k';\n" +
+                "    int j = +i; //convert to int\n" +
+                "    cout << j; //should print int value of k 107\n" +
+                "}", false);
+    }
+
+    @Test
+    void validUnaryMinusExpressionTestM4() {
+        test("//Unary SUBTRACT\n" +
+                "void main() {\n" +
+                "    int i = -10;\n" +
+                "    int j = i + 9; \n" +
+                "    cout << i; //should be -1\n" +
+                "    cout << j; // should be 0\n" +
+                "}", false);
+    }
+
+    @Test
+    void validArithmicExpressionsTestM4() {
+        test("//ARITHMIC Expressions\n" +
+                "void main() {\n" +
+                "    int i = 10;\n" +
+                "    int j = 10;\n" +
+                "    int r = i * j; //100\n" +
+                "    cout << r; \n" +
+                "     r = i / j; //1\n" +
+                "    cout << r;\n" +
+                "     r = i * j; //100\n" +
+                "    cout << r;\n" +
+                "     r = i + j; //20\n" +
+                "    cout << r;\n" +
+                "     r = i - j; //0\n" +
+                "    cout << r;\n" +
+                "    r = i * j / i + j - i; //(((i * j)/i) + j) - i -> 10\n" +
+                "    cout << i; //should be 10\n" +
+                "    cout << j; // should be 10\n" +
+                "}", false);
+    }
+
+    @Test
+    void validRelationalExpressionsTestM4() {
+        test("//RELATIONAL Expression. print 8 trues\n" +
+                "void main() {\n" +
+                "\tint i = 10;\n" +
+                "\tint j = -1;\n" +
+                "\tint l = 10;\n" +
+                "\tif(i > j)\n" +
+                "\t\tcout << \"true\";\n" +
+                "\tif (i >= l)\n" +
+                "\t\tcout << \"true\";\n" +
+                "\tif (i < j)\n" +
+                "\t\tcout << \"don't print\";\n" +
+                "\tif (i <= l)\n" +
+                "\t\tcout << \"true\";\n" +
+                "\tif(!(i < j))\n" +
+                "\t\tcout << \"true\";\n" +
+                "\tif(i != j)\n" +
+                "\t\tcout << \"true\";\n" +
+                "\tif(i != l)\n" +
+                "\t\tcout << \"dont print\";\n" +
+                "\tif(i > j && i == l)\n" +
+                "\t\tcout << \"true\";\n" +
+                "\tif(i > j || i == l) //short circut\n" +
+                "\t\tcout << \"true\";\n" +
+                "\tif(i < j && i == l) // short circut\n" +
+                "\t\tcout << \"dont print\";\n" +
+                "\tif(i <= j || i == l) //not short circut\n" +
+                "\t\tcout << \"true\";\n" +
+                "}", false);
+    }
+
+    @Test
+    void validArithmicAssignmentExpressionsTestM4() {
+        test("//ARITHMIC ASSIGNMENT EXPRESSION\n" +
+                "void main() {\n" +
+                "\tint i = 10;\n" +
+                "\tint j = 10;\n" +
+                "\tint r = i += j *= j / 10; // j = 20, i = 30, r = i\n" +
+                "\tcout << r; // print 30;\n" +
+                "}", false);
+    }
+
 
     void test(String input, boolean hasErrors) {
         KxiParser parser = kxiParser(input);
