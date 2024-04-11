@@ -20,6 +20,7 @@ public class ScopeHandler {
 
     public SymbolData Identify(SymbolTable symbolTable, String id) {
         String uniqueName = symbolTable.getUniqueName();
+        if (id.equals("main")) return globalScope.getMainScope().getReturnType();
 
         while (symbolTable != null) {
             SymbolData symbolData;
@@ -55,14 +56,13 @@ public class ScopeHandler {
     }
 
     public MethodScope bubbleToMethodScope(SymbolTable symbolTable, String id) {
+        if (id.equals("main")) return globalScope.getMainScope();
         //traverse up nested scope
         while (symbolTable != null) {
             if (symbolTable instanceof ClassScope) {
                 MethodScope methodScope;
                 methodScope = ((ClassScope) symbolTable).getMethodScopeMap().get(id);
                 if (methodScope != null) return methodScope;
-            } else if (symbolTable instanceof GlobalScope) {
-                if (id.equals("main")) return ((GlobalScope) symbolTable).getMainScope();
             }
             symbolTable = symbolTable.parent;
         }

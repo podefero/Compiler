@@ -28,6 +28,12 @@ public class InvalidWriteVisitor extends KxiVisitorBase {
     private ScopeHandler scopeHandler;
     private int countStack;
 
+    @Override
+    public void dumpErrorStack() {
+        System.out.println("InvalidWriter Errors");
+        super.dumpErrorStack();
+    }
+
     public InvalidWriteVisitor(Stack<ResultFlag> resultFlagStack, ScopeHandler scopeHandler) {
         this.resultFlagStack = resultFlagStack;
         this.scopeHandler = scopeHandler;

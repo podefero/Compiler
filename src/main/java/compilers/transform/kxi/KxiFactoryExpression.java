@@ -39,9 +39,12 @@ public class KxiFactoryExpression extends AbstractKxiFactory {
         if (expressionContext.expression(0) != null && expressionContext.index() != null)
             return new KxiExpressionIndex(new KxiIndex(pop(stack)), pop(stack));
         else if (expressionContext.expression(0) != null && expressionContext.arguments() != null) {
-            if (expressionContext.arguments().argumentList() != null)
-                return new KxiMethodExpression(new KxiArguments(popList(stack, getListSizeFromCtx(expressionContext.arguments().argumentList().expression())))
-                        , pop(stack));
+            if (expressionContext.arguments().argumentList() != null) {
+                KxiArguments kxiArguments = new KxiArguments(popList(stack, getListSizeFromCtx(expressionContext.arguments().argumentList().expression())));
+                AbstractKxiExpression methodExp = pop(stack);
+                kxiArguments.setLineInfo(methodExp.getLineInfo());
+                return new KxiMethodExpression(kxiArguments,methodExp);
+            }
             else
                 return new KxiMethodExpression(new KxiArguments(new GenericListNode(new ArrayList<>())), pop(stack));
         }

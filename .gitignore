@@ -21,6 +21,7 @@ src/main/java/compilers/antlr/KxiLexer.tokens
 ### OUTPUT FILES ###
 dot
 png
+asm
 src/test/resources/
 src/main/java/test_p
 ### Eclipse ###

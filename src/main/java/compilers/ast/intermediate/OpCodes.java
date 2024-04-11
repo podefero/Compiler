@@ -1,9 +1,13 @@
 package compilers.ast.intermediate;
 
+import lombok.Getter;
+
+@Getter
 public enum OpCodes {
     JMP(1),
     JMR(2),
-    BNZ(3);
+    BNZ(3),
+    TRP(21);
     private final int value;
 
     OpCodes(int value) {

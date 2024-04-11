@@ -1,12 +1,17 @@
 package compilers.ast.intermediate;
 
+import lombok.AllArgsConstructor;
+
+@AllArgsConstructor
 public class InterInstructionNode extends AbstractInterNode implements Assemble{
+    private String label;
     private OpCodes opCodes;
-    private int offset;
+    private String operandL;
+    private String operandR;
 
 
     @Override
     public String getAssembly() {
-        return null;
+        return label + " " + opCodes + " " + operandL + " " + operandR;
     }
 }

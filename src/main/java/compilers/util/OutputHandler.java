@@ -6,6 +6,7 @@ import guru.nidi.graphviz.engine.Graphviz;
 import guru.nidi.graphviz.model.MutableGraph;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 
 public class OutputHandler {
@@ -20,11 +21,29 @@ public class OutputHandler {
         else this.outputFileArgs = outputFileArgs.substring(1, outputFileArgs.length() - 1);
 
         //split
-        if(!useStdout) {
+        if (!useStdout) {
             outputFiles = this.outputFileArgs.split(",");
             if (outputFiles.length == 0)
                 outputFiles = new String[]{this.outputFileArgs};
         }
+    }
+
+    private void writeFile(String content, String filePath) throws IOException {
+        if (!useStdout) {
+            FileWriter writer = new FileWriter(filePath);
+            writer.write(content);
+            writer.close();
+        } else
+            System.out.println(content);
+
+    }
+
+    public void outputAsm(String asm) throws IOException {
+        writeFile(asm, getRelativeOutputFile("asm"));
+    }
+
+    public void outputLex(String lex) throws IOException {
+        writeFile(lex, getRelativeOutputFile("lex"));
     }
 
     public void outputAST(MutableGraph graph) throws IOException {

@@ -30,7 +30,6 @@ public class GenericArgumentAction implements ArgumentAction {
                 argumentFlags.semantics = true;
                 argumentFlags.parseTree = true;
                 argumentFlags.lexing = true;
-                argumentFlags.printSemanticInformation = true;
                 break;
             case "-c":
                 argumentFlags.compile = true;

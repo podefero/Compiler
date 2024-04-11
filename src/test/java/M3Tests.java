@@ -1705,7 +1705,7 @@ public class M3Tests {
                 "    }\n" +
                 "}\n" +
                 "void main() {\n" +
-                "}" , true);
+                "}", true);
     }
 
     @Test
@@ -1718,6 +1718,60 @@ public class M3Tests {
                 "    }\n" +
                 "}\n" +
                 "void main() {\n" +
+                "}", true);
+    }
+
+    @Test
+    void validNullAssignment() {
+        test("class Dave{}\n" +
+                "void main() {\n" +
+                "    Dave dave = new Dave();\n" +
+                "    dave == null;\n" +
+                "}", false);
+    }
+
+    @Test
+    void validStaticFunctionReturnStatic() {
+        test("class Dave{\n" +
+                "    static private int b;\n" +
+                "    static public int getB() {\n" +
+                "        return b;\n" +
+                "    }\n" +
+                "}\n" +
+                "void main() {\n" +
+                "  \n" +
+                "}", false);
+    }
+
+    @Test
+    void validReturnNewObjNNull() {
+        test("class Dave{   \n" +
+                "     public Dave getDave() {\n" +
+                "        return new Dave();\n" +
+                "    }\n" +
+                "    \n" +
+                "     public Dave getDaveNull() {\n" +
+                "        return null;\n" +
+                "    }\n" +
+                "}\n" +
+                "void main() {\n" +
+                "  \n" +
+                "}", false);
+    }
+
+    @Test
+    void invalidMethodMissingParenth() {
+        test("class A {\n" +
+                "    static public int f() {\n" +
+                "        int x = 1;\n" +
+                "        return x;\n" +
+                "    }\n" +
+                "}\n" +
+                "\n" +
+                "void main() {\n" +
+                "    int k = 5;\n" +
+                "    int x = 5;\n" +
+                "    int i = (k + x) - A.f; //i = 9\n" +
                 "}", true);
     }
 

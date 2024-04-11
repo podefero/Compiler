@@ -10,6 +10,12 @@ import compilers.visitor.kxi.symboltable.SymbolTable;
 public class InvalidBreakVisitor extends KxiVisitorBase {
 
     @Override
+    public void dumpErrorStack() {
+        System.out.println("Invalid Break Errors");
+        super.dumpErrorStack();
+    }
+
+    @Override
     public void visit(KxiBreakStatement breakStatement) {
         SymbolTable scope = currentScope;
         boolean found = false;

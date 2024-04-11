@@ -37,14 +37,16 @@ public class KxiLexer extends Lexer {
 		"DEFAULT_MODE"
 	};
 
-	public void printTokens() {
+	public String printTokens() {
 		CommonTokenStream tokens = new CommonTokenStream(this);
 		tokens.fill();
 		List<Token> tokenList = tokens.getTokens();
+		StringBuilder stringBuilder = new StringBuilder();
 		for (Token token : tokenList) {
 			String tokenName = getVocabulary().getSymbolicName(token.getType());
-			System.out.println("Line#: " + token.getLine() + ":" + token.getCharPositionInLine() + " " + token.getText() + " " + tokenName);
+			stringBuilder.append("Line#: " + token.getLine() + ":" + token.getCharPositionInLine() + " " + token.getText() + " " + tokenName + "\n");
 		}
+		return stringBuilder.toString();
 	}
 
 	private static String[] makeRuleNames() {

@@ -37,6 +37,11 @@ public class SymbolTableVisitor extends KxiVisitorBase {
         nameCounter = 0;
     }
 
+    @Override
+    public void dumpErrorStack() {
+        System.out.println("SymbolTable Errors");
+        super.dumpErrorStack();
+    }
 
     private void setScopeUniqueName() {
         if (currentSymbolTable instanceof ClassScope) {

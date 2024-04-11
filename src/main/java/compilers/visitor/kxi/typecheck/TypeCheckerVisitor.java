@@ -37,6 +37,12 @@ public class TypeCheckerVisitor extends KxiVisitorBase {
     private ScopeHandler scopeHandler;
     private Stack<ResultType> resultTypeStack;
 
+    @Override
+    public void dumpErrorStack() {
+        System.out.println("TypeCheck Errors");
+        super.dumpErrorStack();
+    }
+
 
     private void matchId(ResultType resultL, ResultType resultR, String codeLine) {
 
@@ -66,9 +72,11 @@ public class TypeCheckerVisitor extends KxiVisitorBase {
             ScalarType right = resultR.getTypeData().getType().getScalarType();
 
             matchId(resultL, resultR, codeLine);
-
-            //check if left is pointer
-            if (resultL.getTypeData().isStatic() && resultR.containsFlag(ResultFlag.This)) {
+            //if has flags
+            if (resultR.containsFlag(ResultFlag.Method))
+                exceptionStack.push(new TypeCheckException(codeLine, "invalid method in expression " + resultR.getReferenceId()));
+                //check if left is pointer
+            else if (resultL.getTypeData().isStatic() && resultR.containsFlag(ResultFlag.This)) {
                 exceptionStack.push(new TypeCheckException(codeLine, "Can't access non-static member " + resultR.getReferenceId() + " in a static context"));
             } else if (right == ScalarType.NULL) {
                 if (left != ScalarType.ID && arrayDepthL == 0 && left != ScalarType.STRING) {
@@ -200,11 +208,6 @@ public class TypeCheckerVisitor extends KxiVisitorBase {
         String id = expressionLiteral.getTokenLiteral().getValue();
         SymbolData typeData = scopeHandler.Identify(currentScope, id);
 
-        //check if main
-        if (id.equals("main")) {
-            typeData = scopeHandler.getGlobalScope().getMainScope().getReturnType();
-        }
-
         //not found, check for class level
         if (typeData == null) {
             ClassScope classScope = scopeHandler.getClassScope(id);
@@ -218,10 +221,14 @@ public class TypeCheckerVisitor extends KxiVisitorBase {
             }
         } else {
             typeData.getType().setLineInfo(expressionLiteral.getLineInfo());
+            ResultType resultType = new ResultType(id, typeData, currentScope);
             if (typeData.getModifier() != null && !typeData.isStatic()) //has to be a data member with non-static context
-                pushNewResult(id, typeData, currentScope).getResultFlagList().add(ResultFlag.This);
-            else
-                pushNewResult(id, typeData, currentScope).getResultFlagList();
+                resultType.getResultFlagList().add(ResultFlag.This);
+            if (scopeHandler.bubbleToMethodScope(currentScope, id) != null) {
+                resultType.getResultFlagList().add(ResultFlag.Method);
+            }
+
+            resultTypeStack.push(resultType);
         }
 
     }
@@ -430,8 +437,13 @@ EXPRESSIONS DOT
                 if (currentClassScope == null || !currentClassScope.equals(resultClassScope))
                     resultType.getResultFlagList().add(ResultFlag.OutOfScope);
 
-                //get dataType from result scope using childID
                 String childID = expression.getId().getValue();
+
+                if (resultClassScope.getMethodScopeMap().get(childID) != null) {
+                    resultType.getResultFlagList().add(ResultFlag.Method);
+                }
+
+                //get dataType from result scope using childID
                 SymbolData resultSymbolData = scopeHandler.Identify(resultClassScope, childID);
 
                 if (resultSymbolData != null) {
@@ -486,8 +498,13 @@ EXPRESSIONS DOT
         //check if it's a method, no changes
         expression.getArguments().setLineInfo(expression.getLineInfo()); //cuz
         ResultType result = resultTypeStack.pop();
-        if (result.getReferenceId() == null || scopeHandler.bubbleToMethodScope(result.getScope(), result.getReferenceId()) == null)
+
+        if (!result.containsFlag(ResultFlag.Method))
             exceptionStack.push(new TypeCheckException(expression.getLineInfo(), "Can't find method "));
+        else
+            result.getResultFlagList().remove(ResultFlag.Method);
+//        if (result.getReferenceId() == null || scopeHandler.bubbleToMethodScope(result.getScope(), result.getReferenceId()) == null)
+//            exceptionStack.push(new TypeCheckException(expression.getLineInfo(), "Can't find method "));
         resultTypeStack.push(result);
     }
 
@@ -571,7 +588,9 @@ EXPRESSIONS DOT
 
     @Override
     public void visit(KxiExpressionStatement statement) {
-        resultTypeStack.pop();
+        ResultType resultType = resultTypeStack.pop();
+        if (resultType.containsFlag(ResultFlag.Method))
+            exceptionStack.push(new TypeCheckException(statement.getLineInfo(), "invalid method in expression"));
     }
 
     @Override
