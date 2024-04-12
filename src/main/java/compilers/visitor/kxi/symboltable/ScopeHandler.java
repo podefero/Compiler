@@ -19,7 +19,11 @@ public class ScopeHandler {
     }
 
     public SymbolData Identify(SymbolTable symbolTable, String id) {
-        String uniqueName = symbolTable.getUniqueName();
+        ClassScope classScope = bubbleToClassScope(symbolTable);
+        String uniqueName = "";
+        if (classScope != null) {
+             uniqueName = bubbleToClassScope(symbolTable).getUniqueName();
+        }
         if (id.equals("main")) return globalScope.getMainScope().getReturnType();
 
         while (symbolTable != null) {

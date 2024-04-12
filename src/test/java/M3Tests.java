@@ -1759,6 +1759,14 @@ public class M3Tests {
                 "}", false);
     }
 
+    @Test
+    void validSameNameVarDifIfBlock() {
+        test("void main() {\n" +
+                "   if(true) int i;\n" +
+                "   if(false) int i;\n" +
+                "}", false);
+    }
+
     //TODO: PLACE THESE TEST IN M4 test when it's ready
 
     @Test
@@ -1908,6 +1916,38 @@ public class M3Tests {
                 "\tint r = i += j *= j / 10; // j = 20, i = 30, r = i\n" +
                 "\tcout << r; // print 30;\n" +
                 "}", false);
+    }
+
+    @Test
+    void validStaticFunctionCallsM4() {
+        test("class Test {\n" +
+                "    static public int testInt = 1;\n" +
+                "    static private B b;\n" +
+                "    \n" +
+                "    static public int intF() {\n" +
+                "        return testInt;\n" +
+                "    }\n" +
+                "\n" +
+                "    static public B getB() {\n" +
+                "        b.bInt += intF();\n" +
+                "        return b;\n" +
+                "    }\n" +
+                "    \n" +
+                "}\n" +
+                "\n" +
+                "class B {\n" +
+                "    static public int bInt = 2;\n" +
+                "    \n" +
+                "}\n" +
+                "\n" +
+                "void main() {\n" +
+                "    int test = Test.testInt; //1\n" +
+                "    int f = Test.intF(); //1\n" +
+                "    int b = Test.getB().bInt; //3\n" +
+                "    cout << test;\n" +
+                "    cout << f;\n" +
+                "    cout << b;\n" +
+                "}", true);
     }
 
 

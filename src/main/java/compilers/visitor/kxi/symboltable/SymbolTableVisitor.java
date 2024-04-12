@@ -4,6 +4,7 @@ import compilers.ast.kxi_nodes.*;
 import compilers.ast.kxi_nodes.class_members.KxiConstructor;
 import compilers.ast.kxi_nodes.class_members.KxiDataMember;
 import compilers.ast.kxi_nodes.class_members.KxiMethod;
+import compilers.ast.kxi_nodes.expressions.binary.conditional.KxiOr;
 import compilers.ast.kxi_nodes.scope.KxiBlock;
 import compilers.ast.kxi_nodes.scope.KxiCaseBlock;
 import compilers.ast.kxi_nodes.scope.KxiClass;
@@ -62,7 +63,7 @@ public class SymbolTableVisitor extends KxiVisitorBase {
             tableStack.push(currentSymbolTable);
         }
         currentSymbolTable = symbolTable;
-        setScopeUniqueName();
+//        setScopeUniqueName();
     }
 
     private void scopeNodeVisit() {
@@ -147,6 +148,7 @@ public class SymbolTableVisitor extends KxiVisitorBase {
                         , new ArrayList<>(), (BlockScope) currentSymbolTable);
 
         globalScope.setMainScope(methodScope);
+        currentSymbolTable.setUniqueName("main");
         scopeNodeVisit();
         scopeHandler.setGlobalScope(globalScope);
     }
@@ -164,6 +166,7 @@ public class SymbolTableVisitor extends KxiVisitorBase {
 
         scopeHandler.addClassScope(classScope.getClassId(), (ClassScope) kxiClass.getScope());
         scopeNodePreVisit(classScope);
+        classScope.setUniqueName(classScope.getClassId());
     }
 
     @Override
@@ -201,6 +204,8 @@ public class SymbolTableVisitor extends KxiVisitorBase {
 
         setBlockScopeType(ScopeType.Method);
 
+        currentSymbolTable.setUniqueName(tableStack.peek().getUniqueName() + id);
+
         scopeNodeVisit();
 
         addSymbolDataToCurrentScope(id, returnData);
@@ -222,6 +227,7 @@ public class SymbolTableVisitor extends KxiVisitorBase {
         setBlockScopeType(ScopeType.Constructor);
 
         scopeNodeVisit();
+
     }
 
     @Override
@@ -231,6 +237,9 @@ public class SymbolTableVisitor extends KxiVisitorBase {
             scopeNodeVisit();
         }
         setBlockScopeType(ScopeType.If);
+
+        currentSymbolTable.setUniqueName(tableStack.peek().getUniqueName() + kxiIfStatement.hashCode());
+
         scopeNodeVisit();
 
     }
@@ -238,18 +247,27 @@ public class SymbolTableVisitor extends KxiVisitorBase {
     @Override
     public void visit(KxiForStatement kxiForStatement) {
         setBlockScopeType(ScopeType.For);
+
+        currentSymbolTable.setUniqueName(tableStack.peek().getUniqueName() + kxiForStatement.hashCode());
+
         scopeNodeVisit();
     }
 
     @Override
     public void visit(KxiWhileStatement kxiWhileStatement) {
         setBlockScopeType(ScopeType.While);
+
+        currentSymbolTable.setUniqueName(tableStack.peek().getUniqueName() + kxiWhileStatement.hashCode());
+
         scopeNodeVisit();
     }
 
     @Override
-    public void visit(KxiSwitchStatement kxiSwitchStatementChar) {
+    public void visit(KxiSwitchStatement kxiSwitchStatement) {
         setBlockScopeType(ScopeType.Switch);
+
+        currentSymbolTable.setUniqueName(tableStack.peek().getUniqueName() + kxiSwitchStatement.hashCode());
+
         scopeNodeVisit();
     }
 
