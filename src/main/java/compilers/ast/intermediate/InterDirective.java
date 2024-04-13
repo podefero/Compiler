@@ -3,7 +3,7 @@ package compilers.ast.intermediate;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
-public class InterInstructionNode extends AbstractInterNode implements Assemble{
+public class InterDirective extends AbstractInterNode implements Assemble{
     private String label;
     private OpCodes opCodes;
     private String operandL;

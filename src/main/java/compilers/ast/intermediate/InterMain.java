@@ -3,23 +3,19 @@ package compilers.ast.intermediate;
 import compilers.ast.GenericListNode;
 import lombok.Getter;
 
+import java.util.List;
+
 @Getter
 public class InterMain extends AbstractInterNode {
-    private InstructionChunk jmpToMain;
-    private InstructionChunk blockOfCode;
-    private InstructionChunk globalDirectives;
-    private InstructionChunk globalInit;
+    private InterFunctionNode interFunctionNode;
+    private List<InterGlobalVariable> interGlobalVariables;
+    private List<InterDirective> interDirectives;
 
-    public InterMain(InstructionChunk blockOfCode, InstructionChunk jmpToMain, InstructionChunk globalInit, InstructionChunk globalDir) {
-        super(blockOfCode, jmpToMain, globalDir, globalDir);
-        this.jmpToMain = jmpToMain;
-        this.blockOfCode = blockOfCode;
-        this.globalDirectives = globalDir;
-        this.globalInit = globalInit;
+    public InterMain(GenericListNode globalData, GenericListNode globalVars, InterFunctionNode interFunction) {
+        super(globalData, globalVars, interFunction);
+        this.interDirectives = getNodeList(globalData);
+        this.interGlobalVariables = getNodeList(globalVars);
+        this.interFunctionNode = interFunction;
     }
 
-    @Override
-    public String gatherAssembly() {
-        return super.gatherAssembly();
-    }
 }

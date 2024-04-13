@@ -7,8 +7,5 @@ public abstract class AbstractInterNode extends GenericNode {
         super(genericNodes);
     }
 
-    public String gatherAssembly() {
-        return null;
-    }
 
 }

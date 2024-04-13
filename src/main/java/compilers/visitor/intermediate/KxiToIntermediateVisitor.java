@@ -1,6 +1,7 @@
 package compilers.visitor.intermediate;
 
 import compilers.ast.intermediate.*;
+import compilers.ast.intermediate.expression.operation.InterOperation;
 import compilers.ast.kxi_nodes.AbstractKxiNode;
 import compilers.ast.kxi_nodes.KxiMain;
 import compilers.transform.intermediate.AbstractInterFactory;
@@ -35,8 +36,8 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
 
 
 
-        jmpToMain.add(new InterInstructionNode( "", OpCodes.JMP, kxiMain.getId().getValue(), ""));
-        jmpToMain.add(new InterInstructionNode( "main", OpCodes.TRP, "#0", ""));
+        jmpToMain.add(new InterOperation( "", OpCodes.JMP, kxiMain.getId().getValue(), ""));
+        jmpToMain.add(new InterOperation( "main", OpCodes.TRP, "#0", ""));
 
         rootNode = new InterMain(mainBody, jmpToMain, globalInit, globalDir);
 
