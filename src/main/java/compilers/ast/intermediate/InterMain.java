@@ -1,6 +1,7 @@
 package compilers.ast.intermediate;
 
 import compilers.ast.GenericListNode;
+import compilers.visitor.kxi.KxiVisitorBase;
 import lombok.Getter;
 
 import java.util.List;
@@ -18,4 +19,9 @@ public class InterMain extends AbstractInterNode {
         this.interFunctionNode = interFunction;
     }
 
+    @Override
+    public void accept(KxiVisitorBase visit) {
+        visitChildren(visit);
+        visit.visit(this);
+    }
 }

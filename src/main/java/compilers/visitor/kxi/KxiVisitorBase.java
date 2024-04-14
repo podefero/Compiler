@@ -1,5 +1,6 @@
 package compilers.visitor.kxi;
 
+import compilers.ast.intermediate.InterMain;
 import compilers.ast.kxi_nodes.*;
 import compilers.ast.kxi_nodes.class_members.KxiConstructor;
 import compilers.ast.kxi_nodes.class_members.KxiDataMember;
@@ -710,4 +711,6 @@ public  class KxiVisitorBase implements VisitKxi {
         currentScope = kxiCaseBlock.getScope().getParent();
     }
 
+    public void visit(InterMain interMain) {
+    }
 }
