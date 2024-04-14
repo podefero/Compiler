@@ -2,9 +2,10 @@ package compilers.ast.kxi_nodes.expressions.binary;
 
 import compilers.ast.kxi_nodes.expressions.AbstractKxiExpression;
 import compilers.visitor.kxi.KxiVisitorBase;
+import lombok.Data;
 import lombok.Getter;
 
-@Getter
+@Data
 public abstract class AbstractKxiBinaryOperation extends AbstractKxiExpression {
     protected AbstractKxiExpression expressionR;
     protected AbstractKxiExpression expressionL;

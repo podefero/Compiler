@@ -11,7 +11,7 @@ import java.util.List;
 public class InterCase extends AbstractInterNode {
     InterLit interLit;
     InterIfStatement interIfStatement;
-    List<InterStatements> block;
+    List<InterStatement> block;
 
     public InterCase(InterLit interLit, InterIfStatement interIfStatement, GenericListNode block) {
         super(interLit, interIfStatement, block);

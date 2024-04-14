@@ -4,11 +4,12 @@ import compilers.ast.intermediate.AbstractInterNode;
 import compilers.ast.intermediate.Assemble;
 import compilers.ast.intermediate.InterValue;
 import compilers.ast.intermediate.OpCodes;
+import compilers.ast.intermediate.expression.InterExpression;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
-public abstract class InterOperation extends AbstractInterNode  {
+public abstract class InterOperation extends InterExpression {
     protected OpCodes opCodes;
     protected InterValue leftValue;
     protected InterValue rightValue;

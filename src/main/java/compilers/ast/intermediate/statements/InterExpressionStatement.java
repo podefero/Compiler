@@ -7,7 +7,7 @@ import lombok.Getter;
 import java.util.List;
 
 @Getter
-public class InterExpressionStatement extends InterStatements{
+public class InterExpressionStatement extends InterStatement {
     List<InterExpression> expressions;
 
     public InterExpressionStatement(GenericListNode expressions) {

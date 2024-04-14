@@ -1,14 +1,9 @@
 package compilers.ast.intermediate.statements;
 
-import compilers.ast.GenericListNode;
-import compilers.ast.intermediate.AbstractInterNode;
-import compilers.ast.intermediate.expression.operation.InterOperation;
 import lombok.Getter;
 
-import java.util.List;
-
 @Getter
-public class InterWhile extends InterStatements {
+public class InterWhile extends InterStatement {
     private InterIfStatement interIfStatement;
 
     public InterWhile(InterIfStatement interIfStatement) {

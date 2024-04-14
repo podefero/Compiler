@@ -7,7 +7,7 @@ import lombok.Getter;
 import java.util.List;
 
 @Getter
-public class InterSwitch extends InterStatements {
+public class InterSwitch extends InterStatement {
     List<InterExpression> interExpressions;
     List<InterCase> interCases;
     InterCase caseDefault;

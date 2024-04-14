@@ -1,5 +1,6 @@
 package compilers.ast.intermediate;
 
+import compilers.ast.intermediate.statements.InterVariable;
 import lombok.Getter;
 
 @Getter

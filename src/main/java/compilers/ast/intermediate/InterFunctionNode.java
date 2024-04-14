@@ -2,8 +2,7 @@ package compilers.ast.intermediate;
 
 import compilers.ast.GenericListNode;
 import compilers.ast.intermediate.expression.operation.InterOperation;
-import compilers.ast.intermediate.statements.InterReturn;
-import compilers.ast.intermediate.statements.InterStatements;
+import compilers.ast.intermediate.statements.InterStatement;
 import lombok.Getter;
 
 import java.util.List;
@@ -12,15 +11,15 @@ import java.util.List;
 public class InterFunctionNode extends AbstractInterNode {
     private InterId interId;
     private List<InterOperation> activationRecord;
-    private List<InterStatements> statements;
-    private InterReturn interReturn;
+    private List<InterStatement> statements;
+   // private InterReturn interReturn;
 
-    public InterFunctionNode(InterId interId, GenericListNode activationRecord, GenericListNode statements, InterReturn interReturn) {
-        super(interId, activationRecord, statements, interReturn);
+    public InterFunctionNode(InterId interId, GenericListNode activationRecord, GenericListNode statements) {
+        super(statements, activationRecord, interId);
         this.interId = interId;
         this.activationRecord = getNodeList(activationRecord);
         this.statements = getNodeList(statements);
-        this.interReturn = interReturn;
+        //this.interReturn = interReturn;
     }
 
 }

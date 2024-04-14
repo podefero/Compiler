@@ -131,7 +131,7 @@ public class Main {
         KxiToIntermediateVisitor kxiToIntermediateVisitor = new KxiToIntermediateVisitor();
         rootNode.accept(kxiToIntermediateVisitor);
         InterMain interRoot = (InterMain) kxiToIntermediateVisitor.getRootNode();
-        outputHandler.outputAsm(interRoot.getJmpToMain().gatherAssembly());
+       // outputHandler.outputAsm(interRoot.getJmpToMain().gatherAssembly());
     }
 
 }

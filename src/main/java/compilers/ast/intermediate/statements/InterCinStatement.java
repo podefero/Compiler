@@ -8,7 +8,7 @@ import lombok.Getter;
 import java.util.List;
 
 @Getter
-public class InterCinStatement extends InterStatements{
+public class InterCinStatement extends InterStatement {
     private List<InterExpression> expressionList;
     private InterOperation operation;
 
