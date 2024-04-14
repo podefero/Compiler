@@ -5,6 +5,6 @@ import compilers.ast.intermediate.OpCodes;
 
 public class InterBinaryAssignmentOp extends InterOperation{
     public InterBinaryAssignmentOp(OpCodes opCodes, InterValue leftValue, InterValue rightValue) {
-        super(opCodes, leftValue, rightValue);
+        super(leftValue, rightValue);
     }
 }

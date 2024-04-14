@@ -1,6 +1,8 @@
 package compilers.visitor.kxi;
 
-import compilers.ast.intermediate.InterMain;
+import compilers.ast.intermediate.InterFunctionNode;
+import compilers.ast.intermediate.InterGlobal;
+import compilers.ast.intermediate.statements.InterVariable;
 import compilers.ast.kxi_nodes.*;
 import compilers.ast.kxi_nodes.class_members.KxiConstructor;
 import compilers.ast.kxi_nodes.class_members.KxiDataMember;
@@ -711,6 +713,18 @@ public  class KxiVisitorBase implements VisitKxi {
         currentScope = kxiCaseBlock.getScope().getParent();
     }
 
-    public void visit(InterMain interMain) {
+    public void visit(InterGlobal interGlobal) {
+    }
+
+    public void preVisit(InterGlobal interGlobal) {
+    }
+
+    public void visit(InterVariable interVariable) {
+    }
+
+    public void visit(InterFunctionNode interFunctionNode) {
+    }
+
+    public void preVisit(InterFunctionNode interFunctionNode) {
     }
 }

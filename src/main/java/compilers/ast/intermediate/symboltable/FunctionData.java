@@ -1,14 +1,19 @@
 package compilers.ast.intermediate.symboltable;
 
-import compilers.ast.intermediate.Label;
+import compilers.util.DataSizes;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 
 @AllArgsConstructor
-@Data
+@Getter
 public class FunctionData {
     String id;
-    Label label;
+    String label;
     ActivationRecord activationRecord;
-    int size;
+
+
+    public int getSize() {
+        return activationRecord.getStackDataMap().size() * DataSizes.INT_SIZE;
+    }
+
 }

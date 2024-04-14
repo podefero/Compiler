@@ -1,7 +1,9 @@
 package compilers.visitor.intermediate;
 
-import compilers.ast.kxi_nodes.*;
-import compilers.ast.kxi_nodes.expressions.AbstractKxiExpression;
+import compilers.ast.kxi_nodes.AbstractKxiNode;
+import compilers.ast.kxi_nodes.KxiMain;
+import compilers.ast.kxi_nodes.KxiVariableDeclaration;
+import compilers.ast.kxi_nodes.class_members.KxiMethod;
 import compilers.ast.kxi_nodes.expressions.KxiDotExpression;
 import compilers.ast.kxi_nodes.expressions.KxiMethodExpression;
 import compilers.ast.kxi_nodes.expressions.binary.arithmic.KxiDiv;
@@ -14,9 +16,11 @@ import compilers.ast.kxi_nodes.expressions.literals.*;
 import compilers.ast.kxi_nodes.expressions.uni.KxiNot;
 import compilers.ast.kxi_nodes.expressions.uni.KxiUniPlus;
 import compilers.ast.kxi_nodes.expressions.uni.KxiUniSubtract;
+import compilers.ast.kxi_nodes.scope.KxiBlock;
 import compilers.ast.kxi_nodes.statements.KxiReturnStatement;
-import compilers.ast.kxi_nodes.token_literals.IdentifierToken;
 import compilers.visitor.kxi.KxiVisitorBase;
+import compilers.visitor.kxi.symboltable.BlockScope;
+import compilers.visitor.kxi.symboltable.ScopeType;
 import lombok.AllArgsConstructor;
 
 import java.util.List;
@@ -49,11 +53,38 @@ public class KxiSimplifyVisitor extends KxiVisitorBase {
 
     @Override
     public void visit(KxiMain node) {
-        if (!hasNode(KxiReturnStatement.class, node.getBlock().getStatements())) {
-            node.getBlock().getChildren().add(new KxiReturnStatement(null));
+        String id = node.getId().getValue();
+        node.getId().setValue(currentScope.getUniqueName() + id);
+//        //make main into a function node
+//        KxiMethod kxiMethod = new KxiMethod(new KxiMethodSuffixHelper(node.getBlock(), new GenericListNode(new ArrayList<>()), node.getId())
+//                , new KxiType(ScalarType.VOID, null)
+//                , new KxiModifierHelper(Modifier.PUBLIC)
+//                , new KxiStaticHelper(false));
+//        node.getChildren().add(0, kxiMethod);
+
+    }
+
+    @Override
+    public void visit(KxiMethod node) {
+        String id = node.getId().getValue();
+        node.getId().setValue(currentScope.getUniqueName() + id);
+    }
+
+    @Override
+    public void visit(KxiBlock node) {
+        //add return statements to methods and main (if they don't have one)
+        BlockScope blockScope = (BlockScope) node.getScope();
+        if ((blockScope.getScopeType() == ScopeType.Method || blockScope.getScopeType() == ScopeType.Main)
+                && !hasNode(KxiReturnStatement.class, node.getStatements())) {
+            node.getChildren().add(new KxiReturnStatement(null));
         }
     }
 
+    @Override
+    public void visit(KxiVariableDeclaration node) {
+        String id = node.getId().getValue();
+        node.getId().setValue(currentScope.getUniqueName() + id);
+    }
 
     @Override
     public void visit(KxiDiv node) {
@@ -65,20 +96,19 @@ public class KxiSimplifyVisitor extends KxiVisitorBase {
 
     @Override
     public void visit(KxiPlus node) {
-        if (!areLiterals(node.getExpressionL(), node.getExpressionR())) {
-            AbstractKxiExpression expression = (AbstractKxiExpression) kxiNodeStack.pop();
-            IdentifierToken identifierToken = new IdentifierToken(currentScope.getUniqueName() + node.hashCode());
-
-            KxiVariableDeclaration kxiVariableDeclaration =
-                    new KxiVariableDeclaration(expression
-                            , identifierToken
-                            , new KxiType(ScalarType.INT, identifierToken));
-
-            node.getChildren().add(kxiVariableDeclaration);
-
-
-        }
-        kxiNodeStack.push(node);
+//        if (!areLiterals(node.getExpressionL(), node.getExpressionR())) {
+//            AbstractKxiExpression expression = (AbstractKxiExpression) kxiNodeStack.pop();
+//            IdentifierToken identifierToken = new IdentifierToken("" + node.hashCode());
+//
+//            KxiVariableDeclaration kxiVariableDeclaration =
+//                    new KxiVariableDeclaration(expression
+//                            , identifierToken
+//                            , new KxiType(ScalarType.INT, null));
+//
+//            node.getChildren().add(kxiVariableDeclaration);
+//
+//        }
+//        kxiNodeStack.push(node);
 
     }
 
@@ -149,6 +179,8 @@ public class KxiSimplifyVisitor extends KxiVisitorBase {
 
     @Override
     public void visit(ExpressionIdLit node) {
+        String id = node.getTokenLiteral().getValue();
+        node.getTokenLiteral().setValue(currentScope.getUniqueName() + id);
     }
 
     @Override

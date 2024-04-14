@@ -2,8 +2,7 @@ package compilers;
 
 import compilers.antlr.KxiLexer;
 import compilers.antlr.KxiParser;
-import compilers.ast.intermediate.AbstractInterNode;
-import compilers.ast.intermediate.InterMain;
+import compilers.ast.intermediate.InterGlobal;
 import compilers.ast.kxi_nodes.AbstractKxiNode;
 import compilers.ast.kxi_nodes.KxiMain;
 import compilers.commandargs.ArgumentFlags;
@@ -16,7 +15,6 @@ import compilers.visitor.generic.GraphVizVisitor;
 import compilers.visitor.intermediate.KxiToIntermediateVisitor;
 import compilers.visitor.kxi.invalid_break.InvalidBreakVisitor;
 import compilers.visitor.kxi.invalid_write.InvalidWriteVisitor;
-import compilers.visitor.kxi.symboltable.SymbolTable;
 import compilers.visitor.kxi.symboltable.SymbolTableVisitor;
 import compilers.visitor.kxi.typecheck.TypeCheckerVisitor;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -130,7 +128,7 @@ public class Main {
     static void compile(AbstractKxiNode rootNode, OutputHandler outputHandler) throws IOException {
         KxiToIntermediateVisitor kxiToIntermediateVisitor = new KxiToIntermediateVisitor();
         rootNode.accept(kxiToIntermediateVisitor);
-        InterMain interRoot = (InterMain) kxiToIntermediateVisitor.getRootNode();
+        InterGlobal interRoot = (InterGlobal) kxiToIntermediateVisitor.getRootNode();
        // outputHandler.outputAsm(interRoot.getJmpToMain().gatherAssembly());
     }
 

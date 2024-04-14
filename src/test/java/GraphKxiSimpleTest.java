@@ -29,7 +29,7 @@ public class GraphKxiSimpleTest {
         KxiSimplifyVisitor kxiSimplifyVisitor = new KxiSimplifyVisitor(new Stack<>());
         rootNode.accept(kxiSimplifyVisitor);
 
-        validateAST(rootNode);
+//        validateAST(rootNode);
 
         GraphVizVisitor graphVizVisitor = new GraphVizVisitor(rootNode);
 

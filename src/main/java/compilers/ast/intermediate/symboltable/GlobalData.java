@@ -10,5 +10,5 @@ import lombok.Data;
 public class GlobalData {
     String id;
     DirType dirType;
-    Label label;
+    String label;
 }

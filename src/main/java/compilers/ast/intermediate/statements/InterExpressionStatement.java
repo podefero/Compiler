@@ -1,16 +1,13 @@
 package compilers.ast.intermediate.statements;
 
-import compilers.ast.GenericListNode;
 import compilers.ast.intermediate.expression.InterExpression;
 import lombok.Getter;
 
-import java.util.List;
-
 @Getter
 public class InterExpressionStatement extends InterStatement {
-    List<InterExpression> expressions;
+    InterExpression expression;
 
-    public InterExpressionStatement(GenericListNode expressions) {
-        this.expressions = getNodeList(expressions);
+    public InterExpressionStatement(InterExpression expression) {
+        this.expression = expression;
     }
 }

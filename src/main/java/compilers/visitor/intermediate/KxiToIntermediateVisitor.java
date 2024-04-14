@@ -4,16 +4,16 @@ import compilers.ast.GenericListNode;
 import compilers.ast.GenericNode;
 import compilers.ast.intermediate.*;
 import compilers.ast.intermediate.expression.InterExpression;
-import compilers.ast.intermediate.expression.operation.InterBinaryOp;
-import compilers.ast.intermediate.expression.operation.InterOperation;
-import compilers.ast.intermediate.helper.InterBlock;
+import compilers.ast.intermediate.expression.operation.InterAssignment;
+import compilers.ast.intermediate.expression.operation.InterBinaryPlus;
+import compilers.ast.intermediate.statements.InterExpressionStatement;
 import compilers.ast.intermediate.statements.InterReturn;
+import compilers.ast.intermediate.statements.InterVariable;
 import compilers.ast.kxi_nodes.*;
 import compilers.ast.kxi_nodes.class_members.KxiConstructor;
 import compilers.ast.kxi_nodes.class_members.KxiDataMember;
 import compilers.ast.kxi_nodes.class_members.KxiMethod;
 import compilers.ast.kxi_nodes.expressions.KxiDotExpression;
-import compilers.ast.kxi_nodes.expressions.KxiExpressionIndex;
 import compilers.ast.kxi_nodes.expressions.KxiMethodExpression;
 import compilers.ast.kxi_nodes.expressions.binary.arithmic.KxiDiv;
 import compilers.ast.kxi_nodes.expressions.binary.arithmic.KxiMult;
@@ -25,13 +25,10 @@ import compilers.ast.kxi_nodes.expressions.literals.*;
 import compilers.ast.kxi_nodes.expressions.uni.KxiNot;
 import compilers.ast.kxi_nodes.expressions.uni.KxiUniPlus;
 import compilers.ast.kxi_nodes.expressions.uni.KxiUniSubtract;
-import compilers.ast.kxi_nodes.scope.KxiBlock;
 import compilers.ast.kxi_nodes.statements.*;
 import compilers.ast.kxi_nodes.statements.conditional.KxiForStatement;
 import compilers.ast.kxi_nodes.statements.conditional.KxiIfStatement;
 import compilers.ast.kxi_nodes.statements.conditional.KxiWhileStatement;
-import compilers.transform.intermediate.AbstractInterFactory;
-import compilers.transform.intermediate.InterFactoryDefault;
 import compilers.visitor.kxi.KxiVisitorBase;
 import lombok.Getter;
 
@@ -43,14 +40,13 @@ import java.util.Stack;
 @Getter
 public class KxiToIntermediateVisitor extends KxiVisitorBase {
     private final Stack<AbstractInterNode> nodeStack;
-    private AbstractInterNode rootNode;
-    private List<InterGlobalVariable> globalVariableList;
+    private InterGlobal rootNode;
     private List<InterExpression> expressionsList;
+    private InterFunctionNode currentFunction;
 
 
     public KxiToIntermediateVisitor() {
         nodeStack = new Stack<>();
-        globalVariableList = new ArrayList<>();
         expressionsList = new ArrayList<>();
     }
 
@@ -77,25 +73,38 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
     }
 
     @Override
-    public void visit(KxiMain node) {
-        GenericListNode activationRecord = new GenericListNode(new ArrayList<>()); //use this after symboltable
-        InterBlock block = pop();
-        InterId interId = new InterId(block.getName());
-        InterFunctionNode functionNode = new InterFunctionNode(interId, activationRecord, block.getInterStatements());
+    public void preVisit(KxiMain node) {
+        GenericListNode functions = new GenericListNode(new ArrayList<>());
+        GenericListNode globalDir = new GenericListNode(new ArrayList<>()); //after symbol table
+        GenericListNode globalInit = new GenericListNode(new ArrayList<>());
 
-        GenericListNode globalData = new GenericListNode(new ArrayList<>()); //after symbol table
-        InterMain interMain = new InterMain(globalData, new GenericListNode(globalVariableList), functionNode);
-        rootNode = interMain;
+        InterGlobal interGlobal = new InterGlobal(globalDir, globalInit, functions);
+        rootNode = interGlobal;
+
+        InterId interId = new InterId(node.getId().getValue());
+        InterFunctionNode interFunctionNode = new InterFunctionNode(interId, new GenericListNode(new ArrayList<>()));
+        currentFunction = interFunctionNode;
+        rootNode.getInterFunctionNode().add(interFunctionNode);
+    }
+
+
+    @Override
+    public void preVisit(KxiMethod node) {
+        InterId interId = new InterId(node.getId().getValue());
+        InterFunctionNode interFunctionNode = new InterFunctionNode(interId, new GenericListNode(new ArrayList<>()));
+        currentFunction = interFunctionNode;
+        rootNode.getInterFunctionNode().add(interFunctionNode);
     }
 
     @Override
     public void visit(KxiMethod node) {
+
     }
 
     @Override
     public void visit(KxiReturnStatement node) {
-        InterReturn interReturn = new InterReturn(getExpressionList());
-        nodeStack.push(interReturn);
+        InterReturn interReturn = new InterReturn();
+        currentFunction.getStatements().add(interReturn);
     }
 
     @Override
@@ -110,7 +119,10 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
     public void visit(KxiPlus node) {
         InterValue left = pop();
         InterValue right = pop();
-        nodeStack.push(new InterBinaryOp(OpCodes.ADD, left, right));
+        InterId tempId = new InterId(node.hashCode());
+        InterVariable interVariable = new InterVariable(tempId, new InterBinaryPlus(left, right));
+        currentFunction.getStatements().add(interVariable);
+        nodeStack.push(tempId);
     }
 
     @Override
@@ -123,7 +135,10 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
 
     @Override
     public void visit(KxiEquals node) {
-
+        if (nodeStack.size() == 2) {
+            InterExpressionStatement interExpressionStatement = new InterExpressionStatement(new InterAssignment(pop(), pop()));
+            currentFunction.getStatements().add(interExpressionStatement);
+        }
     }
 
     @Override
@@ -253,6 +268,16 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
 
     @Override
     public void visit(KxiVariableDeclaration node) {
+        InterId varId = new InterId(node.getId().getValue());
+
+        InterVariable interVariable;
+        if (node.getInitializer() != null) {
+            interVariable = new InterVariable(varId, new InterAssignment(varId, pop()));
+        } else {
+            interVariable = new InterVariable(varId, null);
+        }
+        currentFunction.getStatements().add(interVariable);
+
 
     }
 
@@ -280,10 +305,4 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
     public void visit(KxiDataMember node) {
     }
 
-    @Override
-    public void visit(KxiBlock kxiBlock) {
-        InterBlock interBlock = new InterBlock(currentScope.getUniqueName(), popList(kxiBlock.getStatements().size()));
-        super.visit(kxiBlock);
-        nodeStack.push(interBlock);
-    }
 }
