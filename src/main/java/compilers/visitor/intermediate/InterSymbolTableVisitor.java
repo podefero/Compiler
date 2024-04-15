@@ -2,11 +2,13 @@ package compilers.visitor.intermediate;
 
 import compilers.ast.intermediate.InterFunctionNode;
 import compilers.ast.intermediate.StackType;
+import compilers.ast.intermediate.statements.InterFunctionalCall;
 import compilers.ast.intermediate.statements.InterVariable;
 import compilers.ast.intermediate.symboltable.ActivationRecord;
 import compilers.ast.intermediate.symboltable.FunctionData;
 import compilers.ast.intermediate.symboltable.InterSymbolTable;
 import compilers.ast.intermediate.symboltable.StackData;
+import compilers.ast.kxi_nodes.KxiMain;
 import compilers.visitor.kxi.KxiVisitorBase;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -29,14 +31,18 @@ public class InterSymbolTableVisitor extends KxiVisitorBase {
         String id = node.getInterId().getId();
         String label = convertIdToLabel(id);
         FunctionData functionData = new FunctionData(id, label, new ActivationRecord(new HashMap<>()));
+        ActivationRecord activationRecord = functionData.getActivationRecord();
+        //have two items on stack, return address and pfp
+        activationRecord.pushStackItem(node.getReturnId(), StackType.PARAM);
+        activationRecord.pushStackItem(node.getPfpId(), StackType.PARAM);
         currentFunctionData = functionData;
         interSymbolTable.getFunctionDataMap().put(id, functionData);
     }
 
+
     @Override
     public void visit(InterVariable node) {
         String id = node.getInterId().getId();
-        StackData stackData = new StackData(currentFunctionData.getSize(), StackType.LOCAL, id);
-        currentFunctionData.getActivationRecord().getStackDataMap().put(id, stackData);
+        currentFunctionData.getActivationRecord().pushStackItem(id, StackType.LOCAL);
     }
 }

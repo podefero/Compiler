@@ -1,6 +1,5 @@
 package compilers.ast.intermediate.symboltable;
 
-import compilers.util.DataSizes;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -9,11 +8,12 @@ import lombok.Getter;
 public class FunctionData {
     String id;
     String label;
+    int numParam;
     ActivationRecord activationRecord;
 
 
     public int getSize() {
-        return activationRecord.getStackDataMap().size() * DataSizes.INT_SIZE;
+        return activationRecord.getStackDataMap().size();
     }
 
 }

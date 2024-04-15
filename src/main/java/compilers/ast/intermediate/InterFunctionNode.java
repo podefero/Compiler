@@ -11,11 +11,15 @@ import java.util.List;
 public class InterFunctionNode extends AbstractInterNode {
     private InterId interId;
     private List<InterStatement> statements;
+    private String returnId;
+    private String pfpId;
 
     public InterFunctionNode(InterId interId, GenericListNode statements) {
         super(statements, interId);
         this.interId = interId;
         this.statements = getNodeList(statements);
+        this.returnId = "return" + this.hashCode();
+        this.pfpId = "pfp" + this.hashCode();
     }
 
     //add to children

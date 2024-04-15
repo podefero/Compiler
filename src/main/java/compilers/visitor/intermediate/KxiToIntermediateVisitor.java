@@ -80,12 +80,13 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
         GenericListNode globalDir = new GenericListNode(new ArrayList<>()); //after symbol table
         GenericListNode globalInit = new GenericListNode(new ArrayList<>());
 
-        InterGlobal interGlobal = new InterGlobal(globalDir, globalInit, functions);
-        rootNode = interGlobal;
-
         InterId interId = new InterId(node.getId().getValue());
         InterFunctionNode interFunctionNode = new InterFunctionNode(interId, new GenericListNode(new ArrayList<>()));
         currentFunction = interFunctionNode;
+
+        InterGlobal interGlobal = new InterGlobal(globalDir, globalInit, functions, new InterFunctionalCall(interId));
+        rootNode = interGlobal;
+
         rootNode.getInterFunctionNode().add(interFunctionNode);
     }
 

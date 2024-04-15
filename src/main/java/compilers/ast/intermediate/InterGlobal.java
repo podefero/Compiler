@@ -1,6 +1,7 @@
 package compilers.ast.intermediate;
 
 import compilers.ast.GenericListNode;
+import compilers.ast.intermediate.statements.InterFunctionalCall;
 import compilers.ast.intermediate.statements.InterStatement;
 import compilers.visitor.kxi.KxiVisitorBase;
 import lombok.Getter;
@@ -12,12 +13,14 @@ public class InterGlobal extends AbstractInterNode {
     private List<InterFunctionNode> interFunctionNode;
     private List<InterStatement> globalInit;
     private List<InterDirective> interDirectives;
+    private InterFunctionalCall functionalCall;
 
-    public InterGlobal(GenericListNode globalData, GenericListNode globalInit, GenericListNode interFunction) {
-        super(globalData, globalInit, interFunction);
+    public InterGlobal(GenericListNode globalData, GenericListNode globalInit, GenericListNode interFunction, InterFunctionalCall interFunctionalCall) {
+        super(interFunction, interFunctionalCall ,globalInit, globalData);
         this.interDirectives = getNodeList(globalData);
         this.globalInit = getNodeList(globalInit);
         this.interFunctionNode = getNodeList(interFunction);
+        this.functionalCall = interFunctionalCall;
     }
 
     @Override
