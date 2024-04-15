@@ -23,6 +23,7 @@ public class InterVariable extends InterStatement {
 
     @Override
     public void accept(KxiVisitorBase visit) {
+        visit.preVisit(this);
         visitChildren(visit);
         visit.visit(this);
     }

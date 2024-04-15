@@ -19,12 +19,13 @@ public class InterFunctionNode extends AbstractInterNode {
     }
 
     //add to children
-    public void pushActivationRecord() {}
+    public void pushActivationRecord() {
+    }
 
     @Override
     public void accept(KxiVisitorBase visit) {
         visit.preVisit(this);
-       visitChildren(visit);
-       visit.visit(this);
+        visitChildren(visit);
+        visit.visit(this);
     }
 }

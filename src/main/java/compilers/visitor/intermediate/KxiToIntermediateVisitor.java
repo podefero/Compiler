@@ -3,6 +3,7 @@ package compilers.visitor.intermediate;
 import compilers.ast.GenericListNode;
 import compilers.ast.GenericNode;
 import compilers.ast.intermediate.*;
+import compilers.ast.intermediate.InterOperand.*;
 import compilers.ast.intermediate.expression.InterExpression;
 import compilers.ast.intermediate.expression.operation.InterAssignment;
 import compilers.ast.intermediate.expression.operation.InterBinaryPlus;
@@ -119,11 +120,27 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
     public void visit(KxiPlus node) {
         InterValue left = pop();
         InterValue right = pop();
+
+        InterOperand leftOperand;
+        InterOperand rightOperand;
+
+        if (left instanceof InterId)
+            leftOperand = new LeftOperandId(left);
+        else
+            leftOperand = new LeftOperandLit(left);
+
+        if (right instanceof InterId)
+            rightOperand = new RightOperandId(left);
+        else
+            rightOperand = new RightOperandLit(left);
+
+
         InterId tempId = new InterId(node.hashCode());
-        InterVariable interVariable = new InterVariable(tempId, new InterBinaryPlus(left, right));
+        InterVariable interVariable = new InterVariable(tempId, new InterBinaryPlus(leftOperand, rightOperand));
         currentFunction.getStatements().add(interVariable);
         nodeStack.push(tempId);
     }
+
 
     @Override
     public void visit(KxiSubtract node) {
@@ -269,10 +286,20 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
     @Override
     public void visit(KxiVariableDeclaration node) {
         InterId varId = new InterId(node.getId().getValue());
+        LeftOperandId leftOperandId = new LeftOperandId(varId);
+        InterOperand rightOperand;
+
+        InterValue right = pop();
+
+        if (right instanceof InterId)
+            rightOperand = new RightOperandId(right);
+        else
+            rightOperand = new RightOperandLit(right);
+
 
         InterVariable interVariable;
         if (node.getInitializer() != null) {
-            interVariable = new InterVariable(varId, new InterAssignment(varId, pop()));
+            interVariable = new InterVariable(varId, new InterAssignment(leftOperandId, rightOperand));
         } else {
             interVariable = new InterVariable(varId, null);
         }

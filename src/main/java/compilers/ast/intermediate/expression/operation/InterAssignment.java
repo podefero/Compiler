@@ -1,10 +1,9 @@
 package compilers.ast.intermediate.expression.operation;
 
-import compilers.ast.intermediate.InterValue;
-import compilers.ast.intermediate.OpCodes;
+import compilers.ast.intermediate.InterOperand.InterOperand;
 
 public class InterAssignment extends InterOperation{
-    public InterAssignment(InterValue leftValue, InterValue rightValue) {
-        super(leftValue, rightValue);
+    public InterAssignment(InterOperand leftOperand, InterOperand rightOperand) {
+        super(rightOperand, leftOperand);
     }
 }

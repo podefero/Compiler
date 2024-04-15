@@ -31,7 +31,9 @@ public class InterSymbolTableVisitor extends KxiVisitorBase {
         FunctionData functionData = new FunctionData(id, label, new ActivationRecord(new HashMap<>()));
         currentFunctionData = functionData;
         interSymbolTable.getFunctionDataMap().put(id, functionData);
-
+        //reserve stack for a return value
+        StackData stackData = new StackData(currentFunctionData.getSize(), StackType.PARAM, "return$" + node.hashCode());
+        currentFunctionData.getActivationRecord().getStackDataMap().put("return$" + node.hashCode(), stackData);
     }
 
     @Override

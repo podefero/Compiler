@@ -1,5 +1,6 @@
 package compilers.ast.intermediate;
 
+import compilers.ast.assembly.OpCodes;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
