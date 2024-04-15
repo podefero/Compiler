@@ -125,12 +125,12 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
         InterOperand rightOperand;
 
         if (left instanceof InterId)
-            leftOperand = new LeftOperandId(left);
+            leftOperand = new LeftVariableStack(left);
         else
             leftOperand = new LeftOperandLit(left);
 
         if (right instanceof InterId)
-            rightOperand = new RightOperandId(left);
+            rightOperand = new RightVariableStack(left);
         else
             rightOperand = new RightOperandLit(left);
 
@@ -286,20 +286,20 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
     @Override
     public void visit(KxiVariableDeclaration node) {
         InterId varId = new InterId(node.getId().getValue());
-        LeftOperandId leftOperandId = new LeftOperandId(varId);
+        LeftVariableStack leftVariableStack = new LeftVariableStack(varId);
         InterOperand rightOperand;
 
         InterValue right = pop();
 
         if (right instanceof InterId)
-            rightOperand = new RightOperandId(right);
+            rightOperand = new RightVariableStack(right);
         else
             rightOperand = new RightOperandLit(right);
 
 
         InterVariable interVariable;
         if (node.getInitializer() != null) {
-            interVariable = new InterVariable(varId, new InterAssignment(leftOperandId, rightOperand));
+            interVariable = new InterVariable(varId, new InterAssignment(leftVariableStack, rightOperand));
         } else {
             interVariable = new InterVariable(varId, null);
         }

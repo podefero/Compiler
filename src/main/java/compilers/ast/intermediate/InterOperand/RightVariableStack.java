@@ -6,9 +6,9 @@ import compilers.visitor.kxi.KxiVisitorBase;
 import lombok.Getter;
 
 @Getter
-public class RightOperandId extends InterOperand{
+public class RightVariableStack extends InterOperand{
     private InterId interId;
-    public RightOperandId(InterValue interValue) {
+    public RightVariableStack(InterValue interValue) {
         super(interValue);
         this.interId = (InterId) interValue;
     }

@@ -4,9 +4,9 @@ import compilers.ast.GenericListNode;
 import compilers.ast.assembly.*;
 import compilers.ast.intermediate.InterFunctionNode;
 import compilers.ast.intermediate.InterGlobal;
-import compilers.ast.intermediate.InterOperand.LeftOperandId;
+import compilers.ast.intermediate.InterOperand.LeftVariableStack;
 import compilers.ast.intermediate.InterOperand.LeftOperandLit;
-import compilers.ast.intermediate.InterOperand.RightOperandId;
+import compilers.ast.intermediate.InterOperand.RightVariableStack;
 import compilers.ast.intermediate.InterOperand.RightOperandLit;
 import compilers.ast.intermediate.expression.operation.InterBinaryPlus;
 import compilers.ast.intermediate.statements.InterVariable;
@@ -59,7 +59,7 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
     }
 
     @Override
-    public void visit(RightOperandId node) {
+    public void visit(RightVariableStack node) {
         //instruction to load variable in R2 from stack
         if (isStack) {
             //set the fp R14 FP
@@ -78,7 +78,7 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
     }
 
     @Override
-    public void visit(LeftOperandId node) {
+    public void visit(LeftVariableStack node) {
     }
 
     @Override

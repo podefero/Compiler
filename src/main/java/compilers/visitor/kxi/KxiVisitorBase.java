@@ -2,9 +2,9 @@ package compilers.visitor.kxi;
 
 import compilers.ast.intermediate.InterFunctionNode;
 import compilers.ast.intermediate.InterGlobal;
-import compilers.ast.intermediate.InterOperand.LeftOperandId;
+import compilers.ast.intermediate.InterOperand.LeftVariableStack;
 import compilers.ast.intermediate.InterOperand.LeftOperandLit;
-import compilers.ast.intermediate.InterOperand.RightOperandId;
+import compilers.ast.intermediate.InterOperand.RightVariableStack;
 import compilers.ast.intermediate.InterOperand.RightOperandLit;
 import compilers.ast.intermediate.expression.operation.InterBinaryPlus;
 import compilers.ast.intermediate.statements.InterVariable;
@@ -736,13 +736,13 @@ public  class KxiVisitorBase implements VisitKxi {
     public void visit(InterBinaryPlus interBinaryPlus) {
     }
 
-    public void visit(LeftOperandId leftOperandId) {
+    public void visit(LeftVariableStack leftVariableStack) {
     }
 
     public void visit(LeftOperandLit leftOperandLit) {
     }
 
-    public void visit(RightOperandId rightOperandId) {
+    public void visit(RightVariableStack rightVariableStack) {
     }
 
     public void visit(RightOperandLit rightOperandLit) {

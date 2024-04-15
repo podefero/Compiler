@@ -3,8 +3,8 @@ package compilers.ast.intermediate.InterOperand;
 import compilers.ast.intermediate.InterValue;
 import compilers.visitor.kxi.KxiVisitorBase;
 
-public class LeftOperandId extends InterOperand{
-    public LeftOperandId(InterValue interValue) {
+public class LeftVariableStack extends InterOperand{
+    public LeftVariableStack(InterValue interValue) {
         super(interValue);
     }
 
