@@ -1,9 +1,8 @@
 package compilers.ast.assembly;
 
-public abstract class Operand extends AbstractAssembly {
+import lombok.Getter;
 
-    public String intLiteral(int value) {
-        String result = "#" + value;
-        return result;
-    }
+@Getter
+public abstract class Operand extends AbstractAssembly {
+    protected String value;
 }

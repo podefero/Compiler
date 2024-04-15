@@ -1,6 +1,7 @@
 package compilers.ast.intermediate;
 
 import compilers.ast.GenericListNode;
+import compilers.ast.intermediate.statements.InterStatement;
 import compilers.visitor.kxi.KxiVisitorBase;
 import lombok.Getter;
 
@@ -8,8 +9,8 @@ import java.util.List;
 
 @Getter
 public class InterGlobal extends AbstractInterNode {
-    private  List<InterFunctionNode> interFunctionNode;
-    private List<InterGlobalVariable> globalInit;
+    private List<InterFunctionNode> interFunctionNode;
+    private List<InterStatement> globalInit;
     private List<InterDirective> interDirectives;
 
     public InterGlobal(GenericListNode globalData, GenericListNode globalInit, GenericListNode interFunction) {

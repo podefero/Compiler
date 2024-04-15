@@ -1,6 +1,7 @@
 package compilers.ast.assembly;
 
 import compilers.ast.GenericListNode;
+import compilers.visitor.kxi.KxiVisitorBase;
 import lombok.Getter;
 
 import java.util.List;
@@ -13,5 +14,11 @@ public class AssemblyMain extends AbstractAssembly {
         super(codes);
         this.assemblyCodes = getNodeList(codes);
 
+    }
+
+    @Override
+    public void accept(KxiVisitorBase visit) {
+        visitChildren(visit);
+        visit.visit(this);
     }
 }

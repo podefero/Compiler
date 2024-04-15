@@ -18,6 +18,6 @@ public class InterSymbolTable {
 
     public int getOffset(InterId id, FunctionData functionData) {
         StackData stackData = functionData.getActivationRecord().getStackDataMap().get(id.getId());
-        return stackData.offset;
+        return - stackData.offset; //needs to negative
     }
 }

@@ -12,6 +12,9 @@ public enum OpCodes {
     LDR("LDR"),
     LDRI("LDR"),
     MOV("MOV"),
+    MOVI("MOVI"),
+    STR("STR"),
+    STRI("STR"),
     TRP("TRP");
     private final String value;
 

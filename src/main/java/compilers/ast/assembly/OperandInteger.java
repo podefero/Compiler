@@ -8,5 +8,6 @@ public class OperandInteger extends Operand {
 
     public OperandInteger(int numInteger) {
         this.numInteger = "#" + numInteger;
+        this.value = this.numInteger;
     }
 }

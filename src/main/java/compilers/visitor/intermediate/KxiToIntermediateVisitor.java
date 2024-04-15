@@ -8,6 +8,7 @@ import compilers.ast.intermediate.expression.InterExpression;
 import compilers.ast.intermediate.expression.operation.InterAssignment;
 import compilers.ast.intermediate.expression.operation.InterBinaryPlus;
 import compilers.ast.intermediate.statements.InterExpressionStatement;
+import compilers.ast.intermediate.statements.InterFunctionalCall;
 import compilers.ast.intermediate.statements.InterReturn;
 import compilers.ast.intermediate.statements.InterVariable;
 import compilers.ast.kxi_nodes.*;
@@ -88,6 +89,10 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
         rootNode.getInterFunctionNode().add(interFunctionNode);
     }
 
+    @Override
+    public void visit(KxiMain kxiMain) {
+
+    }
 
     @Override
     public void preVisit(KxiMethod node) {
@@ -130,9 +135,9 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
             leftOperand = new LeftOperandLit(left);
 
         if (right instanceof InterId)
-            rightOperand = new RightVariableStack(left);
+            rightOperand = new RightVariableStack(right);
         else
-            rightOperand = new RightOperandLit(left);
+            rightOperand = new RightOperandLit(right);
 
 
         InterId tempId = new InterId(node.hashCode());
@@ -216,7 +221,7 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
 
     @Override
     public void visit(ExpressionIntLit node) {
-        nodeStack.push(new InterLit<>(node.getTokenLiteral().getValue()));
+        nodeStack.push(new InterLit<>(node.getTokenLiteral().getValue(), ScalarType.INT));
     }
 
     @Override
