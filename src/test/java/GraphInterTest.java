@@ -69,15 +69,18 @@ public class GraphInterTest {
 
         assemblyMain.accept(assemblyAssembleVisitor);
 
+        String asm = "";
         for(String line : assemblyAssembleVisitor.getInstructions()) {
             System.out.println(line);
+            asm+=line+"\n";
         }
 
         GraphVizVisitor graphVizVisitor = new GraphVizVisitor(kxiToIntermediateVisitor.getRootNode());
 
-        OutputHandler outputHandler = new OutputHandler("[inter.dot]");
+        OutputHandler outputHandler = new OutputHandler("[inter.dot,main.asm]");
         try {
             outputHandler.outputAST(graphVizVisitor.getGraph());
+            outputHandler.outputAsm(asm);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

@@ -9,11 +9,11 @@ import lombok.Getter;
 @Getter
 public class InterCoutStatement extends InterStatement {
     ScalarType scalarType;
-    RightVariableStack rightVariableStack;
-    public InterCoutStatement(ScalarType scalarType, RightVariableStack rightVariableStack) {
-        super(rightVariableStack);
+    InterOperand rightOperand;
+    public InterCoutStatement(ScalarType scalarType, InterOperand rightOperand) {
+        super(rightOperand);
         this.scalarType = scalarType;
-        this.rightVariableStack = rightVariableStack;
+        this.rightOperand = rightOperand;
     }
 
     @Override

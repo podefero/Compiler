@@ -782,4 +782,7 @@ public  class KxiVisitorBase implements VisitKxi {
 
     public void visit(InterCoutStatement interCoutStatement) {
     }
+
+    public void visit(InterExpressionStatement interExpressionStatement) {
+    }
 }

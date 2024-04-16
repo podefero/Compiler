@@ -207,13 +207,11 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
         int trpVal;
         if (node.getScalarType() == ScalarType.INT) trpVal = 1;
         else trpVal = 3;
+        tryDerefInterOperand(node.getRightOperand());
+        comment("COUT  result");
+        twoReg(MOV, R3, R2);
+        trap(trpVal);
 
-        if (node.getRightVariableStack() != null) {
-            tryDerefInterOperand(node.getRightVariableStack());
-            comment("COUT  result");
-            twoReg(MOV, R3, R2);
-            trap(trpVal);
-        }
     }
 
     @Override
