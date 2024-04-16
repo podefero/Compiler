@@ -2,18 +2,18 @@ package compilers.visitor.assembly;
 
 import compilers.ast.GenericListNode;
 import compilers.ast.assembly.*;
-import compilers.ast.intermediate.InterFunctionNode;
-import compilers.ast.intermediate.InterGlobal;
-import compilers.ast.intermediate.InterLit;
+import compilers.ast.intermediate.*;
 import compilers.ast.intermediate.InterOperand.LeftVariableStack;
 import compilers.ast.intermediate.InterOperand.LeftOperandLit;
 import compilers.ast.intermediate.InterOperand.RightVariableStack;
 import compilers.ast.intermediate.InterOperand.RightOperandLit;
+import compilers.ast.intermediate.expression.operation.InterAssignment;
 import compilers.ast.intermediate.expression.operation.InterBinaryPlus;
-import compilers.ast.intermediate.statements.InterFunctionalCall;
-import compilers.ast.intermediate.statements.InterVariable;
+import compilers.ast.intermediate.statements.*;
+import compilers.ast.intermediate.symboltable.ActivationRecord;
 import compilers.ast.intermediate.symboltable.FunctionData;
 import compilers.ast.intermediate.symboltable.InterSymbolTable;
+import compilers.ast.intermediate.symboltable.StackData;
 import compilers.ast.kxi_nodes.KxiMain;
 import compilers.ast.kxi_nodes.ScalarType;
 import compilers.util.DataSizes;
@@ -22,7 +22,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Stack;
 
 import static compilers.ast.assembly.Registers.*;
 import static compilers.ast.assembly.OpCodes.*;
@@ -67,16 +69,25 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
         assemblyList.add(new AssemblyCode("", opCodes.getValue(), new OperandReg(RD), new OperandChar(value)));
     }
 
+    private void regLabel(OpCodes opCodes, String value) {
+        assemblyList.add(new AssemblyCode("", opCodes.getValue(), new OperandLabel(value), null));
+    }
+
     private void leftOp(OpCodes opCodes, Registers RD) {
         assemblyList.add(new AssemblyCode("", opCodes.getValue(), new OperandReg(RD), null));
     }
+
+    private void trap(int value) {
+        assemblyList.add(new AssemblyCode("", TRP.getValue(), new OperandInteger(value), null));
+    }
+
 
     private void comment(String comment) {
         assemblyList.add(new AssemblyComment(comment));
     }
 
     private void label(String comment) {
-        assemblyList.add(new OperandLabel(comment));
+        assemblyList.add(new OperandLabelWrapper(comment));
     }
 
 
@@ -90,28 +101,13 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
 
     @Override
     public void visit(InterGlobal node) {
+        label("END");
+        trap(0);
         for (AbstractAssembly assembly : assemblyList) {
             rootNode.getAssemblyCodes().add(assembly);
         }
-        System.out.println("done");
     }
 
-
-    @Override
-    public void visit(InterVariable node) {
-        //assign R1 to result of R2
-        if (node.getInterOperation() != null) {
-            comment("Initializing Variable " + node.getInterId().getId());
-            comment("loading " + node.getInterId().getId() + " into R1 from Stack");
-            getFP();
-            comment("offset ptr to var");
-            decFP(interSymbolTable.getOffset(node.getInterId(), currentFunctionData));
-            comment("set R1 to ptr address");
-            twoReg(LDRI, R1, R14);
-            comment("str R2 into R1");
-            twoReg(STRI, R2, R1);
-        }
-    }
 
     @Override
     public void preVisit(InterFunctionNode node) {
@@ -121,49 +117,126 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
     }
 
     @Override
+    public void visit(InterActivationRecord node) {
+        comment("push " + node.getFunctionId().getId() + " activation record");
+        regImmInt(MOVI, R0, 0);
+        ActivationRecord activationRecord = currentFunctionData.getActivationRecord();
+        Collection<StackData> stackDataCollection = activationRecord.getStackDataMap().values();
+        for (StackData stackData : stackDataCollection) {
+            if (stackData.getStackType() == StackType.LOCAL) {
+                comment("push " + stackData.getId());
+                comment("offset: " + stackData.getOffset());
+                leftOp(PUSH, R0);
+            }
+        }
+    }
+
+    @Override
+    public void visit(InterReturn node) {
+        comment("Return");
+        comment("Get ptr to Return Address in R15");
+        getFP();
+        comment("Deref the ptr so R15 now has the return address");
+        twoReg(LDRI, R15, R14);
+        comment("Get PFP in R14");
+        getFP();
+        decFP(4);
+        comment("Move SP to PFP to pop activation record");
+        twoReg(MOV, FP, R14);
+        comment("push result on stack");
+        leftOp(PUSH, R2);
+        comment("jump to return address");
+        leftOp(JMR, R15);
+
+    }
+
+    @Override
     public void visit(InterFunctionalCall node) {
+        comment("Calling function " + currentFunctionData.getLabel());
         comment("Zero out Record");
         getFP();
-        comment("Use to zero out");
-        regImmInt(MOVI, R1, 0);
+        regImmInt(MOVI, R0, 0);
         int size = currentFunctionData.getSize();
         for (int i = 0; i < size; i++) {
             decFP(i * DataSizes.INT_SIZE);
-            twoReg(STRI, R1, R14); //store 0 in stack ptr
+            twoReg(STRI, R0, R14); //store 0 in stack ptr
         }
         //now zeroed out push return address
+        comment("Pre Activation Record");
         comment("R14(PFP) = FP");
         getFP();
         comment("SP = FP");
         setPFP();
         comment("Get Address");
         setPC();
+        int offset = interSymbolTable.getFunctionDataMap().get(node.getCalleeId().getId()).getNumParam() * DataSizes.INSTRUCTION_SIZE;
+        offset += 2 * DataSizes.INSTRUCTION_SIZE; //return and pfp
+        comment("Offset Address by " + offset);
+        regImmInt(ADI, R15, offset);
+        comment("push return address");
+        leftOp(PUSH, R15);
+        comment("push pfp");
+        leftOp(PUSH, R14);
+        regLabel(JMP, currentFunctionData.getLabel());
+        regLabel(JMP, "END"); //move around at some point
+    }
 
-        /**
-         * MOV R14 FP ; PFP = FP
-         * MOV FP SP ; FP = SP
-         * MOV R15 PC ; Get Address
-         * ADDI R15 #24
-         * JMP MAIN ; call function
-         * JMP END ; set return address here
-         */
+    @Override
+    public void visit(InterVariable node) {
+        //assign R1 to result of R2
+        if (node.getInterOperation() != null && !(node.getInterOperation() instanceof InterAssignment)) {
+            comment("Initializing Variable " + node.getInterId().getId());
+            comment("Get ptr to var");
+            getFP();
+            decFP(interSymbolTable.getOffset(node.getInterId(), currentFunctionData));
+            comment("store R2 into ptr R14");
+            twoReg(STRI, R2, R14);
+        }
+    }
 
-        assemblyList.add(new AssemblyCode("", OpCodes.JMP.getValue(), new OperandLabel(node.getCalleeId().getId()), null));
+    @Override
+    public void visit(InterCoutStatement node) {
+        if(node.getScalarType() == ScalarType.INT) {
+            comment("COUT int result");
+            twoReg(MOV, R3, R2);
+            trap(1);
+        } else {
+            comment("COUT char result");
+            twoReg(MOV, R3, R2);
+            trap(3);
+        }
     }
 
     @Override
     public void visit(InterBinaryPlus node) {
         comment("Add R1 and R2, result in R2");
+        if(node.getLeftOperand() instanceof LeftVariableStack){
+            comment("Deref " + ((LeftVariableStack) node.getLeftOperand()).getInterId().getId());
+            twoReg(LDRI, R1, R1);
+        }
+        if(node.getRightOperand() instanceof RightVariableStack){
+            comment("Deref " + ((RightVariableStack) node.getRightOperand()).getInterId().getId());
+            twoReg(LDRI, R2, R2);
+        }
+
         twoReg(ADD, R1, R2);
+    }
+
+    @Override
+    public void visit(InterAssignment node) {
+        //assign R1 to result of R2
+        comment("Assignment");
+        comment("str R2 into R1");
+        twoReg(STRI, R2, R1);
     }
 
     @Override
     public void visit(RightVariableStack node) {
         //instruction to load variable in R2 from stack
-        comment("loading " + node.getInterId().getId() + " into R2 from Stack");
+        comment("get ptr to " + node.getInterId().getId() + " into R2 from Stack");
         getFP();
         decFP(interSymbolTable.getOffset(node.getInterId(), currentFunctionData));
-        twoReg(LDRI, R2, R14);
+        twoReg(MOV, R2, R14);
     }
 
     @Override
@@ -180,10 +253,10 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
 
     @Override
     public void visit(LeftVariableStack node) {
-        comment("loading " + node.getInterId().getId() + " into R1 from Stack");
+        comment("get ptr to " + node.getInterId().getId() + " into R1 from Stack");
         getFP();
         decFP(interSymbolTable.getOffset(node.getInterId(), currentFunctionData));
-        twoReg(LDRI, R1, R14);
+        twoReg(MOV, R1, R14);
 
     }
 

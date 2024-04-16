@@ -1,6 +1,5 @@
 package compilers.ast.intermediate;
 
-import compilers.visitor.kxi.symboltable.SymbolTable;
 import lombok.Getter;
 
 @Getter

@@ -10,14 +10,13 @@ import java.util.List;
 
 
 @Getter
-public class InterFunctionalCall extends InterStatement {
-    InterId calleeId;
-    List<InterArgs> interArgList;
+public class InterActivationRecord extends InterStatement {
+    InterId functionId;
 
-    public InterFunctionalCall(InterId calleeId, GenericListNode args) {
-        super(args);
-        this.calleeId = calleeId;
-        this.interArgList = getNodeList(args);
+    //only pushes local variables, args are already pushed
+    public InterActivationRecord(InterId functionId) {
+        super(functionId);
+        this.functionId = functionId;
     }
 
     @Override

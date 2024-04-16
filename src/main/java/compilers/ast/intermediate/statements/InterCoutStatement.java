@@ -1,20 +1,19 @@
 package compilers.ast.intermediate.statements;
 
-import compilers.ast.GenericListNode;
-import compilers.ast.intermediate.expression.InterExpression;
-import compilers.ast.intermediate.expression.operation.InterOperation;
+import compilers.ast.kxi_nodes.ScalarType;
+import compilers.visitor.kxi.KxiVisitorBase;
 import lombok.Getter;
-
-import java.util.List;
 
 @Getter
 public class InterCoutStatement extends InterStatement {
-    private List<InterExpression> expressionList;
-    private InterOperation operation;
+    ScalarType scalarType;
 
-    public InterCoutStatement(GenericListNode expressions, InterOperation operation) {
-        super(expressions, operation);
-        this.expressionList = getNodeList(expressions);
-        this.operation = operation;
+    public InterCoutStatement(ScalarType scalarType) {
+        this.scalarType = scalarType;
+    }
+
+    @Override
+    public void accept(KxiVisitorBase visit) {
+        visit.visit(this);
     }
 }

@@ -60,11 +60,11 @@ public class GraphInterTest {
         InterToAssemblyVisitor interToAssemblyVisitor = new InterToAssemblyVisitor(new ArrayList<>()
                 , null
                 , interSymbolTableVisitor.getInterSymbolTable()
-                , null);
+                , interSymbolTableVisitor.getInterSymbolTable().getFunctionDataMap().get("main$main"));
 
         interGlobal.accept(interToAssemblyVisitor);
 
-        AssemblyAssembleVisitor assemblyAssembleVisitor = new AssemblyAssembleVisitor(new ArrayList<>());
+        AssemblyAssembleVisitor assemblyAssembleVisitor = new AssemblyAssembleVisitor(new ArrayList<>(), "");
         AssemblyMain assemblyMain = interToAssemblyVisitor.getRootNode();
 
         assemblyMain.accept(assemblyAssembleVisitor);

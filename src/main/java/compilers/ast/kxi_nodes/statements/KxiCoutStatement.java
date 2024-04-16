@@ -1,13 +1,16 @@
 package compilers.ast.kxi_nodes.statements;
 
+import compilers.ast.kxi_nodes.ScalarType;
 import compilers.ast.kxi_nodes.expressions.AbstractKxiExpression;
 import compilers.visitor.kxi.KxiVisitorBase;
 import lombok.Getter;
+import lombok.Setter;
 
 @Getter
+@Setter
 public class KxiCoutStatement extends AbstractKxiStatement {
     private AbstractKxiExpression expression;
-
+    private ScalarType scalarType;
     public KxiCoutStatement(AbstractKxiExpression expression) {
         super(expression);
         this.expression = expression;

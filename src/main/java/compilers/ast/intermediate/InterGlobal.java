@@ -15,12 +15,14 @@ public class InterGlobal extends AbstractInterNode {
     private List<InterDirective> interDirectives;
     private InterFunctionalCall functionalCall;
 
+
     public InterGlobal(GenericListNode globalData, GenericListNode globalInit, GenericListNode interFunction, InterFunctionalCall interFunctionalCall) {
-        super(interFunction, interFunctionalCall ,globalInit, globalData);
+        super(interFunction, interFunctionalCall, globalInit, globalData);
         this.interDirectives = getNodeList(globalData);
         this.globalInit = getNodeList(globalInit);
         this.interFunctionNode = getNodeList(interFunction);
         this.functionalCall = interFunctionalCall;
+
     }
 
     @Override

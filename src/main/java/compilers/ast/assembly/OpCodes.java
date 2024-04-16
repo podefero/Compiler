@@ -5,7 +5,7 @@ import lombok.Getter;
 @Getter
 public enum OpCodes {
     JMP("JMP"),
-    JMR("JMP"),
+    JMR("JMR"),
     BNZ("BNZ"),
     ADD("ADD"),
     ADI("ADDI"),
@@ -15,6 +15,7 @@ public enum OpCodes {
     MOVI("MOVI"),
     STR("STR"),
     STRI("STR"),
+    PUSH("PUSH"),
     TRP("TRP");
     private final String value;
 

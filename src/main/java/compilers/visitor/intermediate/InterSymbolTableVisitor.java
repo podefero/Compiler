@@ -30,7 +30,7 @@ public class InterSymbolTableVisitor extends KxiVisitorBase {
     public void preVisit(InterFunctionNode node) {
         String id = node.getInterId().getId();
         String label = convertIdToLabel(id);
-        FunctionData functionData = new FunctionData(id, label, new ActivationRecord(new HashMap<>()));
+        FunctionData functionData = new FunctionData(id, label, 0, new ActivationRecord(new HashMap<>()));
         ActivationRecord activationRecord = functionData.getActivationRecord();
         //have two items on stack, return address and pfp
         activationRecord.pushStackItem(node.getReturnId(), StackType.PARAM);

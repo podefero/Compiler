@@ -3,6 +3,7 @@ package compilers.visitor.kxi;
 import compilers.ast.assembly.AssemblyCode;
 import compilers.ast.assembly.AssemblyComment;
 import compilers.ast.assembly.AssemblyMain;
+import compilers.ast.assembly.OperandLabelWrapper;
 import compilers.ast.intermediate.InterFunctionNode;
 import compilers.ast.intermediate.InterGlobal;
 import compilers.ast.intermediate.InterOperand.LeftVariableStack;
@@ -11,8 +12,7 @@ import compilers.ast.intermediate.InterOperand.RightVariableStack;
 import compilers.ast.intermediate.InterOperand.RightOperandLit;
 import compilers.ast.intermediate.expression.operation.InterAssignment;
 import compilers.ast.intermediate.expression.operation.InterBinaryPlus;
-import compilers.ast.intermediate.statements.InterFunctionalCall;
-import compilers.ast.intermediate.statements.InterVariable;
+import compilers.ast.intermediate.statements.*;
 import compilers.ast.kxi_nodes.*;
 import compilers.ast.kxi_nodes.class_members.KxiConstructor;
 import compilers.ast.kxi_nodes.class_members.KxiDataMember;
@@ -769,5 +769,17 @@ public  class KxiVisitorBase implements VisitKxi {
     }
 
     public void visit(InterAssignment interAssignment) {
+    }
+
+    public void visit(OperandLabelWrapper operandLabelWrapper) {
+    }
+
+    public void visit(InterActivationRecord interActivationRecord) {
+    }
+
+    public void visit(InterReturn interReturn) {
+    }
+
+    public void visit(InterCoutStatement interCoutStatement) {
     }
 }

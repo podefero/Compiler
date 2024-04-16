@@ -22,10 +22,6 @@ public class InterFunctionNode extends AbstractInterNode {
         this.pfpId = "pfp" + this.hashCode();
     }
 
-    //add to children
-    public void pushActivationRecord() {
-    }
-
     @Override
     public void accept(KxiVisitorBase visit) {
         visit.preVisit(this);

@@ -7,10 +7,7 @@ import compilers.ast.intermediate.InterOperand.*;
 import compilers.ast.intermediate.expression.InterExpression;
 import compilers.ast.intermediate.expression.operation.InterAssignment;
 import compilers.ast.intermediate.expression.operation.InterBinaryPlus;
-import compilers.ast.intermediate.statements.InterExpressionStatement;
-import compilers.ast.intermediate.statements.InterFunctionalCall;
-import compilers.ast.intermediate.statements.InterReturn;
-import compilers.ast.intermediate.statements.InterVariable;
+import compilers.ast.intermediate.statements.*;
 import compilers.ast.kxi_nodes.*;
 import compilers.ast.kxi_nodes.class_members.KxiConstructor;
 import compilers.ast.kxi_nodes.class_members.KxiDataMember;
@@ -84,7 +81,10 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
         InterFunctionNode interFunctionNode = new InterFunctionNode(interId, new GenericListNode(new ArrayList<>()));
         currentFunction = interFunctionNode;
 
-        InterGlobal interGlobal = new InterGlobal(globalDir, globalInit, functions, new InterFunctionalCall(interId));
+        interFunctionNode.getStatements().add(new InterActivationRecord(interId));
+
+
+        InterGlobal interGlobal = new InterGlobal(globalDir, globalInit, functions, new InterFunctionalCall(interId, new GenericListNode(new ArrayList<>())));
         rootNode = interGlobal;
 
         rootNode.getInterFunctionNode().add(interFunctionNode);
@@ -92,7 +92,8 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
 
     @Override
     public void visit(KxiMain kxiMain) {
-
+//        InterId interId = rootNode.getInterFunctionNode().get(0).getInterId();
+//        rootNode.getInterFunctionNode().get(0).getStatements().add(0,new InterFunctionalCall(interId, new GenericListNode(new ArrayList<>())));
     }
 
     @Override
@@ -100,6 +101,7 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
         InterId interId = new InterId(node.getId().getValue());
         InterFunctionNode interFunctionNode = new InterFunctionNode(interId, new GenericListNode(new ArrayList<>()));
         currentFunction = interFunctionNode;
+        interFunctionNode.getStatements().add(new InterActivationRecord(interId));
         rootNode.getInterFunctionNode().add(interFunctionNode);
     }
 
@@ -279,6 +281,8 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
 
     @Override
     public void visit(KxiCoutStatement node) {
+        InterCoutStatement interCoutStatement = new InterCoutStatement(node.getScalarType());
+        currentFunction.getStatements().add(interCoutStatement);
     }
 
     @Override
