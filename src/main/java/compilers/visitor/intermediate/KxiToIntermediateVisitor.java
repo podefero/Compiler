@@ -220,6 +220,7 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
 
     @Override
     public void visit(ExpressionIdLit node) {
+        nodeStack.push(new InterId(node.getTokenLiteral().getValue()));
     }
 
     @Override
@@ -281,7 +282,19 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
 
     @Override
     public void visit(KxiCoutStatement node) {
-        InterCoutStatement interCoutStatement = new InterCoutStatement(node.getScalarType());
+        InterCoutStatement interCoutStatement;
+        if (nodeStack.empty())
+            interCoutStatement = new InterCoutStatement(node.getScalarType(), null);
+        else {
+            InterValue interValue = pop();
+            if (interValue instanceof InterId)
+                interCoutStatement = new InterCoutStatement(node.getScalarType(), new RightVariableStack(interValue));
+            else
+                interCoutStatement = new InterCoutStatement(node.getScalarType(), null);
+
+
+        }
+
         currentFunction.getStatements().add(interCoutStatement);
     }
 

@@ -6,7 +6,7 @@ import compilers.visitor.kxi.KxiVisitorBase;
 public class InterAssignment extends InterOperation{
 
 
-    public InterAssignment(InterOperand rightOperand, InterOperand leftOperand) {
+    public InterAssignment(InterOperand leftOperand, InterOperand rightOperand) {
         super(rightOperand, leftOperand);
     }
 

@@ -3,10 +3,7 @@ package compilers.visitor.assembly;
 import compilers.ast.GenericListNode;
 import compilers.ast.assembly.*;
 import compilers.ast.intermediate.*;
-import compilers.ast.intermediate.InterOperand.LeftVariableStack;
-import compilers.ast.intermediate.InterOperand.LeftOperandLit;
-import compilers.ast.intermediate.InterOperand.RightVariableStack;
-import compilers.ast.intermediate.InterOperand.RightOperandLit;
+import compilers.ast.intermediate.InterOperand.*;
 import compilers.ast.intermediate.expression.operation.InterAssignment;
 import compilers.ast.intermediate.expression.operation.InterBinaryPlus;
 import compilers.ast.intermediate.statements.*;
@@ -54,6 +51,17 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
     private void decFP(int value) {
         assemblyList.add(new AssemblyCode("", OpCodes.ADI.getValue()
                 , new OperandReg(Registers.R14), new OperandInteger(-value)));
+    }
+
+    private void tryDerefInterOperand(InterOperand interOperand) {
+        if (interOperand instanceof LeftVariableStack) {
+            comment("Deref " + ((LeftVariableStack) interOperand).getInterId().getId());
+            twoReg(LDRI, R1, R1);
+        } else if (interOperand instanceof RightVariableStack) {
+            comment("Deref " + ((RightVariableStack) interOperand).getInterId().getId());
+            twoReg(LDRI, R2, R2);
+        }
+
     }
 
     //OPS
@@ -137,7 +145,7 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
         comment("Get ptr to Return Address in R15");
         getFP();
         comment("Deref the ptr so R15 now has the return address");
-        twoReg(LDRI, R15, R14);
+        twoReg(LDR, R15, R14);
         comment("Get PFP in R14");
         getFP();
         decFP(4);
@@ -170,7 +178,7 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
         comment("Get Address");
         setPC();
         int offset = interSymbolTable.getFunctionDataMap().get(node.getCalleeId().getId()).getNumParam() * DataSizes.INSTRUCTION_SIZE;
-        offset += 2 * DataSizes.INSTRUCTION_SIZE; //return and pfp
+        offset += 4 * DataSizes.INSTRUCTION_SIZE; //
         comment("Offset Address by " + offset);
         regImmInt(ADI, R15, offset);
         comment("push return address");
@@ -196,30 +204,25 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
 
     @Override
     public void visit(InterCoutStatement node) {
-        if(node.getScalarType() == ScalarType.INT) {
-            comment("COUT int result");
+        int trpVal;
+        if (node.getScalarType() == ScalarType.INT) trpVal = 1;
+        else trpVal = 3;
+
+        if (node.getRightVariableStack() != null) {
+            tryDerefInterOperand(node.getRightVariableStack());
+            comment("COUT  result");
             twoReg(MOV, R3, R2);
-            trap(1);
-        } else {
-            comment("COUT char result");
-            twoReg(MOV, R3, R2);
-            trap(3);
+            trap(trpVal);
         }
     }
 
     @Override
     public void visit(InterBinaryPlus node) {
         comment("Add R1 and R2, result in R2");
-        if(node.getLeftOperand() instanceof LeftVariableStack){
-            comment("Deref " + ((LeftVariableStack) node.getLeftOperand()).getInterId().getId());
-            twoReg(LDRI, R1, R1);
-        }
-        if(node.getRightOperand() instanceof RightVariableStack){
-            comment("Deref " + ((RightVariableStack) node.getRightOperand()).getInterId().getId());
-            twoReg(LDRI, R2, R2);
-        }
+        tryDerefInterOperand(node.getLeftOperand());
+        tryDerefInterOperand(node.getRightOperand());
 
-        twoReg(ADD, R1, R2);
+        twoReg(ADD, R2, R1);
     }
 
     @Override
@@ -227,6 +230,7 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
         //assign R1 to result of R2
         comment("Assignment");
         comment("str R2 into R1");
+        tryDerefInterOperand(node.getRightOperand());
         twoReg(STRI, R2, R1);
     }
 
