@@ -1,8 +1,6 @@
 package compilers.visitor.intermediate;
 
-import compilers.ast.kxi_nodes.AbstractKxiNode;
-import compilers.ast.kxi_nodes.KxiMain;
-import compilers.ast.kxi_nodes.KxiVariableDeclaration;
+import compilers.ast.kxi_nodes.*;
 import compilers.ast.kxi_nodes.class_members.KxiMethod;
 import compilers.ast.kxi_nodes.expressions.KxiDotExpression;
 import compilers.ast.kxi_nodes.expressions.KxiMethodExpression;
@@ -18,6 +16,7 @@ import compilers.ast.kxi_nodes.expressions.uni.KxiUniPlus;
 import compilers.ast.kxi_nodes.expressions.uni.KxiUniSubtract;
 import compilers.ast.kxi_nodes.scope.KxiBlock;
 import compilers.ast.kxi_nodes.statements.KxiReturnStatement;
+import compilers.ast.kxi_nodes.token_literals.IdentifierToken;
 import compilers.visitor.kxi.KxiVisitorBase;
 import compilers.visitor.kxi.symboltable.BlockScope;
 import compilers.visitor.kxi.symboltable.ScopeType;
@@ -131,6 +130,10 @@ public class KxiSimplifyVisitor extends KxiVisitorBase {
 
     @Override
     public void visit(KxiPlusEquals node) {
+        KxiPlus kxiPlus = new KxiPlus(node.getExpressionR(), node.getExpressionL());
+        KxiEquals kxiEquals = new KxiEquals(kxiPlus, node.getExpressionL());
+        node.getChildren().clear();
+        node.getChildren().add(kxiEquals);
     }
 
     @Override

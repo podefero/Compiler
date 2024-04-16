@@ -1375,8 +1375,8 @@ public class KxiParser extends Parser {
 		public TerminalNode FALSE() { return getToken(KxiParser.FALSE, 0); }
 		public TerminalNode NULL() { return getToken(KxiParser.NULL, 0); }
 		public TerminalNode THIS() { return getToken(KxiParser.THIS, 0); }
-		public TerminalNode MULT() { return getToken(KxiParser.MULT, 0); }
 		public TerminalNode DIVIDE() { return getToken(KxiParser.DIVIDE, 0); }
+		public TerminalNode MULT() { return getToken(KxiParser.MULT, 0); }
 		public TerminalNode LESSTHEN() { return getToken(KxiParser.LESSTHEN, 0); }
 		public TerminalNode LESSEQUALS() { return getToken(KxiParser.LESSEQUALS, 0); }
 		public TerminalNode GREATERTHEN() { return getToken(KxiParser.GREATERTHEN, 0); }
@@ -1542,7 +1542,7 @@ public class KxiParser extends Parser {
 						setState(250);
 						if (!(precpred(_ctx, 25))) throw new FailedPredicateException(this, "precpred(_ctx, 25)");
 						setState(251);
-						match(MULT);
+						match(DIVIDE);
 						setState(252);
 						expression(26);
 						}
@@ -1554,7 +1554,7 @@ public class KxiParser extends Parser {
 						setState(253);
 						if (!(precpred(_ctx, 24))) throw new FailedPredicateException(this, "precpred(_ctx, 24)");
 						setState(254);
-						match(DIVIDE);
+						match(MULT);
 						setState(255);
 						expression(25);
 						}
@@ -1566,7 +1566,7 @@ public class KxiParser extends Parser {
 						setState(256);
 						if (!(precpred(_ctx, 23))) throw new FailedPredicateException(this, "precpred(_ctx, 23)");
 						setState(257);
-						match(PLUS);
+						match(SUBTRACT);
 						setState(258);
 						expression(24);
 						}
@@ -1578,7 +1578,7 @@ public class KxiParser extends Parser {
 						setState(259);
 						if (!(precpred(_ctx, 22))) throw new FailedPredicateException(this, "precpred(_ctx, 22)");
 						setState(260);
-						match(SUBTRACT);
+						match(PLUS);
 						setState(261);
 						expression(23);
 						}
@@ -2174,11 +2174,11 @@ public class KxiParser extends Parser {
 		"\u00f3\u0001\u0000\u0000\u0000\u00f8\u00f4\u0001\u0000\u0000\u0000\u00f8"+
 		"\u00f5\u0001\u0000\u0000\u0000\u00f8\u00f6\u0001\u0000\u0000\u0000\u00f8"+
 		"\u00f7\u0001\u0000\u0000\u0000\u00f9\u0136\u0001\u0000\u0000\u0000\u00fa"+
-		"\u00fb\n\u0019\u0000\u0000\u00fb\u00fc\u0005-\u0000\u0000\u00fc\u0135"+
+		"\u00fb\n\u0019\u0000\u0000\u00fb\u00fc\u0005.\u0000\u0000\u00fc\u0135"+
 		"\u0003$\u0012\u001a\u00fd\u00fe\n\u0018\u0000\u0000\u00fe\u00ff\u0005"+
-		".\u0000\u0000\u00ff\u0135\u0003$\u0012\u0019\u0100\u0101\n\u0017\u0000"+
-		"\u0000\u0101\u0102\u0005+\u0000\u0000\u0102\u0135\u0003$\u0012\u0018\u0103"+
-		"\u0104\n\u0016\u0000\u0000\u0104\u0105\u0005,\u0000\u0000\u0105\u0135"+
+		"-\u0000\u0000\u00ff\u0135\u0003$\u0012\u0019\u0100\u0101\n\u0017\u0000"+
+		"\u0000\u0101\u0102\u0005,\u0000\u0000\u0102\u0135\u0003$\u0012\u0018\u0103"+
+		"\u0104\n\u0016\u0000\u0000\u0104\u0105\u0005+\u0000\u0000\u0105\u0135"+
 		"\u0003$\u0012\u0017\u0106\u0107\n\u0015\u0000\u0000\u0107\u0108\u0005"+
 		"&\u0000\u0000\u0108\u0135\u0003$\u0012\u0016\u0109\u010a\n\u0014\u0000"+
 		"\u0000\u010a\u010b\u0005%\u0000\u0000\u010b\u0135\u0003$\u0012\u0015\u010c"+

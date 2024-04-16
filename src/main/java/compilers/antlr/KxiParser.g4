@@ -44,10 +44,10 @@ expression :
             | NEW IDENTIFIER arguments
             | NEW type index
             //l to r
-            | expression MULT expression
             | expression DIVIDE expression
-            | expression PLUS expression
+            | expression MULT expression
             | expression SUBTRACT expression
+            | expression PLUS expression
             | expression LESSTHEN expression
             | expression LESSEQUALS expression
             | expression GREATERTHEN expression

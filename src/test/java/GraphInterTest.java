@@ -29,6 +29,14 @@ import java.util.Stack;
 
 public class GraphInterTest {
     @Test
+    void stuff() {
+        int i = 1;
+        int k = 2;
+        k += i += i;
+        System.out.println(i);
+        System.out.println(k);
+    }
+    @Test
     void graphIntermediateViz() {
         AbstractKxiNode rootNode = kxiRootNode("inter.kxi");
         SymbolTableVisitor symbolTableVisitor = new SymbolTableVisitor();

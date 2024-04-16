@@ -5,8 +5,7 @@ import compilers.ast.GenericNode;
 import compilers.ast.intermediate.*;
 import compilers.ast.intermediate.InterOperand.*;
 import compilers.ast.intermediate.expression.InterExpression;
-import compilers.ast.intermediate.expression.operation.InterAssignment;
-import compilers.ast.intermediate.expression.operation.InterBinaryPlus;
+import compilers.ast.intermediate.expression.operation.*;
 import compilers.ast.intermediate.statements.*;
 import compilers.ast.kxi_nodes.*;
 import compilers.ast.kxi_nodes.class_members.KxiConstructor;
@@ -110,20 +109,6 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
 
     }
 
-    @Override
-    public void visit(KxiReturnStatement node) {
-        InterReturn interReturn = new InterReturn();
-        currentFunction.getStatements().add(interReturn);
-    }
-
-    @Override
-    public void visit(KxiDiv node) {
-    }
-
-    @Override
-    public void visit(KxiMult node) {
-    }
-
     private InterOperand getLeftOperand() {
         InterValue left = pop();
         InterOperand leftOperand;
@@ -149,31 +134,65 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
     }
 
     @Override
-    public void visit(KxiPlus node) {
+    public void visit(KxiReturnStatement node) {
+        InterReturn interReturn = new InterReturn();
+        currentFunction.getStatements().add(interReturn);
+    }
 
+    @Override
+    public void visit(KxiDiv node) {
         InterId tempId = new InterId(node.hashCode());
-        InterVariable interVariable = new InterVariable(tempId, new InterBinaryPlus(getLeftOperand(), getRightOperand()));
+        InterOperand rightOperand = getRightOperand();
+        InterOperand leftOperand = getLeftOperand();
+        InterVariable interVariable = new InterVariable(tempId, new InterBinaryDivide(leftOperand, rightOperand));
         currentFunction.getStatements().add(interVariable);
         nodeStack.push(tempId);
     }
 
-
     @Override
-    public void visit(KxiSubtract node) {
+    public void visit(KxiMult node) {
+        InterId tempId = new InterId(node.hashCode());
+        InterOperand rightOperand = getRightOperand();
+        InterOperand leftOperand = getLeftOperand();
+        InterVariable interVariable = new InterVariable(tempId, new InterBinaryMult(leftOperand, rightOperand));
+        currentFunction.getStatements().add(interVariable);
+        nodeStack.push(tempId);
     }
 
     @Override
-    public void visit(KxiDivEquals node) {
+    public void visit(KxiPlus node) {
+        InterId tempId = new InterId(node.hashCode());
+        InterOperand rightOperand = getRightOperand();
+        InterOperand leftOperand = getLeftOperand();
+        InterVariable interVariable = new InterVariable(tempId, new InterBinaryPlus(leftOperand, rightOperand));
+        currentFunction.getStatements().add(interVariable);
+        nodeStack.push(tempId);
+    }
+
+    @Override
+    public void visit(KxiSubtract node) {
+        InterId tempId = new InterId(node.hashCode());
+        InterOperand rightOperand = getRightOperand();
+        InterOperand leftOperand = getLeftOperand();
+        InterVariable interVariable = new InterVariable(tempId, new InterBinarySubtract(leftOperand, rightOperand));
+        currentFunction.getStatements().add(interVariable);
+        nodeStack.push(tempId);
     }
 
     @Override
     public void visit(KxiEquals node) {
-        if (nodeStack.size() == 2) {
+        if (nodeStack.size() >= 2) {
             InterOperand rightOperand = getRightOperand();
             InterOperand leftOperand = getLeftOperand();
             InterExpressionStatement interExpressionStatement = new InterExpressionStatement(new InterAssignment(leftOperand, rightOperand));
             currentFunction.getStatements().add(interExpressionStatement);
+            nodeStack.push(rightOperand.getInterValue());
         }
+    }
+
+    @Override
+    public void visit(KxiDivEquals node) {
+
     }
 
     @Override
@@ -182,6 +201,20 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
 
     @Override
     public void visit(KxiPlusEquals node) {
+//        if (nodeStack.size() == 1) {
+//            InterExpressionStatement interExpressionStatementAssign = new InterExpressionStatement(new InterAssignment(getLeftOperand(), null));
+//            currentFunction.getStatements().add(interExpressionStatementAssign);
+//
+//        } else {
+//            InterOperand rightOperand = getRightOperand();
+//            InterOperand leftOperand = getLeftOperand();
+//            InterBinaryPlus interBinaryPlus = new InterBinaryPlus(leftOperand, rightOperand);
+//            InterAssignment interAssignment = new InterAssignment(leftOperand, rightOperand);
+//            InterExpressionStatement interExpressionStatementPlus = new InterExpressionStatement(interBinaryPlus);
+//            InterExpressionStatement interExpressionStatementAssign = new InterExpressionStatement(interAssignment);
+//            currentFunction.getStatements().add(interExpressionStatementPlus);
+//            currentFunction.getStatements().add(interExpressionStatementAssign);
+//        }
     }
 
     @Override

@@ -4,8 +4,7 @@ import compilers.ast.GenericListNode;
 import compilers.ast.assembly.*;
 import compilers.ast.intermediate.*;
 import compilers.ast.intermediate.InterOperand.*;
-import compilers.ast.intermediate.expression.operation.InterAssignment;
-import compilers.ast.intermediate.expression.operation.InterBinaryPlus;
+import compilers.ast.intermediate.expression.operation.*;
 import compilers.ast.intermediate.statements.*;
 import compilers.ast.intermediate.symboltable.ActivationRecord;
 import compilers.ast.intermediate.symboltable.FunctionData;
@@ -219,8 +218,36 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
         comment("Add R1 and R2, result in R2");
         tryDerefInterOperand(node.getLeftOperand());
         tryDerefInterOperand(node.getRightOperand());
+        twoReg(ADD, R1, R2);
+        twoReg(MOV, R2, R1);
+    }
 
-        twoReg(ADD, R2, R1);
+    @Override
+    public void visit(InterBinarySubtract node) {
+        comment("Subtract R1 and R2, result in R2");
+        tryDerefInterOperand(node.getLeftOperand());
+        tryDerefInterOperand(node.getRightOperand());
+        twoReg(SUB, R1, R2);
+        twoReg(MOV, R2, R1);
+
+    }
+
+    @Override
+    public void visit(InterBinaryDivide node) {
+        comment("Divide R1 and R2, result in R2");
+        tryDerefInterOperand(node.getLeftOperand());
+        tryDerefInterOperand(node.getRightOperand());
+        twoReg(DIV, R1, R2);
+        twoReg(MOV, R2, R1);
+    }
+
+    @Override
+    public void visit(InterBinaryMult node) {
+        comment("Mult R1 and R2, result in R2");
+        tryDerefInterOperand(node.getLeftOperand());
+        tryDerefInterOperand(node.getRightOperand());
+        twoReg(MUL, R1, R2);
+        twoReg(MOV, R2, R1);
     }
 
     @Override

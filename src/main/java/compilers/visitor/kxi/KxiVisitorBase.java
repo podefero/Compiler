@@ -10,8 +10,7 @@ import compilers.ast.intermediate.InterOperand.LeftVariableStack;
 import compilers.ast.intermediate.InterOperand.LeftOperandLit;
 import compilers.ast.intermediate.InterOperand.RightVariableStack;
 import compilers.ast.intermediate.InterOperand.RightOperandLit;
-import compilers.ast.intermediate.expression.operation.InterAssignment;
-import compilers.ast.intermediate.expression.operation.InterBinaryPlus;
+import compilers.ast.intermediate.expression.operation.*;
 import compilers.ast.intermediate.statements.*;
 import compilers.ast.kxi_nodes.*;
 import compilers.ast.kxi_nodes.class_members.KxiConstructor;
@@ -784,5 +783,14 @@ public  class KxiVisitorBase implements VisitKxi {
     }
 
     public void visit(InterExpressionStatement interExpressionStatement) {
+    }
+
+    public void visit(InterBinarySubtract interBinarySubtract) {
+    }
+
+    public void visit(InterBinaryDivide interBinaryDivide) {
+    }
+
+    public void visit(InterBinaryMult interBinaryMult) {
     }
 }
