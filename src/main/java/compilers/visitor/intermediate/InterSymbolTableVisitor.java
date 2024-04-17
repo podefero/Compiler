@@ -3,11 +3,9 @@ package compilers.visitor.intermediate;
 import compilers.ast.intermediate.InterFunctionNode;
 import compilers.ast.intermediate.StackType;
 import compilers.ast.intermediate.statements.InterFunctionalCall;
+import compilers.ast.intermediate.statements.InterGlobalVariable;
 import compilers.ast.intermediate.statements.InterVariable;
-import compilers.ast.intermediate.symboltable.ActivationRecord;
-import compilers.ast.intermediate.symboltable.FunctionData;
-import compilers.ast.intermediate.symboltable.InterSymbolTable;
-import compilers.ast.intermediate.symboltable.StackData;
+import compilers.ast.intermediate.symboltable.*;
 import compilers.ast.kxi_nodes.KxiMain;
 import compilers.visitor.kxi.KxiVisitorBase;
 import lombok.AllArgsConstructor;
@@ -44,5 +42,12 @@ public class InterSymbolTableVisitor extends KxiVisitorBase {
     public void visit(InterVariable node) {
         String id = node.getInterId().getId();
         currentFunctionData.getActivationRecord().pushStackItem(id, StackType.LOCAL);
+    }
+
+    @Override
+    public void visit(InterGlobalVariable node) {
+        String id = node.getInterId().getId();
+        GlobalData globalData = new GlobalData(id, node.getDirective(), convertIdToLabel(id));
+        interSymbolTable.getGlobalDataMap().put(id, globalData);
     }
 }

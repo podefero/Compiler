@@ -1,5 +1,6 @@
 package compilers.ast.intermediate;
 
+import compilers.ast.assembly.Directive;
 import compilers.ast.kxi_nodes.ScalarType;
 import lombok.Getter;
 
@@ -7,10 +8,12 @@ import lombok.Getter;
 public class InterLitDir<T> extends InterValue {
     private T value;
     private ScalarType scalarType;
+    Directive directive;
 
-    public InterLitDir(T value, ScalarType scalarType) {
+    public InterLitDir(T value, ScalarType scalarType, Directive directive) {
         this.value = value;
         this.scalarType = scalarType;
+        this.directive = directive;
     }
 
 

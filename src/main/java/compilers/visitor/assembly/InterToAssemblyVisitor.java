@@ -10,6 +10,7 @@ import compilers.ast.intermediate.symboltable.ActivationRecord;
 import compilers.ast.intermediate.symboltable.FunctionData;
 import compilers.ast.intermediate.symboltable.InterSymbolTable;
 import compilers.ast.intermediate.symboltable.StackData;
+import compilers.ast.kxi_nodes.KxiMain;
 import compilers.ast.kxi_nodes.ScalarType;
 import compilers.util.DataSizes;
 import compilers.visitor.kxi.KxiVisitorBase;
@@ -21,6 +22,7 @@ import java.util.Collection;
 import java.util.List;
 
 import static compilers.ast.assembly.Registers.*;
+import static compilers.ast.assembly.Directive.*;
 import static compilers.ast.assembly.OpCodes.*;
 
 
@@ -65,6 +67,28 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
 
     }
 
+    //DIR
+    private<T> void directive(Directive directive, String label, InterLitDir value) {
+        if(directive == INT)
+            directiveInt(label, (Integer) value.getValue());
+        if(directive == BYT)
+            directiveByte(label, (Character) value.getValue());
+        if(directive == Directive.STR)
+            directiveString(label, (String) value.getValue());
+    }
+
+    private void directiveInt(String label, int value) {
+        assemblyList.add(new AssemblyDirective(label, INT.getValue(), new OperandInteger(value).getNumInteger()));
+    }
+
+    private void directiveByte(String label, char value) {
+        assemblyList.add(new AssemblyDirective(label, BYT.getValue(), value + ""));
+    }
+
+    private void directiveString(String label, String value) {
+        assemblyList.add(new AssemblyDirective(label, Directive.STR.getValue(), value));
+    }
+
     //OPS
     private void twoReg(OpCodes opCodes, Registers RD, Registers RS) {
         assemblyList.add(new AssemblyCode("", opCodes.getValue(), new OperandReg(RD), new OperandReg(RS)));
@@ -99,6 +123,10 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
         assemblyList.add(new AssemblyComment(comment));
     }
 
+    private void newLine() {
+        assemblyList.add(new AssemblyNewLine());
+    }
+
     private void label(String comment) {
         assemblyList.add(new OperandLabelWrapper(comment));
     }
@@ -119,6 +147,31 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
         for (AbstractAssembly assembly : assemblyList) {
             rootNode.getAssemblyCodes().add(assembly);
         }
+    }
+
+    //write to dir
+    @Override
+    public void visit(InterGlobalVariable node) {
+        comment("Write variable " + node.getInterId().getId() + " to Data Segment");
+        if(node.getInterOperation() != null)
+            directive(node.getDirective(), node.getLabel(), (InterLitDir) node.getInterOperation().getRightOperand().getInterValue());
+
+    }
+
+    @Override
+    public void visit(LeftVariableDir node) {
+//        newLine();
+//        comment("Store address of DIR in R1");
+
+    }
+
+    @Override
+    public void visit(InterDirAssignment node) {
+//        newLine();
+//        comment("DIR Assignment");
+//
+//        tryDerefInterOperand(node.getRightOperand());
+//        twoReg(STRI, R2, R1);
     }
 
 
@@ -357,6 +410,7 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
         tryDerefInterOperand(node.getRightOperand());
         twoReg(STRI, R2, R1);
     }
+
 
     @Override
     public void visit(RightVariableStack node) {

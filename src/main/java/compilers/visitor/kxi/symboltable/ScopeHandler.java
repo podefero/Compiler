@@ -20,7 +20,7 @@ public class ScopeHandler {
 
     public SymbolData Identify(SymbolTable symbolTable, String id) {
         ClassScope classScope = bubbleToClassScope(symbolTable);
-        String uniqueName = "";
+        String uniqueName = symbolTable.getUniqueName();
         if (classScope != null) {
              uniqueName = bubbleToClassScope(symbolTable).getUniqueName();
         }

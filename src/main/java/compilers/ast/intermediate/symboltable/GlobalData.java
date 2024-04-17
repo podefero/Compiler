@@ -1,5 +1,6 @@
 package compilers.ast.intermediate.symboltable;
 
+import compilers.ast.assembly.Directive;
 import compilers.ast.intermediate.DirType;
 import compilers.ast.intermediate.Label;
 import lombok.AllArgsConstructor;
@@ -9,6 +10,6 @@ import lombok.Data;
 @Data
 public class GlobalData {
     String id;
-    DirType dirType;
+    Directive dirType;
     String label;
 }

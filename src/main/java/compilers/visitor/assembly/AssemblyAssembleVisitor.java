@@ -1,9 +1,7 @@
 package compilers.visitor.assembly;
 
-import compilers.ast.assembly.AssemblyCode;
-import compilers.ast.assembly.AssemblyComment;
-import compilers.ast.assembly.Operand;
-import compilers.ast.assembly.OperandLabelWrapper;
+import compilers.ast.assembly.*;
+import compilers.ast.kxi_nodes.KxiMain;
 import compilers.visitor.kxi.KxiVisitorBase;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -37,6 +35,15 @@ public class AssemblyAssembleVisitor extends KxiVisitorBase {
     }
 
     @Override
+    public void visit(AssemblyDirective node) {
+        String label = node.getLabel();
+        String directive = node.getDirective();
+        String value = node.getValue();
+        instructions.add(label + " " + directive + " " + value);
+
+    }
+
+    @Override
     public void visit(OperandLabelWrapper node) {
         label = node.getValue();
     }
@@ -46,5 +53,8 @@ public class AssemblyAssembleVisitor extends KxiVisitorBase {
         instructions.add(node.getComment());
     }
 
-
+    @Override
+    public void visit(AssemblyNewLine node) {
+        instructions.add("\n");
+    }
 }

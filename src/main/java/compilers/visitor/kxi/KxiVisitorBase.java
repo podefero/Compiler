@@ -1,9 +1,6 @@
 package compilers.visitor.kxi;
 
-import compilers.ast.assembly.AssemblyCode;
-import compilers.ast.assembly.AssemblyComment;
-import compilers.ast.assembly.AssemblyMain;
-import compilers.ast.assembly.OperandLabelWrapper;
+import compilers.ast.assembly.*;
 import compilers.ast.intermediate.InterFunctionNode;
 import compilers.ast.intermediate.InterGlobal;
 import compilers.ast.intermediate.InterOperand.*;
@@ -837,5 +834,17 @@ public  class KxiVisitorBase implements VisitKxi {
     }
 
     public void visit(LeftDirLiteral leftDirLiteral) {
+    }
+
+    public void visit(InterPtrAssignment interPtrAssignment) {
+    }
+
+    public void visit(AssemblyNewLine assemblyNewLine) {
+    }
+
+    public void visit(InterDirAssignment interDirAssignment) {
+    }
+
+    public void visit(AssemblyDirective AssemblyDirective) {
     }
 }
