@@ -14,4 +14,8 @@ public class InterId extends InterValue {
         this.id =  "temp$" + hash;
     }
 
+    @Override
+    public String getTerminalValue() {
+        return this.id;
+    }
 }

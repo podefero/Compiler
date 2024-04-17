@@ -130,10 +130,10 @@ public class KxiSimplifyVisitor extends KxiVisitorBase {
 
     @Override
     public void visit(KxiPlusEquals node) {
-        KxiPlus kxiPlus = new KxiPlus(node.getExpressionR(), node.getExpressionL());
-        KxiEquals kxiEquals = new KxiEquals(kxiPlus, node.getExpressionL());
-        node.getChildren().clear();
-        node.getChildren().add(kxiEquals);
+//        KxiPlus kxiPlus = new KxiPlus(node.getExpressionR(), node.getExpressionL());
+//        KxiEquals kxiEquals = new KxiEquals(kxiPlus, node.getExpressionL());
+//        node.getChildren().clear();
+//        node.getChildren().add(kxiEquals);
     }
 
     @Override

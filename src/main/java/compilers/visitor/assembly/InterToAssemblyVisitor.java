@@ -10,7 +10,6 @@ import compilers.ast.intermediate.symboltable.ActivationRecord;
 import compilers.ast.intermediate.symboltable.FunctionData;
 import compilers.ast.intermediate.symboltable.InterSymbolTable;
 import compilers.ast.intermediate.symboltable.StackData;
-import compilers.ast.kxi_nodes.KxiMain;
 import compilers.ast.kxi_nodes.ScalarType;
 import compilers.util.DataSizes;
 import compilers.visitor.kxi.KxiVisitorBase;
@@ -20,7 +19,6 @@ import lombok.Getter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Stack;
 
 import static compilers.ast.assembly.Registers.*;
 import static compilers.ast.assembly.OpCodes.*;
@@ -271,7 +269,7 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
     @Override
     public void visit(RightOperandLit node) {
         InterLit interLit = node.getInterLit();
-        comment("setting R2 to " + interLit.getValue());
+        comment("setting R2 to " + interLit.getTerminalValue());
         if (interLit.getScalarType() == ScalarType.INT)
             regImmInt(MOVI, R2, (Integer) interLit.getValue());
         else
@@ -292,7 +290,7 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
     @Override
     public void visit(LeftOperandLit node) {
         InterLit interLit = node.getInterLit();
-        comment("setting R1 to " + interLit.getValue());
+        comment("setting R1 to " + interLit.getTerminalValue());
         if (interLit.getScalarType() == ScalarType.INT)
             regImmInt(MOVI, R1, (Integer) interLit.getValue());
         else

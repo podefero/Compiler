@@ -52,4 +52,8 @@ public abstract class GenericNode {
                 .forEach(node -> node.accept(visit));
     }
 
+    public GenericNode copy() {
+        return null;
+    }
+
 }

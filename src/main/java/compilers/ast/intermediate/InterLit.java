@@ -13,4 +13,9 @@ public class InterLit<T> extends InterValue {
         this.scalarType = scalarType;
     }
 
+
+    @Override
+    public String getTerminalValue() {
+        return value.toString();
+    }
 }

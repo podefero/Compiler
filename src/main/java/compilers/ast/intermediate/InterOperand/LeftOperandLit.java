@@ -1,5 +1,6 @@
 package compilers.ast.intermediate.InterOperand;
 
+import compilers.ast.GenericNode;
 import compilers.ast.intermediate.InterLit;
 import compilers.ast.intermediate.InterValue;
 import compilers.visitor.kxi.KxiVisitorBase;
@@ -11,6 +12,12 @@ public class LeftOperandLit extends InterOperand{
     public LeftOperandLit(InterValue interValue) {
         super(interValue);
         this.interLit = (InterLit) interValue;
+    }
+
+    @Override
+    public GenericNode copy() {
+        LeftOperandLit leftOperandLit = new LeftOperandLit(new InterLit<>(interLit.getValue(), interLit.getScalarType()));
+        return leftOperandLit;
     }
 
     @Override

@@ -1,5 +1,7 @@
 package compilers.ast.intermediate;
 
-public abstract class InterValue extends AbstractInterNode{
+import compilers.ast.GenericTerminal;
+
+public abstract class InterValue extends AbstractInterNode implements GenericTerminal {
 
 }

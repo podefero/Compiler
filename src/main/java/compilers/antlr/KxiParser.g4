@@ -58,10 +58,10 @@ expression :
             | expression OR expression
             // r to l
             | expression EQUALS expression
-            | expression MULTEQUALS expression
             | expression DIVEQUALS expression
-            | expression PLUSEQUALS expression
+            | expression MULTEQUALS expression
             | expression SUBEQUALS expression
+            | expression PLUSEQUALS expression
             | INTLIT
             | CHARLIT
             | STRINGLIT

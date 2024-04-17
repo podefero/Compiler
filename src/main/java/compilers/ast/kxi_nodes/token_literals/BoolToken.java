@@ -9,8 +9,8 @@ public class BoolToken extends TokenLiteral<Boolean> {
     public BoolToken(String tokenText) {
         super(tokenText);
         scalarType = ScalarType.BOOL;
-        if(tokenText.equals("false")) value = false;
-        else if(tokenText.equals("true")) value = true;
+        if (tokenText.equals("false")) value = false;
+        else if (tokenText.equals("true")) value = true;
     }
 
     @Override
@@ -23,4 +23,5 @@ public class BoolToken extends TokenLiteral<Boolean> {
         visit.preVisit(this);
         visit.visit(this);
     }
+
 }

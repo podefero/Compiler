@@ -793,4 +793,7 @@ public  class KxiVisitorBase implements VisitKxi {
 
     public void visit(InterBinaryMult interBinaryMult) {
     }
+
+    public void visit(InterBinaryAssignmentStatement interBinaryAssignmentStatement) {
+    }
 }

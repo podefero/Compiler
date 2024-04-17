@@ -32,9 +32,11 @@ public class GraphInterTest {
     void stuff() {
         int i = 1;
         int k = 2;
-        k += i += i;
+        int h = 5;
+        k += i += i *= h;
         System.out.println(i);
         System.out.println(k);
+        System.out.println(h);
     }
     @Test
     void graphIntermediateViz() {
@@ -79,7 +81,7 @@ public class GraphInterTest {
 
         String asm = "";
         for(String line : assemblyAssembleVisitor.getInstructions()) {
-            System.out.println(line);
+           // System.out.println(line);
             asm+=line+"\n";
         }
 
