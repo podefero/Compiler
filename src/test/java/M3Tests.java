@@ -1767,6 +1767,17 @@ public class M3Tests {
                 "}", false);
     }
 
+    @Test
+    void validBoolFunctionAnd() {
+        test("class A {\n" +
+                "    static public bool f(){}\n" +
+                "}\n" +
+                "\n" +
+                "void main() {\n" +
+                "    bool a = A.f() && A.f();\n" +
+                "}", false);
+    }
+
     //TODO: PLACE THESE TEST IN M4 test when it's ready
 
     @Test
@@ -1947,7 +1958,7 @@ public class M3Tests {
                 "    cout << test;\n" +
                 "    cout << f;\n" +
                 "    cout << b;\n" +
-                "}", true);
+                "}", false);
     }
 
 

@@ -91,6 +91,37 @@ public class TypeCheckerVisitor extends KxiVisitorBase {
         }
     }
 
+    private void matchResultsOnType(String codeLine, ScalarType scalarType) {
+        if (resultTypeStack.size() >= 2) {
+            ResultType resultR = resultTypeStack.pop();
+            ResultType resultL = resultTypeStack.pop();
+
+            int arrayDepthL = resultL.getTypeData().getType().getArrayDepth();
+            int arrayDepthR = resultR.getTypeData().getType().getArrayDepth();
+
+            ScalarType left = resultL.getTypeData().getType().getScalarType();
+            ScalarType right = resultR.getTypeData().getType().getScalarType();
+
+            matchId(resultL, resultR, codeLine);
+            //if has flags
+            if (resultR.containsFlag(ResultFlag.Method))
+                exceptionStack.push(new TypeCheckException(codeLine, "invalid method in expression " + resultR.getReferenceId()));
+                //check if left is pointer
+            else if (resultL.getTypeData().isStatic() && resultR.containsFlag(ResultFlag.This)) {
+                exceptionStack.push(new TypeCheckException(codeLine, "Can't access non-static member " + resultR.getReferenceId() + " in a static context"));
+            } else if (right == ScalarType.NULL) {
+                if (left != ScalarType.ID && arrayDepthL == 0 && left != ScalarType.STRING) {
+                    exceptionStack.push(new TypeCheckException(codeLine, "Mismatched Types provided: " + right + " expected pointer"));
+                }
+            } else if (left != scalarType && right != scalarType)
+                exceptionStack.push(new TypeCheckException(codeLine, "Mismatched Types provided: " + right + " expected: " + scalarType));
+            else if (arrayDepthL != arrayDepthR)
+                exceptionStack.push(new TypeCheckException(codeLine, "Mismatched ArrayDim providedDimension: " + arrayDepthR + " expectedDimension: " + arrayDepthL));
+
+            resultTypeStack.push(resultR);
+        }
+    }
+
     private void matchParamArg(SymbolData left, SymbolData right, String codeLine) {
 
         int arrayDepthL = right.getType().getArrayDepth();
@@ -353,8 +384,8 @@ public class TypeCheckerVisitor extends KxiVisitorBase {
   */
     @Override
     public void visit(KxiAnd expression) {
-        matchResults(expression.getLineInfo());
-        updatedResultScalarType(ScalarType.BOOL);
+        matchResultsOnType(expression.getLineInfo(), ScalarType.BOOL);
+        //updatedResultScalarType(ScalarType.BOOL);
     }
 
     @Override
@@ -391,8 +422,8 @@ public class TypeCheckerVisitor extends KxiVisitorBase {
 
     @Override
     public void visit(KxiOr expression) {
-        matchResults(expression.getLineInfo());
-        updatedResultScalarType(ScalarType.BOOL);
+        matchResultsOnType(expression.getLineInfo(), ScalarType.BOOL);
+        //updatedResultScalarType(ScalarType.BOOL);
     }
 
     /*

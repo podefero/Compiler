@@ -796,4 +796,31 @@ public  class KxiVisitorBase implements VisitKxi {
 
     public void visit(InterBinaryAssignmentStatement interBinaryAssignmentStatement) {
     }
+
+    public void visit(InterLogicalLessThen interLogicalLessThen) {
+    }
+
+    public void visit(InterLogicalGreaterThen interLogicalGreaterThen) {
+    }
+
+    public void visit(InterLogicalEqualsEquals interLogicalEqualsEquals) {
+    }
+
+    public void visit(InterLogicalLessEqualThen interLogicalLessEqualThen) {
+    }
+
+    public void visit(InterLogicalGreaterEqualThen interLogicalGreaterEqualThen) {
+    }
+
+    public void visit(InterLogicalOr interLogicalOr) {
+    }
+
+    public void visit(InterLogicalAnd interLogicalAnd) {
+    }
+
+    public void visit(InterLogicalNot interLogicalNot) {
+    }
+
+    public void visit(InterLogicalNotEquals interLogicalNotEquals) {
+    }
 }

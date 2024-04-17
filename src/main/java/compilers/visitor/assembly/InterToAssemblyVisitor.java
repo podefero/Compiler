@@ -50,6 +50,10 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
                 , new OperandReg(Registers.R14), new OperandInteger(-value)));
     }
 
+    private String uniqueLabel(int hash) {
+        return currentFunctionData.getLabel() + "_" + hash;
+    }
+
     private void tryDerefInterOperand(InterOperand interOperand) {
         if (interOperand instanceof LeftVariableStack) {
             comment("Deref " + ((LeftVariableStack) interOperand).getInterId().getId());
@@ -76,6 +80,10 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
 
     private void regLabel(OpCodes opCodes, String value) {
         assemblyList.add(new AssemblyCode("", opCodes.getValue(), new OperandLabel(value), null));
+    }
+
+    private void regAndLabel(OpCodes opCodes, Registers registers, String value) {
+        assemblyList.add(new AssemblyCode("", opCodes.getValue(), new OperandReg(registers), new OperandLabel(value)));
     }
 
     private void leftOp(OpCodes opCodes, Registers RD) {
@@ -202,7 +210,7 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
     @Override
     public void visit(InterCoutStatement node) {
         int trpVal;
-        if (node.getScalarType() == ScalarType.INT) trpVal = 1;
+        if (node.getScalarType() != ScalarType.CHAR) trpVal = 1;
         else trpVal = 3;
         tryDerefInterOperand(node.getRightOperand());
         comment("COUT  result");
@@ -249,6 +257,99 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
     }
 
     @Override
+    public void visit(InterLogicalLessThen node) {
+        comment("R1 < R2, result in R2");
+        tryDerefInterOperand(node.getLeftOperand());
+        tryDerefInterOperand(node.getRightOperand());
+        twoReg(CMP, R1, R2);
+        twoReg(MOV, R2, R1);
+    }
+
+    @Override
+    public void visit(InterLogicalGreaterThen node) {
+        comment("R1 > R2, result in R2");
+        tryDerefInterOperand(node.getLeftOperand());
+        tryDerefInterOperand(node.getRightOperand());
+        twoReg(CMP, R1, R2);
+        twoReg(MOV, R2, R1);
+    }
+
+    @Override
+    public void visit(InterLogicalEqualsEquals node) {
+        comment("R1 == R2, result in R2");
+        tryDerefInterOperand(node.getLeftOperand());
+        tryDerefInterOperand(node.getRightOperand());
+        twoReg(CMP, R1, R2);
+        twoReg(MOV, R2, R1);
+    }
+
+    @Override
+    public void visit(InterLogicalGreaterEqualThen node) {
+        comment("R1 >= R2, result in R2");
+        tryDerefInterOperand(node.getLeftOperand());
+        tryDerefInterOperand(node.getRightOperand());
+        twoReg(CMP, R1, R2);
+        twoReg(MOV, R2, R1);
+    }
+
+    @Override
+    public void visit(InterLogicalLessEqualThen node) {
+        comment("R1 <= R2, result in R2");
+        tryDerefInterOperand(node.getLeftOperand());
+        tryDerefInterOperand(node.getRightOperand());
+        twoReg(CMP, R1, R2);
+        twoReg(MOV, R2, R1);
+    }
+
+    @Override
+    public void visit(InterLogicalAnd node) {
+        comment("R1 AND R2, result in R2");
+        tryDerefInterOperand(node.getLeftOperand());
+        tryDerefInterOperand(node.getRightOperand());
+        twoReg(AND, R1, R2);
+        twoReg(MOV, R2, R1);
+    }
+
+    @Override
+    public void visit(InterLogicalOr node) {
+        comment("R1 OR R2, result in R2");
+        tryDerefInterOperand(node.getLeftOperand());
+        tryDerefInterOperand(node.getRightOperand());
+        twoReg(OR, R1, R2);
+        twoReg(MOV, R2, R1);
+    }
+
+    @Override
+    public void visit(InterLogicalNot node) {
+        comment("R1 NOT R2, result in R2");
+        tryDerefInterOperand(node.getLeftOperand());
+        tryDerefInterOperand(node.getRightOperand());
+        twoReg(NOT, R1, R2);
+        twoReg(MOV, R2, R1);
+    }
+
+    @Override
+    public void visit(InterLogicalNotEquals node) {
+        String ifZero = uniqueLabel(node.hashCode()) + "_ifzero";
+        String ifNot = uniqueLabel(node.hashCode()) + "_ifnot";
+        String done = uniqueLabel(node.hashCode()) + "_done";
+
+        comment("R1 != R2, result in R2");
+        tryDerefInterOperand(node.getLeftOperand());
+        tryDerefInterOperand(node.getRightOperand());
+        twoReg(CMP, R1, R2);
+        regAndLabel(BRZ, R1, ifZero);
+        regLabel(JMP, ifNot);
+        label(ifZero);
+        regImmInt(MOVI, R1, -1);
+        regLabel(JMP, done);
+        label(ifNot);
+        regImmInt(MOVI, R1, 1);
+        label(done);
+        twoReg(MOV, R2, R1);
+    }
+
+    @Override
     public void visit(InterAssignment node) {
         //assign R1 to result of R2
         comment("Assignment");
@@ -274,8 +375,6 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
             regImmInt(MOVI, R2, (Integer) interLit.getValue());
         else
             regImmInt(MOVI, R2, (Character) interLit.getValue());
-
-
     }
 
     @Override

@@ -30,13 +30,7 @@ import java.util.Stack;
 public class GraphInterTest {
     @Test
     void stuff() {
-        int i = 1;
-        int k = 2;
-        int h = 5;
-        k += i += i *= h;
-        System.out.println(i);
-        System.out.println(k);
-        System.out.println(h);
+        //boolean r = 'k' && 'k';
     }
     @Test
     void graphIntermediateViz() {
