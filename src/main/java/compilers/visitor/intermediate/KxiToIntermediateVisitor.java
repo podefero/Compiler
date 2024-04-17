@@ -4,7 +4,6 @@ import compilers.ast.GenericListNode;
 import compilers.ast.GenericNode;
 import compilers.ast.intermediate.*;
 import compilers.ast.intermediate.InterOperand.*;
-import compilers.ast.intermediate.expression.InterExpression;
 import compilers.ast.intermediate.expression.operation.*;
 import compilers.ast.intermediate.statements.*;
 import compilers.ast.kxi_nodes.*;
@@ -28,6 +27,7 @@ import compilers.ast.kxi_nodes.statements.conditional.KxiForStatement;
 import compilers.ast.kxi_nodes.statements.conditional.KxiIfStatement;
 import compilers.ast.kxi_nodes.statements.conditional.KxiWhileStatement;
 import compilers.visitor.kxi.KxiVisitorBase;
+import compilers.visitor.kxi.symboltable.SymbolData;
 import compilers.visitor.kxi.symboltable.SymbolTable;
 import lombok.Getter;
 
@@ -42,11 +42,13 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
     private InterGlobal rootNode;
     private Stack<InterStatement> rightToLeftStack;
     private InterFunctionNode currentFunction;
+    private SymbolTable globalScope;
 
 
-    public KxiToIntermediateVisitor() {
+    public KxiToIntermediateVisitor(SymbolTable globalScope) {
         nodeStack = new Stack<>();
         rightToLeftStack = new Stack<>();
+        this.globalScope = globalScope;
     }
 
     private void addStatementToFunc(InterStatement interStatement) {
@@ -115,6 +117,10 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
 
         if (left instanceof InterId)
             leftOperand = new LeftVariableStack(left);
+        else if (left instanceof InterLitDir)
+            leftOperand = new LeftDirLiteral(left);
+        else if (left instanceof InterIdDir)
+            leftOperand = new LeftVariableDir(left);
         else
             leftOperand = new LeftOperandLit(left);
 
@@ -127,6 +133,10 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
 
         if (right instanceof InterId)
             rightOperand = new RightVariableStack(right);
+        else if (right instanceof InterLitDir)
+            rightOperand = new RightDirLiteral(right);
+        else if (right instanceof InterIdDir)
+            rightOperand = new RightVariableDir(right);
         else
             rightOperand = new RightOperandLit(right);
 
@@ -326,11 +336,19 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
 
     @Override
     public void visit(ExpressionCharLit node) {
+        nodeStack.push(new InterLit<>(node.getTokenLiteral().getValue(), ScalarType.CHAR));
     }
 
     @Override
     public void visit(ExpressionIdLit node) {
-        nodeStack.push(new InterId(node.getTokenLiteral().getValue()));
+        SymbolData symbolData = globalScope.getScope().get(node.getTokenLiteral().getValue());
+        ScalarType scalarType = symbolData.getScalarType();
+        boolean isStatic = symbolData.isStatic();
+
+        if (scalarType != ScalarType.STRING && !isStatic)
+            nodeStack.push(new InterId(node.getTokenLiteral().getValue()));
+        else
+            nodeStack.push(new InterIdDir(node.getTokenLiteral().getValue()));
     }
 
     @Override
@@ -344,6 +362,7 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
 
     @Override
     public void visit(ExpressionStringLit node) {
+        nodeStack.push(new InterLitDir<>(node.getTokenLiteral().getValue(), ScalarType.STRING));
     }
 
     @Override
@@ -407,16 +426,32 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
 
     @Override
     public void visit(KxiVariableDeclaration node) {
-        InterId varId = new InterId(node.getId().getValue());
-        LeftVariableStack leftVariableStack = new LeftVariableStack(varId);
+        //Global Var
+        if (node.getType().getScalarType() == ScalarType.STRING) {
+            InterIdDir varId = new InterIdDir(node.getId().getValue());
 
-        InterVariable interVariable;
-        if (node.getInitializer() != null) {
-            interVariable = new InterVariable(varId, new InterAssignment(leftVariableStack, getRightOperand()));
+            LeftVariableDir leftVariableDir = new LeftVariableDir(varId);
+            InterGlobalVariable interGlobalVariable;
+            if (node.getInitializer() != null) {
+                interGlobalVariable = new InterGlobalVariable(varId, new InterAssignment(leftVariableDir, getRightOperand()));
+            } else {
+                interGlobalVariable = new InterGlobalVariable(varId, null);
+            }
+            currentFunction.getStatements().add(interGlobalVariable);
         } else {
-            interVariable = new InterVariable(varId, null);
+            InterId varId = new InterId(node.getId().getValue());
+
+            //Stack Var
+            LeftVariableStack leftVariableStack = new LeftVariableStack(varId);
+
+            InterVariable interVariable;
+            if (node.getInitializer() != null) {
+                interVariable = new InterVariable(varId, new InterAssignment(leftVariableStack, getRightOperand()));
+            } else {
+                interVariable = new InterVariable(varId, null);
+            }
+            currentFunction.getStatements().add(interVariable);
         }
-        currentFunction.getStatements().add(interVariable);
     }
 
     @Override

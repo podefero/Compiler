@@ -24,6 +24,7 @@ import java.util.Stack;
 public class SymbolTableVisitor extends KxiVisitorBase {
     private ScopeHandler scopeHandler;
     private Stack<SymbolTable> tableStack;
+    private Stack<String> uniqueNameStack;
     private GlobalScope globalScope;
     private SymbolTable currentSymbolTable;
     private List<String> allIds;
@@ -36,6 +37,7 @@ public class SymbolTableVisitor extends KxiVisitorBase {
         globalScope = new GlobalScope();
         allIds = new ArrayList<>();
         nameCounter = 0;
+        uniqueNameStack = new Stack<>();
     }
 
     @Override
@@ -44,18 +46,14 @@ public class SymbolTableVisitor extends KxiVisitorBase {
         super.dumpErrorStack();
     }
 
-    private void setScopeUniqueName() {
-        if (currentSymbolTable instanceof ClassScope) {
-            currentSymbolTable.setUniqueName(((ClassScope) currentSymbolTable).getClassId());
-        } else if (currentSymbolTable instanceof BlockScope) {
-            if (!tableStack.empty()) {
-                nameCounter++;
-                currentSymbolTable.setUniqueName(tableStack.peek().getUniqueName() + nameCounter);
-            } else {
-                currentSymbolTable.setUniqueName("Main");
-            }
 
-        }
+    private void setScopeUniqueName(String id) {
+        if (!tableStack.empty())
+            uniqueNameStack.push(tableStack.peek().getUniqueName() + id);
+        else
+            uniqueNameStack.push(id);
+
+
     }
 
     private void scopeNodePreVisit(SymbolTable symbolTable) {
@@ -137,6 +135,11 @@ public class SymbolTableVisitor extends KxiVisitorBase {
     }
 
     @Override
+    public void preVisit(KxiMain kxiMain) {
+       setScopeUniqueName("main");
+    }
+
+    @Override
     public void visit(KxiMain kxiMain) {
         //check if id is 'main'
         if (!kxiMain.getId().getValue().equals("main")) {
@@ -148,7 +151,6 @@ public class SymbolTableVisitor extends KxiVisitorBase {
                         , new ArrayList<>(), (BlockScope) currentSymbolTable);
 
         globalScope.setMainScope(methodScope);
-        currentSymbolTable.setUniqueName("main");
         scopeNodeVisit();
         scopeHandler.setGlobalScope(globalScope);
     }
@@ -165,8 +167,8 @@ public class SymbolTableVisitor extends KxiVisitorBase {
             exceptionStack.push(new SymbolTableException(kxiClass.getLineInfo(), "ID exists " + classScope.getClassId()));
 
         scopeHandler.addClassScope(classScope.getClassId(), (ClassScope) kxiClass.getScope());
-        scopeNodePreVisit(classScope);
         classScope.setUniqueName(classScope.getClassId());
+        scopeNodePreVisit(classScope);
     }
 
     @Override
@@ -180,6 +182,7 @@ public class SymbolTableVisitor extends KxiVisitorBase {
     public void preVisit(KxiBlock kxiBlock) {
         BlockScope blockScope = new BlockScope();
         kxiBlock.setScope(blockScope);
+        kxiBlock.getScope().setUniqueName(uniqueNameStack.pop());
         scopeNodePreVisit(blockScope);
     }
 
@@ -187,10 +190,14 @@ public class SymbolTableVisitor extends KxiVisitorBase {
     public void preVisit(KxiCaseBlock kxiBlock) {
         BlockScope blockScope = new BlockScope();
         kxiBlock.setScope(blockScope);
-
+        kxiBlock.getScope().setUniqueName(uniqueNameStack.pop());
         scopeNodePreVisit(blockScope);
     }
 
+    @Override
+    public void preVisit(KxiMethod kxiMethod) {
+        uniqueNameStack.push(kxiMethod.getId().getValue());
+    }
 
     @Override
     public void visit(KxiMethod kxiMethod) {
@@ -204,12 +211,17 @@ public class SymbolTableVisitor extends KxiVisitorBase {
 
         setBlockScopeType(ScopeType.Method);
 
-        currentSymbolTable.setUniqueName(tableStack.peek().getUniqueName() + id);
+        //currentSymbolTable.setUniqueName(tableStack.peek().getUniqueName() + id);
 
         scopeNodeVisit();
 
         addSymbolDataToCurrentScope(id, returnData);
 
+    }
+
+    @Override
+    public void preVisit(KxiConstructor kxiConstructor) {
+        setScopeUniqueName(kxiConstructor.getId().getValue());
     }
 
     @Override
@@ -231,46 +243,56 @@ public class SymbolTableVisitor extends KxiVisitorBase {
     }
 
     @Override
+    public void preVisit(KxiIfStatement kxiIfStatement) {
+        setScopeUniqueName("if_" + kxiIfStatement.hashCode());
+    }
+
+    @Override
     public void visit(KxiIfStatement kxiIfStatement) {
         if (kxiIfStatement.getElseStatement() != null) {
             setBlockScopeType(ScopeType.If);
             scopeNodeVisit();
         }
         setBlockScopeType(ScopeType.If);
-
-        currentSymbolTable.setUniqueName(tableStack.peek().getUniqueName() + kxiIfStatement.hashCode());
-
+        //currentSymbolTable.setUniqueName(tableStack.peek().getUniqueName() + kxiIfStatement.hashCode());
         scopeNodeVisit();
+    }
 
+    @Override
+    public void preVisit(KxiForStatement kxiForStatement) {
+        setScopeUniqueName("for_" + kxiForStatement.hashCode());
     }
 
     @Override
     public void visit(KxiForStatement kxiForStatement) {
         setBlockScopeType(ScopeType.For);
-
-        currentSymbolTable.setUniqueName(tableStack.peek().getUniqueName() + kxiForStatement.hashCode());
-
+        //currentSymbolTable.setUniqueName(tableStack.peek().getUniqueName() + kxiForStatement.hashCode());
         scopeNodeVisit();
+    }
+
+    @Override
+    public void preVisit(KxiWhileStatement kxiWhileStatement) {
+        setScopeUniqueName("while_" + kxiWhileStatement.hashCode());
     }
 
     @Override
     public void visit(KxiWhileStatement kxiWhileStatement) {
         setBlockScopeType(ScopeType.While);
-
-        currentSymbolTable.setUniqueName(tableStack.peek().getUniqueName() + kxiWhileStatement.hashCode());
-
+        //currentSymbolTable.setUniqueName(tableStack.peek().getUniqueName() + kxiWhileStatement.hashCode());
         scopeNodeVisit();
+    }
+
+    @Override
+    public void preVisit(KxiSwitchStatement kxiSwitchStatement) {
+        setScopeUniqueName("switch_" + kxiSwitchStatement.hashCode());
     }
 
     @Override
     public void visit(KxiSwitchStatement kxiSwitchStatement) {
         setBlockScopeType(ScopeType.Switch);
-
-        currentSymbolTable.setUniqueName(tableStack.peek().getUniqueName() + kxiSwitchStatement.hashCode());
-
+        //currentSymbolTable.setUniqueName(tableStack.peek().getUniqueName() + kxiSwitchStatement.hashCode());
         scopeNodeVisit();
     }
-
 
 
     @Override

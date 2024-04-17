@@ -6,10 +6,7 @@ import compilers.ast.assembly.AssemblyMain;
 import compilers.ast.assembly.OperandLabelWrapper;
 import compilers.ast.intermediate.InterFunctionNode;
 import compilers.ast.intermediate.InterGlobal;
-import compilers.ast.intermediate.InterOperand.LeftVariableStack;
-import compilers.ast.intermediate.InterOperand.LeftOperandLit;
-import compilers.ast.intermediate.InterOperand.RightVariableStack;
-import compilers.ast.intermediate.InterOperand.RightOperandLit;
+import compilers.ast.intermediate.InterOperand.*;
 import compilers.ast.intermediate.expression.operation.*;
 import compilers.ast.intermediate.statements.*;
 import compilers.ast.kxi_nodes.*;
@@ -822,5 +819,23 @@ public  class KxiVisitorBase implements VisitKxi {
     }
 
     public void visit(InterLogicalNotEquals interLogicalNotEquals) {
+    }
+
+    public void visit(RightVariableDir rightVariableDir) {
+    }
+
+    public void visit(LeftVariableDir leftVariableDir) {
+    }
+
+    public void preVisit(InterGlobalVariable interGlobalVariable) {
+    }
+
+    public void visit(InterGlobalVariable interGlobalVariable) {
+    }
+
+    public void visit(RightDirLiteral rightDirLiteral) {
+    }
+
+    public void visit(LeftDirLiteral leftDirLiteral) {
     }
 }

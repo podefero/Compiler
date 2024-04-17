@@ -32,9 +32,11 @@ public class GraphInterTest {
     void stuff() {
         //boolean r = 'k' && 'k';
     }
+
     @Test
     void graphIntermediateViz() {
         AbstractKxiNode rootNode = kxiRootNode("inter.kxi");
+
         SymbolTableVisitor symbolTableVisitor = new SymbolTableVisitor();
         rootNode.accept(symbolTableVisitor);
         symbolTableVisitor.dumpErrorStack();
@@ -53,14 +55,28 @@ public class GraphInterTest {
 
         KxiSimplifyVisitor kxiSimplifyVisitor = new KxiSimplifyVisitor(new Stack<>());
         rootNode.accept(kxiSimplifyVisitor);
-
-        KxiToIntermediateVisitor kxiToIntermediateVisitor = new KxiToIntermediateVisitor();
+        KxiToIntermediateVisitor kxiToIntermediateVisitor = new KxiToIntermediateVisitor(symbolTableVisitor.getGlobalScope());
         rootNode.accept(kxiToIntermediateVisitor);
 
-        InterSymbolTableVisitor interSymbolTableVisitor = new InterSymbolTableVisitor(new InterSymbolTable(new HashMap<>(), new HashMap<>()), null);
+        InterSymbolTableVisitor interSymbolTableVisitor =
+                new InterSymbolTableVisitor(new InterSymbolTable(new HashMap<>(), new HashMap<>()), null);
         InterGlobal interGlobal = kxiToIntermediateVisitor.getRootNode();
         interGlobal.accept(interSymbolTableVisitor);
 
+        makeAssembly(interGlobal, interSymbolTableVisitor);
+
+
+        GraphVizVisitor graphVizVisitor = new GraphVizVisitor(kxiToIntermediateVisitor.getRootNode());
+
+        OutputHandler outputHandler = new OutputHandler("[inter.dot,main.asm]");
+        try {
+            outputHandler.outputAST(graphVizVisitor.getGraph());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    void makeAssembly(InterGlobal interGlobal, InterSymbolTableVisitor interSymbolTableVisitor) {
         InterToAssemblyVisitor interToAssemblyVisitor = new InterToAssemblyVisitor(new ArrayList<>()
                 , null
                 , interSymbolTableVisitor.getInterSymbolTable()
@@ -74,21 +90,18 @@ public class GraphInterTest {
         assemblyMain.accept(assemblyAssembleVisitor);
 
         String asm = "";
-        for(String line : assemblyAssembleVisitor.getInstructions()) {
-           // System.out.println(line);
-            asm+=line+"\n";
+        for (String line : assemblyAssembleVisitor.getInstructions()) {
+            // System.out.println(line);
+            asm += line + "\n";
         }
-
-        GraphVizVisitor graphVizVisitor = new GraphVizVisitor(kxiToIntermediateVisitor.getRootNode());
-
-        OutputHandler outputHandler = new OutputHandler("[inter.dot,main.asm]");
+        OutputHandler outputHandler = new OutputHandler("[main.asm]");
         try {
-            outputHandler.outputAST(graphVizVisitor.getGraph());
             outputHandler.outputAsm(asm);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
+
 
     @Test
     void testSymbolTableVisitorStressTest() {
