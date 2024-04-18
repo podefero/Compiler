@@ -9,6 +9,7 @@ public class InterLit<T> extends InterValue {
     private ScalarType scalarType;
 
     public InterLit(T value, ScalarType scalarType) {
+        super(scalarType);
         this.value = value;
         this.scalarType = scalarType;
     }

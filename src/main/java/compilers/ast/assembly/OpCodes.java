@@ -20,6 +20,7 @@ public enum OpCodes {
     NOT("NOT"),
     LDR("LDR"),
     LDRI("LDR"),
+    LDA("LDA"),
     MOV("MOV"),
     MOVI("MOVI"),
     STR("STR"),

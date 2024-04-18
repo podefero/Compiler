@@ -5,15 +5,15 @@ import compilers.util.HashString;
 import lombok.Getter;
 
 @Getter
-public class InterId extends InterValue {
+public class InterPtr extends InterValue {
     private String id;
 
-    public InterId(String id, ScalarType scalarType) {
+    public InterPtr(String id, ScalarType scalarType) {
         super(scalarType);
         this.id =  id;
     }
 
-    public InterId(ScalarType scalarType) {
+    public InterPtr(ScalarType scalarType) {
         super(scalarType);
         this.id =  "temp$" + HashString.updateStringHash();
     }

@@ -55,7 +55,7 @@ public class GraphInterTest {
 
         KxiSimplifyVisitor kxiSimplifyVisitor = new KxiSimplifyVisitor(new Stack<>());
         rootNode.accept(kxiSimplifyVisitor);
-        KxiToIntermediateVisitor kxiToIntermediateVisitor = new KxiToIntermediateVisitor(symbolTableVisitor.getGlobalScope());
+        KxiToIntermediateVisitor kxiToIntermediateVisitor = new KxiToIntermediateVisitor(symbolTableVisitor.getScopeHandler());
         rootNode.accept(kxiToIntermediateVisitor);
 
         InterSymbolTableVisitor interSymbolTableVisitor =
@@ -80,7 +80,7 @@ public class GraphInterTest {
         InterToAssemblyVisitor interToAssemblyVisitor = new InterToAssemblyVisitor(new ArrayList<>()
                 , null
                 , interSymbolTableVisitor.getInterSymbolTable()
-                , interSymbolTableVisitor.getInterSymbolTable().getFunctionDataMap().get("main$main"));
+                , interSymbolTableVisitor.getInterSymbolTable().getFunctionDataMap().get("main$"));
 
         interGlobal.accept(interToAssemblyVisitor);
 

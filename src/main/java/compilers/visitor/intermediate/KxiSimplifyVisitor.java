@@ -50,24 +50,17 @@ public class KxiSimplifyVisitor extends KxiVisitorBase {
 
     }
 
-    @Override
-    public void visit(KxiMain node) {
-        String id = node.getId().getValue();
-        node.getId().setValue(currentScope.getUniqueName() + id);
-//        //make main into a function node
-//        KxiMethod kxiMethod = new KxiMethod(new KxiMethodSuffixHelper(node.getBlock(), new GenericListNode(new ArrayList<>()), node.getId())
-//                , new KxiType(ScalarType.VOID, null)
-//                , new KxiModifierHelper(Modifier.PUBLIC)
-//                , new KxiStaticHelper(false));
-//        node.getChildren().add(0, kxiMethod);
+//    @Override
+//    public void visit(KxiMain node) {
+//        String id = node.getId().getValue();
+//        node.getId().setValue(currentScope.getUniqueName() + id);
+//    }
 
-    }
-
-    @Override
-    public void visit(KxiMethod node) {
-        String id = node.getId().getValue();
-        node.getId().setValue(currentScope.getUniqueName() + id);
-    }
+//    @Override
+//    public void visit(KxiMethod node) {
+//        String id = node.getId().getValue();
+//        node.getId().setValue(currentScope.getUniqueName() + id);
+//    }
 
     @Override
     public void visit(KxiBlock node) {
@@ -79,148 +72,15 @@ public class KxiSimplifyVisitor extends KxiVisitorBase {
         }
     }
 
-    @Override
-    public void visit(KxiVariableDeclaration node) {
-        String id = node.getId().getValue();
-        node.getId().setValue(currentScope.getUniqueName() + id);
-    }
-
-    @Override
-    public void visit(KxiDiv node) {
-    }
-
-    @Override
-    public void visit(KxiMult node) {
-    }
-
-    @Override
-    public void visit(KxiPlus node) {
-//        if (!areLiterals(node.getExpressionL(), node.getExpressionR())) {
-//            AbstractKxiExpression expression = (AbstractKxiExpression) kxiNodeStack.pop();
-//            IdentifierToken identifierToken = new IdentifierToken("" + node.hashCode());
+//    @Override
+//    public void visit(KxiVariableDeclaration node) {
+//        String id = node.getId().getValue();
+//        node.getId().setValue(currentScope.getUniqueName() + id);
+//    }
 //
-//            KxiVariableDeclaration kxiVariableDeclaration =
-//                    new KxiVariableDeclaration(expression
-//                            , identifierToken
-//                            , new KxiType(ScalarType.INT, null));
-//
-//            node.getChildren().add(kxiVariableDeclaration);
-//
-//        }
-//        kxiNodeStack.push(node);
-
-    }
-
-    @Override
-    public void visit(KxiSubtract node) {
-    }
-
-    @Override
-    public void visit(KxiDivEquals node) {
-    }
-
-    @Override
-    public void visit(KxiEquals node) {
-
-    }
-
-    @Override
-    public void visit(KxiMultEquals node) {
-    }
-
-    @Override
-    public void visit(KxiPlusEquals node) {
-//        KxiPlus kxiPlus = new KxiPlus(node.getExpressionR(), node.getExpressionL());
-//        KxiEquals kxiEquals = new KxiEquals(kxiPlus, node.getExpressionL());
-//        node.getChildren().clear();
-//        node.getChildren().add(kxiEquals);
-    }
-
-    @Override
-    public void visit(KxiSubtractEquals node) {
-    }
-
-    @Override
-    public void visit(KxiAnd node) {
-    }
-
-    @Override
-    public void visit(KxiEqualsEquals node) {
-    }
-
-    @Override
-    public void visit(KxiGreaterEqualsThen node) {
-    }
-
-    @Override
-    public void visit(KxiGreaterThen node) {
-    }
-
-    @Override
-    public void visit(KxiLessEqualsThen node) {
-    }
-
-    @Override
-    public void visit(KxiLessThen node) {
-    }
-
-    @Override
-    public void visit(KxiNotEquals node) {
-    }
-
-    @Override
-    public void visit(KxiOr node) {
-    }
-
-    @Override
-    public void visit(ExpressionBoolLit node) {
-    }
-
-    @Override
-    public void visit(ExpressionCharLit node) {
-    }
-
-    @Override
-    public void visit(ExpressionIdLit node) {
-        String id = node.getTokenLiteral().getValue();
-        node.getTokenLiteral().setValue(currentScope.getUniqueName() + id);
-    }
-
-    @Override
-    public void visit(ExpressionIntLit node) {
-    }
-
-    @Override
-    public void visit(ExpressionNullLit node) {
-    }
-
-    @Override
-    public void visit(ExpressionStringLit node) {
-    }
-
-    @Override
-    public void visit(ExpressionThisLit node) {
-    }
-
-    @Override
-    public void visit(KxiNot node) {
-    }
-
-    @Override
-    public void visit(KxiUniPlus node) {
-    }
-
-    @Override
-    public void visit(KxiUniSubtract node) {
-    }
-
-    @Override
-    public void visit(KxiDotExpression node) {
-    }
-
-    @Override
-    public void visit(KxiMethodExpression node) {
-    }
-
-
+//    @Override
+//    public void visit(ExpressionIdLit node) {
+//        String id = node.getTokenLiteral().getValue();
+//        node.getTokenLiteral().setValue(currentScope.getUniqueName() + id);
+//    }
 }

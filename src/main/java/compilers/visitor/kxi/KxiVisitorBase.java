@@ -818,22 +818,16 @@ public  class KxiVisitorBase implements VisitKxi {
     public void visit(InterLogicalNotEquals interLogicalNotEquals) {
     }
 
-    public void visit(RightVariableDir rightVariableDir) {
+    public void visit(RightPtr rightPtr) {
     }
 
-    public void visit(LeftVariableDir leftVariableDir) {
+    public void visit(LeftPtr leftPtr) {
     }
 
     public void preVisit(InterGlobalVariable interGlobalVariable) {
     }
 
     public void visit(InterGlobalVariable interGlobalVariable) {
-    }
-
-    public void visit(RightDirLiteral rightDirLiteral) {
-    }
-
-    public void visit(LeftDirLiteral leftDirLiteral) {
     }
 
     public void visit(InterPtrAssignment interPtrAssignment) {
@@ -847,4 +841,6 @@ public  class KxiVisitorBase implements VisitKxi {
 
     public void visit(AssemblyDirective AssemblyDirective) {
     }
+
+
 }

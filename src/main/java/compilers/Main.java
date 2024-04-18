@@ -15,6 +15,7 @@ import compilers.visitor.generic.GraphVizVisitor;
 import compilers.visitor.intermediate.KxiToIntermediateVisitor;
 import compilers.visitor.kxi.invalid_break.InvalidBreakVisitor;
 import compilers.visitor.kxi.invalid_write.InvalidWriteVisitor;
+import compilers.visitor.kxi.symboltable.ScopeHandler;
 import compilers.visitor.kxi.symboltable.SymbolTable;
 import compilers.visitor.kxi.symboltable.SymbolTableVisitor;
 import compilers.visitor.kxi.typecheck.TypeCheckerVisitor;
@@ -119,15 +120,15 @@ public class Main {
 
         if(argumentFlags.compile && !hasError) {
             try {
-                compile(rootNode, outputHandler, symbolTableVisitor.getGlobalScope());
+                compile(rootNode, outputHandler, symbolTableVisitor.getScopeHandler());
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         }
     }
 
-    static void compile(AbstractKxiNode rootNode, OutputHandler outputHandler, SymbolTable globalScope) throws IOException {
-        KxiToIntermediateVisitor kxiToIntermediateVisitor = new KxiToIntermediateVisitor(globalScope);
+    static void compile(AbstractKxiNode rootNode, OutputHandler outputHandler, ScopeHandler scopeHandler) throws IOException {
+        KxiToIntermediateVisitor kxiToIntermediateVisitor = new KxiToIntermediateVisitor(scopeHandler);
         rootNode.accept(kxiToIntermediateVisitor);
         InterGlobal interRoot = (InterGlobal) kxiToIntermediateVisitor.getRootNode();
        // outputHandler.outputAsm(interRoot.getJmpToMain().gatherAssembly());

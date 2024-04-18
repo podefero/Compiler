@@ -13,10 +13,12 @@ import compilers.ast.kxi_nodes.statements.conditional.KxiForStatement;
 import compilers.ast.kxi_nodes.statements.conditional.KxiIfStatement;
 import compilers.ast.kxi_nodes.statements.conditional.KxiWhileStatement;
 import compilers.exceptions.SymbolTableException;
+import compilers.util.HashString;
 import compilers.visitor.kxi.KxiVisitorBase;
 import lombok.Getter;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Stack;
 
@@ -36,7 +38,6 @@ public class SymbolTableVisitor extends KxiVisitorBase {
         tableStack = new Stack<>();
         globalScope = new GlobalScope();
         allIds = new ArrayList<>();
-        nameCounter = 0;
         uniqueNameStack = new Stack<>();
     }
 
@@ -52,8 +53,6 @@ public class SymbolTableVisitor extends KxiVisitorBase {
             uniqueNameStack.push(tableStack.peek().getUniqueName() + id);
         else
             uniqueNameStack.push(id);
-
-
     }
 
     private void scopeNodePreVisit(SymbolTable symbolTable) {
@@ -136,7 +135,7 @@ public class SymbolTableVisitor extends KxiVisitorBase {
 
     @Override
     public void preVisit(KxiMain kxiMain) {
-       setScopeUniqueName("main");
+        setScopeUniqueName("main");
     }
 
     @Override
@@ -153,6 +152,7 @@ public class SymbolTableVisitor extends KxiVisitorBase {
         globalScope.setMainScope(methodScope);
         scopeNodeVisit();
         scopeHandler.setGlobalScope(globalScope);
+        scopeHandler.getGlobalScope().setUniqueName("main");
     }
 
     @Override
@@ -244,7 +244,7 @@ public class SymbolTableVisitor extends KxiVisitorBase {
 
     @Override
     public void preVisit(KxiIfStatement kxiIfStatement) {
-        setScopeUniqueName("if_" + kxiIfStatement.hashCode());
+        setScopeUniqueName("if_" + HashString.updateStringHash());
     }
 
     @Override
@@ -260,7 +260,7 @@ public class SymbolTableVisitor extends KxiVisitorBase {
 
     @Override
     public void preVisit(KxiForStatement kxiForStatement) {
-        setScopeUniqueName("for_" + kxiForStatement.hashCode());
+        setScopeUniqueName("for_" + HashString.updateStringHash());
     }
 
     @Override
@@ -272,7 +272,7 @@ public class SymbolTableVisitor extends KxiVisitorBase {
 
     @Override
     public void preVisit(KxiWhileStatement kxiWhileStatement) {
-        setScopeUniqueName("while_" + kxiWhileStatement.hashCode());
+        setScopeUniqueName("while_" + HashString.updateStringHash());
     }
 
     @Override
@@ -284,7 +284,7 @@ public class SymbolTableVisitor extends KxiVisitorBase {
 
     @Override
     public void preVisit(KxiSwitchStatement kxiSwitchStatement) {
-        setScopeUniqueName("switch_" + kxiSwitchStatement.hashCode());
+        setScopeUniqueName("switch_" + HashString.updateStringHash());
     }
 
     @Override

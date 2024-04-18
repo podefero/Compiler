@@ -2,11 +2,9 @@ package compilers.visitor.intermediate;
 
 import compilers.ast.intermediate.InterFunctionNode;
 import compilers.ast.intermediate.StackType;
-import compilers.ast.intermediate.statements.InterFunctionalCall;
 import compilers.ast.intermediate.statements.InterGlobalVariable;
 import compilers.ast.intermediate.statements.InterVariable;
 import compilers.ast.intermediate.symboltable.*;
-import compilers.ast.kxi_nodes.KxiMain;
 import compilers.visitor.kxi.KxiVisitorBase;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -47,7 +45,7 @@ public class InterSymbolTableVisitor extends KxiVisitorBase {
     @Override
     public void visit(InterGlobalVariable node) {
         String id = node.getInterId().getId();
-        GlobalData globalData = new GlobalData(id, node.getDirective(), convertIdToLabel(id));
+        GlobalData globalData = new GlobalData(id, node.getDirective(), convertIdToLabel(id), node.getInterLit());
         interSymbolTable.getGlobalDataMap().put(id, globalData);
     }
 }

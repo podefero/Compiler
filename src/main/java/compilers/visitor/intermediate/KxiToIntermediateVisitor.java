@@ -3,6 +3,7 @@ package compilers.visitor.intermediate;
 import compilers.ast.GenericListNode;
 import compilers.ast.GenericNode;
 import compilers.ast.assembly.Directive;
+import compilers.ast.assembly.Operand;
 import compilers.ast.intermediate.*;
 import compilers.ast.intermediate.InterOperand.*;
 import compilers.ast.intermediate.expression.operation.*;
@@ -28,6 +29,7 @@ import compilers.ast.kxi_nodes.statements.conditional.KxiForStatement;
 import compilers.ast.kxi_nodes.statements.conditional.KxiIfStatement;
 import compilers.ast.kxi_nodes.statements.conditional.KxiWhileStatement;
 import compilers.visitor.kxi.KxiVisitorBase;
+import compilers.visitor.kxi.symboltable.ScopeHandler;
 import compilers.visitor.kxi.symboltable.SymbolData;
 import compilers.visitor.kxi.symboltable.SymbolTable;
 import lombok.Getter;
@@ -43,13 +45,13 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
     private InterGlobal rootNode;
     private Stack<InterStatement> rightToLeftStack;
     private InterFunctionNode currentFunction;
-    private SymbolTable globalScope;
+    private ScopeHandler scopeHandler;
 
 
-    public KxiToIntermediateVisitor(SymbolTable globalScope) {
+    public KxiToIntermediateVisitor(ScopeHandler scopeHandler) {
         nodeStack = new Stack<>();
         rightToLeftStack = new Stack<>();
-        this.globalScope = globalScope;
+        this.scopeHandler = scopeHandler;
     }
 
     private void addStatementToFunc(InterStatement interStatement) {
@@ -79,14 +81,15 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
         GenericListNode globalDir = new GenericListNode(new ArrayList<>()); //after symbol table
         GenericListNode globalInit = new GenericListNode(new ArrayList<>());
 
-        InterId interId = new InterId(node.getId().getValue());
+        InterId interId = new InterId(getFullyQualifiedName(node.getId().getValue()), ScalarType.VOID);
         InterFunctionNode interFunctionNode = new InterFunctionNode(interId, new GenericListNode(new ArrayList<>()));
         currentFunction = interFunctionNode;
 
         interFunctionNode.getStatements().add(new InterActivationRecord(interId));
 
 
-        InterGlobal interGlobal = new InterGlobal(globalDir, globalInit, functions, new InterFunctionalCall(interId, new GenericListNode(new ArrayList<>())));
+        InterGlobal interGlobal =
+                new InterGlobal(globalDir, globalInit, functions, new InterFunctionalCall(interId, new GenericListNode(new ArrayList<>())));
         rootNode = interGlobal;
 
         rootNode.getInterFunctionNode().add(interFunctionNode);
@@ -100,7 +103,7 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
 
     @Override
     public void preVisit(KxiMethod node) {
-        InterId interId = new InterId(node.getId().getValue());
+        InterId interId = new InterId(getFullyQualifiedName(node.getId().getValue()), node.getReturnType().getScalarType());
         InterFunctionNode interFunctionNode = new InterFunctionNode(interId, new GenericListNode(new ArrayList<>()));
         currentFunction = interFunctionNode;
         interFunctionNode.getStatements().add(new InterActivationRecord(interId));
@@ -118,10 +121,8 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
 
         if (left instanceof InterId)
             leftOperand = new LeftVariableStack(left);
-        else if (left instanceof InterLitDir)
-            leftOperand = new LeftDirLiteral(left, ((InterLitDir<?>) left).getDirective());
-        else if (left instanceof InterIdDir)
-            leftOperand = new LeftVariableDir(left, ((InterIdDir) left).getDirective());
+        else if (left instanceof InterPtr)
+            leftOperand = new LeftPtr(left);
         else
             leftOperand = new LeftOperandLit(left);
 
@@ -134,19 +135,17 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
 
         if (right instanceof InterId)
             rightOperand = new RightVariableStack(right);
-        else if (right instanceof InterLitDir)
-            rightOperand = new RightDirLiteral(right, ((InterLitDir<?>) right).getDirective());
-        else if (right instanceof InterIdDir)
-            rightOperand = new RightVariableDir(right, ((InterIdDir) right).getDirective());
+        else if (right instanceof InterPtr)
+            rightOperand = new RightPtr(right);
         else
             rightOperand = new RightOperandLit(right);
 
         return rightOperand;
     }
 
-    private void tempVariableMaker(int hash, InterOperation interOperation) {
+    private void tempVariableMaker(InterOperation interOperation, ScalarType scalarType) {
         //create temp variable
-        InterId tempId = new InterId(hash);
+        InterId tempId = new InterId(scalarType);
         InterVariable interVariable = new InterVariable(tempId, interOperation);
         addStatementToFunc(interVariable);
         nodeStack.push(tempId);
@@ -163,28 +162,28 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
     public void visit(KxiDiv node) {
         InterOperand rightOperand = getRightOperand();
         InterOperand leftOperand = getLeftOperand();
-        tempVariableMaker(node.hashCode(), new InterBinaryDivide(leftOperand, rightOperand));
+        tempVariableMaker(new InterBinaryDivide(leftOperand, rightOperand), ScalarType.INT);
     }
 
     @Override
     public void visit(KxiMult node) {
         InterOperand rightOperand = getRightOperand();
         InterOperand leftOperand = getLeftOperand();
-        tempVariableMaker(node.hashCode(), new InterBinaryMult(leftOperand, rightOperand));
+        tempVariableMaker(new InterBinaryMult(leftOperand, rightOperand), ScalarType.INT);
     }
 
     @Override
     public void visit(KxiPlus node) {
         InterOperand rightOperand = getRightOperand();
         InterOperand leftOperand = getLeftOperand();
-        tempVariableMaker(node.hashCode(), new InterBinaryPlus(leftOperand, rightOperand));
+        tempVariableMaker(new InterBinaryPlus(leftOperand, rightOperand), ScalarType.INT);
     }
 
     @Override
     public void visit(KxiSubtract node) {
         InterOperand rightOperand = getRightOperand();
         InterOperand leftOperand = getLeftOperand();
-        tempVariableMaker(node.hashCode(), new InterBinarySubtract(leftOperand, rightOperand));
+        tempVariableMaker(new InterBinarySubtract(leftOperand, rightOperand), ScalarType.INT);
     }
 
     @Override
@@ -210,7 +209,7 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
         InterOperand leftOperand = getLeftOperand();
 
         InterBinaryDivide interBinaryPlus = new InterBinaryDivide((InterOperand) leftOperand.copy(), (InterOperand) rightOperand.copy());
-        InterId tempId = new InterId(interBinaryPlus.hashCode());
+        InterId tempId = new InterId(ScalarType.INT);
         InterVariable interVariable = new InterVariable(tempId, interBinaryPlus);
 
         RightVariableStack rightVar = new RightVariableStack(tempId);
@@ -226,7 +225,7 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
         InterOperand leftOperand = getLeftOperand();
 
         InterBinaryMult interBinaryPlus = new InterBinaryMult((InterOperand) leftOperand.copy(), (InterOperand) rightOperand.copy());
-        InterId tempId = new InterId(interBinaryPlus.hashCode());
+        InterId tempId = new InterId(ScalarType.INT);
         InterVariable interVariable = new InterVariable(tempId, interBinaryPlus);
 
         RightVariableStack rightVar = new RightVariableStack(tempId);
@@ -243,7 +242,7 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
         InterOperand leftOperand = getLeftOperand();
 
         InterBinaryPlus interBinaryPlus = new InterBinaryPlus((InterOperand) leftOperand.copy(), (InterOperand) rightOperand.copy());
-        InterId tempId = new InterId(interBinaryPlus.hashCode());
+        InterId tempId = new InterId(ScalarType.INT);
         InterVariable interVariable = new InterVariable(tempId, interBinaryPlus);
 
         RightVariableStack rightVar = new RightVariableStack(tempId);
@@ -259,7 +258,7 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
         InterOperand leftOperand = getLeftOperand();
 
         InterBinarySubtract interBinaryPlus = new InterBinarySubtract((InterOperand) leftOperand.copy(), (InterOperand) rightOperand.copy());
-        InterId tempId = new InterId(interBinaryPlus.hashCode());
+        InterId tempId = new InterId(ScalarType.INT);
         InterVariable interVariable = new InterVariable(tempId, interBinaryPlus);
 
         RightVariableStack rightVar = new RightVariableStack(tempId);
@@ -273,56 +272,56 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
     public void visit(KxiAnd node) {
         InterOperand rightOperand = getRightOperand();
         InterOperand leftOperand = getLeftOperand();
-        tempVariableMaker(node.hashCode(), new InterLogicalAnd(leftOperand, rightOperand));
+        tempVariableMaker(new InterLogicalAnd(leftOperand, rightOperand), leftOperand.getInterValue().getScalarType());
     }
 
     @Override
     public void visit(KxiEqualsEquals node) {
         InterOperand rightOperand = getRightOperand();
         InterOperand leftOperand = getLeftOperand();
-        tempVariableMaker(node.hashCode(), new InterLogicalEqualsEquals(leftOperand, rightOperand));
+        tempVariableMaker(new InterLogicalEqualsEquals(leftOperand, rightOperand), leftOperand.getInterValue().getScalarType());
     }
 
     @Override
     public void visit(KxiGreaterEqualsThen node) {
         InterOperand rightOperand = getRightOperand();
         InterOperand leftOperand = getLeftOperand();
-        tempVariableMaker(node.hashCode(), new InterLogicalGreaterEqualThen(leftOperand, rightOperand));
+        tempVariableMaker(new InterLogicalGreaterEqualThen(leftOperand, rightOperand), leftOperand.getInterValue().getScalarType());
     }
 
     @Override
     public void visit(KxiGreaterThen node) {
         InterOperand rightOperand = getRightOperand();
         InterOperand leftOperand = getLeftOperand();
-        tempVariableMaker(node.hashCode(), new InterLogicalGreaterThen(leftOperand, rightOperand));
+        tempVariableMaker(new InterLogicalGreaterThen(leftOperand, rightOperand), leftOperand.getInterValue().getScalarType());
     }
 
     @Override
     public void visit(KxiLessEqualsThen node) {
         InterOperand rightOperand = getRightOperand();
         InterOperand leftOperand = getLeftOperand();
-        tempVariableMaker(node.hashCode(), new InterLogicalLessEqualThen(leftOperand, rightOperand));
+        tempVariableMaker(new InterLogicalLessEqualThen(leftOperand, rightOperand), leftOperand.getInterValue().getScalarType());
     }
 
     @Override
     public void visit(KxiLessThen node) {
         InterOperand rightOperand = getRightOperand();
         InterOperand leftOperand = getLeftOperand();
-        tempVariableMaker(node.hashCode(), new InterLogicalLessThen(leftOperand, rightOperand));
+        tempVariableMaker(new InterLogicalLessThen(leftOperand, rightOperand), leftOperand.getInterValue().getScalarType());
     }
 
     @Override
     public void visit(KxiNotEquals node) {
         InterOperand rightOperand = getRightOperand();
         InterOperand leftOperand = getLeftOperand();
-        tempVariableMaker(node.hashCode(), new InterLogicalNotEquals(leftOperand, rightOperand));
+        tempVariableMaker(new InterLogicalNotEquals(leftOperand, rightOperand), leftOperand.getInterValue().getScalarType());
     }
 
     @Override
     public void visit(KxiOr node) {
         InterOperand rightOperand = getRightOperand();
         InterOperand leftOperand = getLeftOperand();
-        tempVariableMaker(node.hashCode(), new InterLogicalOr(leftOperand, rightOperand));
+        tempVariableMaker(new InterLogicalOr(leftOperand, rightOperand), leftOperand.getInterValue().getScalarType());
     }
 
     @Override
@@ -331,8 +330,6 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
             nodeStack.push(new InterLit<>(1, ScalarType.INT));
         else
             nodeStack.push(new InterLit<>(0, ScalarType.INT));
-
-
     }
 
     @Override
@@ -340,23 +337,20 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
         nodeStack.push(new InterLit<>(node.getTokenLiteral().getValue(), ScalarType.CHAR));
     }
 
+    private String getFullyQualifiedName(String id) {
+        if(currentScope == null) return scopeHandler.getGlobalScope().getUniqueName();
+        return currentScope.getUniqueName() + id;
+    }
+
     @Override
     public void visit(ExpressionIdLit node) {
-        SymbolData symbolData = globalScope.getScope().get(node.getTokenLiteral().getValue());
-        if (symbolData != null) {
-//            ScalarType scalarType = symbolData.getScalarType();
-//            boolean isStatic = symbolData.isStatic();
-//
-//            if (scalarType != ScalarType.STRING && !isStatic)
-            ScalarType scalarType = symbolData.getScalarType();
-            Directive directive;
-            if (scalarType == ScalarType.INT || scalarType == ScalarType.BOOL || scalarType == ScalarType.NULL)
-                directive = Directive.INT;
-            else if (scalarType == ScalarType.CHAR) directive = Directive.BYT;
-            else directive = Directive.STR;
-            nodeStack.push(new InterIdDir(node.getTokenLiteral().getValue(), directive));
-        } else
-            nodeStack.push(new InterId(node.getTokenLiteral().getValue()));
+        SymbolData symbolData = scopeHandler.Identify(currentScope, node.getTokenLiteral().getValue());
+        ScalarType scalarType = symbolData.getScalarType();
+//        boolean isStatic = symbolData.isStatic();
+//        if(scalarType == ScalarType.STRING || isStatic)
+//            nodeStack.push(new InterPtr(getFullyQualifiedName(node.getTokenLiteral().getValue()), scalarType));
+//        else
+        nodeStack.push(new InterId(getFullyQualifiedName(node.getTokenLiteral().getValue()), scalarType));
     }
 
     @Override
@@ -370,7 +364,11 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
 
     @Override
     public void visit(ExpressionStringLit node) {
-        nodeStack.push(new InterLitDir<>(node.getTokenLiteral().getValue(), ScalarType.STRING, Directive.STR));
+        InterPtr interId = new InterPtr(ScalarType.STRING);
+        InterGlobalVariable interGlobalVariable = new InterGlobalVariable(interId, Directive.STR
+                , new InterLit(node.getTokenLiteral().getValue(), ScalarType.STRING));
+        nodeStack.push(interId);
+        rootNode.getGlobalInit().add(interGlobalVariable);
     }
 
     @Override
@@ -381,7 +379,8 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
     public void visit(KxiNot node) {
         InterOperand rightOperand = getRightOperand();
         //InterOperand leftOperand = getLeftOperand();
-        tempVariableMaker(node.hashCode(), new InterLogicalNot(new LeftOperandLit(new InterLit<>(-1, ScalarType.INT)), rightOperand));
+        tempVariableMaker(new InterLogicalNot(new LeftOperandLit(new InterLit<>(-1, ScalarType.INT)), rightOperand)
+                , rightOperand.getInterValue().getScalarType());
     }
 
     @Override
@@ -423,7 +422,8 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
     @Override
     public void visit(KxiCoutStatement node) {
         InterCoutStatement interCoutStatement;
-        interCoutStatement = new InterCoutStatement(node.getScalarType(), getRightOperand());
+        InterOperand rightOperand = getRightOperand();
+        interCoutStatement = new InterCoutStatement(rightOperand.getInterValue().getScalarType(), rightOperand);
         currentFunction.getStatements().add(interCoutStatement);
     }
 
@@ -434,38 +434,22 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
 
     @Override
     public void visit(KxiVariableDeclaration node) {
-        //Global Var
-        if (node.getType().getScalarType() == ScalarType.STRING) {
-            ScalarType scalarType = node.getType().getScalarType();
-            Directive directive;
-            if (scalarType == ScalarType.INT || scalarType == ScalarType.BOOL || scalarType == ScalarType.NULL)
-                directive = Directive.INT;
-            else if (scalarType == ScalarType.CHAR) directive = Directive.BYT;
-            else directive = Directive.STR;
+        InterId varId = new InterId( getFullyQualifiedName(node.getId().getValue()), node.getType().getScalarType());
 
-            InterIdDir varId = new InterIdDir(node.getId().getValue(), directive);
-            LeftVariableDir leftVariableDir = new LeftVariableDir(varId, directive);
-            InterGlobalVariable interGlobalVariable;
-            if (node.getInitializer() != null) {
-                interGlobalVariable = new InterGlobalVariable(varId, new InterDirAssignment(leftVariableDir, getRightOperand(), directive), directive);
-            } else {
-                interGlobalVariable = new InterGlobalVariable(varId, null, directive);
-            }
-            rootNode.getGlobalInit().add(interGlobalVariable);
+        //Stack Var
+        LeftVariableStack leftVariableStack = new LeftVariableStack(varId);
+
+        InterVariable interVariable;
+        if (node.getInitializer() != null) {
+            InterOperand rightOperand = getRightOperand();
+            if (rightOperand instanceof RightPtr)
+                interVariable = new InterVariable(varId, new InterPtrAssignment(leftVariableStack, rightOperand));
+            else
+                interVariable = new InterVariable(varId, new InterAssignment(leftVariableStack, rightOperand));
         } else {
-            InterId varId = new InterId(node.getId().getValue());
-
-            //Stack Var
-            LeftVariableStack leftVariableStack = new LeftVariableStack(varId);
-
-            InterVariable interVariable;
-            if (node.getInitializer() != null) {
-                interVariable = new InterVariable(varId, new InterAssignment(leftVariableStack, getRightOperand()));
-            } else {
-                interVariable = new InterVariable(varId, null);
-            }
-            currentFunction.getStatements().add(interVariable);
+            interVariable = new InterVariable(varId, null);
         }
+        currentFunction.getStatements().add(interVariable);
     }
 
     @Override

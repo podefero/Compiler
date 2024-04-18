@@ -7,7 +7,7 @@ public abstract class AbstractInterNode extends GenericNode {
         super(genericNodes);
     }
 
-    protected String convertIdToLabel(String id) {
+    public String convertIdToLabel(String id) {
         String label = id.replace('$', '_');
         return label;
     }
