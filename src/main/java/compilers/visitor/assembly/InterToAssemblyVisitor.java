@@ -12,6 +12,7 @@ import compilers.ast.intermediate.symboltable.InterSymbolTable;
 import compilers.ast.intermediate.symboltable.StackData;
 import compilers.ast.kxi_nodes.KxiMain;
 import compilers.ast.kxi_nodes.ScalarType;
+import compilers.ast.kxi_nodes.token_literals.ThisToken;
 import compilers.util.DataSizes;
 import compilers.util.HashString;
 import compilers.visitor.kxi.KxiVisitorBase;
@@ -191,6 +192,24 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
                 leftOp(PUSH, R0);
             }
         }
+    }
+
+    @Override
+    public void preVisit(InterIfStatement node) {
+        String ifTrue = uniqueLabel(node.getLabel()) + "_iftrue";
+        String ifNot = uniqueLabel(node.getLabel()) + "_ifnot";
+        String done = uniqueLabel(node.getLabel()) + "_done";
+        newLine();
+
+    }
+
+    @Override
+    public void visit(InterIfStatement node) {
+        String ifTrue = uniqueLabel(node.getLabel()) + "_iftrue";
+        String ifNot = uniqueLabel(node.getLabel()) + "_ifnot";
+        String done = uniqueLabel(node.getLabel()) + "_done";
+        newLine();
+
     }
 
     @Override

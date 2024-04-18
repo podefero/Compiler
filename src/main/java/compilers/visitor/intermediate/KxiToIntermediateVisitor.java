@@ -28,6 +28,7 @@ import compilers.ast.kxi_nodes.statements.*;
 import compilers.ast.kxi_nodes.statements.conditional.KxiForStatement;
 import compilers.ast.kxi_nodes.statements.conditional.KxiIfStatement;
 import compilers.ast.kxi_nodes.statements.conditional.KxiWhileStatement;
+import compilers.util.HashString;
 import compilers.visitor.kxi.KxiVisitorBase;
 import compilers.visitor.kxi.symboltable.ScopeHandler;
 import compilers.visitor.kxi.symboltable.SymbolData;
@@ -442,7 +443,7 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
     @Override
     public void visit(KxiIfStatement node) {
         GenericListNode genericListNode = new GenericListNode(scopeBlock);
-        InterIfStatement interIfStatement = new InterIfStatement(pop(), genericListNode);
+        InterIfStatement interIfStatement = new InterIfStatement(pop(), genericListNode, getFullyQualifiedName(HashString.updateStringHash()));
         addStatementToCurrentScope(interIfStatement);
     }
 

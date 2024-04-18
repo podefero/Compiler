@@ -845,4 +845,10 @@ public  class KxiVisitorBase implements VisitKxi {
 
     public void visit(InterUnarySubOperator interUnarySubOperator) {
     }
+
+    public void visit(InterIfStatement interIfStatement) {
+    }
+
+    public void preVisit(InterIfStatement interIfStatement) {
+    }
 }
