@@ -14,6 +14,8 @@ public enum OpCodes {
     ADI("ADDI"),
     CMP("CMP"),
     BRZ("BRZ"),
+    BGT("BGT"),
+    BLT("BLT"),
     CMPI("CMPI"),
     AND("AND"),
     OR("OR"),

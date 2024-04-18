@@ -13,6 +13,7 @@ import compilers.ast.intermediate.symboltable.StackData;
 import compilers.ast.kxi_nodes.KxiMain;
 import compilers.ast.kxi_nodes.ScalarType;
 import compilers.util.DataSizes;
+import compilers.util.HashString;
 import compilers.visitor.kxi.KxiVisitorBase;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -52,7 +53,7 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
                 , new OperandReg(Registers.R14), new OperandInteger(-value)));
     }
 
-    private String uniqueLabel(int hash) {
+    private String uniqueLabel(String hash) {
         return currentFunctionData.getLabel() + "_" + hash;
     }
 
@@ -345,21 +346,51 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
 
     @Override
     public void visit(InterLogicalGreaterEqualThen node) {
+        String hash = HashString.updateStringHash();
+        String ifTrue = uniqueLabel(hash) + "_iftrue";
+        String ifNot = uniqueLabel(hash) + "_ifnot";
+        String done = uniqueLabel(hash) + "_done";
+
         newLine();
         comment("R1 >= R2, result in R2");
         tryDerefInterOperand(node.getLeftOperand());
         tryDerefInterOperand(node.getRightOperand());
         twoReg(CMP, R1, R2);
+        comment("If zero set true");
+        regAndLabel(BRZ, R1, ifTrue);
+        regAndLabel(BLT, R1, ifTrue);
+        regLabel(JMP, ifNot);
+        label(ifTrue);
+        regImmInt(MOVI, R1, 1);
+        regLabel(JMP, done);
+        label(ifNot);
+        regImmInt(MOVI, R1, -1);
+        label(done);
         twoReg(MOV, R2, R1);
     }
 
     @Override
     public void visit(InterLogicalLessEqualThen node) {
+        String hash = HashString.updateStringHash();
+        String ifTrue = uniqueLabel(hash) + "_iftrue";
+        String ifNot = uniqueLabel(hash) + "_ifnot";
+        String done = uniqueLabel(hash) + "_done";
+
         newLine();
         comment("R1 <= R2, result in R2");
         tryDerefInterOperand(node.getLeftOperand());
         tryDerefInterOperand(node.getRightOperand());
         twoReg(CMP, R1, R2);
+        comment("If zero set true");
+        regAndLabel(BRZ, R1, ifTrue);
+        regAndLabel(BGT, R1, ifTrue);
+        regLabel(JMP, ifNot);
+        label(ifTrue);
+        regImmInt(MOVI, R1, 1);
+        regLabel(JMP, done);
+        label(ifNot);
+        regImmInt(MOVI, R1, -1);
+        label(done);
         twoReg(MOV, R2, R1);
     }
 
@@ -395,9 +426,10 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
 
     @Override
     public void visit(InterLogicalNotEquals node) {
-        String ifZero = uniqueLabel(node.hashCode()) + "_ifzero";
-        String ifNot = uniqueLabel(node.hashCode()) + "_ifnot";
-        String done = uniqueLabel(node.hashCode()) + "_done";
+        String hash = HashString.updateStringHash();
+        String ifZero = uniqueLabel(hash) + "_ifzero";
+        String ifNot = uniqueLabel(hash) + "_ifnot";
+        String done = uniqueLabel(hash) + "_done";
         newLine();
         comment("R1 != R2, result in R2");
         tryDerefInterOperand(node.getLeftOperand());
