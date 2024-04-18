@@ -425,6 +425,20 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
     }
 
     @Override
+    public void visit(InterUnarySubOperator node) {
+        newLine();
+        comment("get ptr to " + node.getInterId().getId() + " into R1 from Stack");
+        getFP();
+        decFP(interSymbolTable.getOffset(node.getInterId(), currentFunctionData));
+        twoReg(MOV, R1, R14);
+        comment("Negate R2");
+        tryDerefInterOperand(node.getRightOperand());
+        regImmInt(MOVI, R0, -1);
+        twoReg(MUL, R2, R0);
+        twoReg(STRI, R2, R1);
+    }
+
+    @Override
     public void visit(InterAssignment node) {
         //assign R1 to result of R2
         newLine();

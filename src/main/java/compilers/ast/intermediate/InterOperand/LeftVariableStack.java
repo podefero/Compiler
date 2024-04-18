@@ -8,10 +8,12 @@ import lombok.Getter;
 
 @Getter
 public class LeftVariableStack extends InterOperand{
-    private InterId interId;
     public LeftVariableStack(InterValue interValue) {
         super(interValue);
-        this.interId = (InterId) interValue;
+    }
+
+    public InterId getInterId() {
+        return (InterId) this.interValue;
     }
 
     @Override

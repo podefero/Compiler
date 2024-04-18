@@ -151,6 +151,25 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
         nodeStack.push(tempId);
     }
 
+    private void tempVariableMakerOnRight(InterOperation interOperation, ScalarType scalarType) {
+        //create temp variable
+        InterId tempId = new InterId(scalarType);
+
+        interOperation.getRightOperand().setInterValue(tempId);
+        InterVariable interVariable = new InterVariable(tempId, interOperation);
+        addStatementToFunc(interVariable);
+        nodeStack.push(tempId);
+    }
+
+    private void tempVariableMakerOnLeft(InterOperation interOperation, ScalarType scalarType) {
+        //create temp variable
+        InterId tempId = new InterId(scalarType);
+        interOperation.setLeftOperand(new LeftVariableStack(tempId));
+        InterVariable interVariable = new InterVariable(tempId, interOperation);
+        addStatementToFunc(interVariable);
+        nodeStack.push(tempId);
+    }
+
 
     @Override
     public void visit(KxiReturnStatement node) {
@@ -338,7 +357,7 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
     }
 
     private String getFullyQualifiedName(String id) {
-        if(currentScope == null) return scopeHandler.getGlobalScope().getUniqueName();
+        if (currentScope == null) return scopeHandler.getGlobalScope().getUniqueName();
         return currentScope.getUniqueName() + id;
     }
 
@@ -385,10 +404,16 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
 
     @Override
     public void visit(KxiUniPlus node) {
+        InterOperand rightOperand = getRightOperand();
+        tempVariableMaker(new InterEmptyOperator(null, null)
+                ,ScalarType.INT);
     }
 
     @Override
     public void visit(KxiUniSubtract node) {
+        InterOperand rightOperand = getRightOperand();
+        tempVariableMakerOnLeft(new InterUnarySubOperator(null, rightOperand)
+                , ScalarType.INT);
     }
 
     @Override
@@ -434,7 +459,7 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
 
     @Override
     public void visit(KxiVariableDeclaration node) {
-        InterId varId = new InterId( getFullyQualifiedName(node.getId().getValue()), node.getType().getScalarType());
+        InterId varId = new InterId(getFullyQualifiedName(node.getId().getValue()), node.getType().getScalarType());
 
         //Stack Var
         LeftVariableStack leftVariableStack = new LeftVariableStack(varId);

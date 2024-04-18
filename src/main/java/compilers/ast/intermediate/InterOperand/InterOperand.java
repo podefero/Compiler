@@ -4,9 +4,10 @@ import compilers.ast.GenericNode;
 import compilers.ast.GenericTerminal;
 import compilers.ast.intermediate.AbstractInterNode;
 import compilers.ast.intermediate.InterValue;
+import lombok.Data;
 import lombok.Getter;
 
-@Getter
+@Data
 public abstract class InterOperand extends AbstractInterNode implements GenericTerminal {
     protected InterValue interValue;
 

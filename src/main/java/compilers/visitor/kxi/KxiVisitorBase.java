@@ -843,4 +843,6 @@ public  class KxiVisitorBase implements VisitKxi {
     }
 
 
+    public void visit(InterUnarySubOperator interUnarySubOperator) {
+    }
 }
