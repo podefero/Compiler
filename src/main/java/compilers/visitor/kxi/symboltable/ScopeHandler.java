@@ -9,6 +9,7 @@ import java.util.Map;
 public class ScopeHandler {
     private Map<String, ClassScope> classScopeMap;
     private GlobalScope globalScope;
+    private SymbolTable lasIdentified;
 
     public ScopeHandler() {
         classScopeMap = new HashMap<>();
@@ -27,8 +28,8 @@ public class ScopeHandler {
         if (id.equals("main")) return globalScope.getMainScope().getReturnType();
 
         while (symbolTable != null) {
+            lasIdentified = symbolTable;
             SymbolData symbolData;
-
             if (symbolTable instanceof GlobalScope)
                 symbolData = symbolTable.getScope().get(uniqueName + id);
             else

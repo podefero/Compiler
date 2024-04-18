@@ -195,21 +195,20 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
     }
 
     @Override
-    public void preVisit(InterIfStatement node) {
-        String ifTrue = uniqueLabel(node.getLabel()) + "_iftrue";
-        String ifNot = uniqueLabel(node.getLabel()) + "_ifnot";
-        String done = uniqueLabel(node.getLabel()) + "_done";
-        newLine();
+    public void visit(InterDerefStatement node) {
+        tryDerefInterOperand(node.getInterOperand());
+    }
 
+    @Override
+    public void preVisit(InterIfStatement node) {
+        newLine();
+        comment("Set up for if statement");
+        regAndLabel(BLT, R2, node.getDone());
     }
 
     @Override
     public void visit(InterIfStatement node) {
-        String ifTrue = uniqueLabel(node.getLabel()) + "_iftrue";
-        String ifNot = uniqueLabel(node.getLabel()) + "_ifnot";
-        String done = uniqueLabel(node.getLabel()) + "_done";
-        newLine();
-
+       label(node.getDone());
     }
 
     @Override

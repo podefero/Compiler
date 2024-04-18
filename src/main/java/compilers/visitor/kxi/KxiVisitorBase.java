@@ -851,4 +851,7 @@ public  class KxiVisitorBase implements VisitKxi {
 
     public void preVisit(InterIfStatement interIfStatement) {
     }
+
+    public void visit(InterDerefStatement interDerefStatement) {
+    }
 }

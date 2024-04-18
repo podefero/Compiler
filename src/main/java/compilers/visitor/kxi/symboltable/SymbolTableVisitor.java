@@ -5,6 +5,8 @@ import compilers.ast.kxi_nodes.class_members.KxiConstructor;
 import compilers.ast.kxi_nodes.class_members.KxiDataMember;
 import compilers.ast.kxi_nodes.class_members.KxiMethod;
 import compilers.ast.kxi_nodes.expressions.binary.conditional.KxiOr;
+import compilers.ast.kxi_nodes.expressions.literals.ExpressionIdLit;
+import compilers.ast.kxi_nodes.expressions.literals.ExpressionIntLit;
 import compilers.ast.kxi_nodes.scope.KxiBlock;
 import compilers.ast.kxi_nodes.scope.KxiCaseBlock;
 import compilers.ast.kxi_nodes.scope.KxiClass;
@@ -12,6 +14,8 @@ import compilers.ast.kxi_nodes.statements.KxiSwitchStatement;
 import compilers.ast.kxi_nodes.statements.conditional.KxiForStatement;
 import compilers.ast.kxi_nodes.statements.conditional.KxiIfStatement;
 import compilers.ast.kxi_nodes.statements.conditional.KxiWhileStatement;
+import compilers.ast.kxi_nodes.token_literals.IdentifierToken;
+import compilers.ast.kxi_nodes.token_literals.IntLitToken;
 import compilers.exceptions.SymbolTableException;
 import compilers.util.HashString;
 import compilers.visitor.kxi.KxiVisitorBase;
@@ -47,6 +51,10 @@ public class SymbolTableVisitor extends KxiVisitorBase {
         super.dumpErrorStack();
     }
 
+//    private void qualifyId(IdentifierToken identifierToken) {
+//        String id = identifierToken.getValue();
+//        identifierToken.setValue(currentSymbolTable.getUniqueName() + id);
+//    }
 
     private void setScopeUniqueName(String id) {
         if (!tableStack.empty())
@@ -305,9 +313,7 @@ public class SymbolTableVisitor extends KxiVisitorBase {
     public void visit(KxiDataMember kxiDataMember) {
         SymbolData symbolData = new SymbolData(kxiDataMember.isStatic(), kxiDataMember.getModifier(), kxiDataMember.getVariableDeclaration().getType());
         String id = kxiDataMember.getVariableDeclaration().getId().getValue();
-        //updates key
-        currentSymbolTable.getScope().put(id, symbolData);
-        //addSymbolDataToCurrentScope(kxiDataMember.getVariableDeclaration().getId().getValue(), symbolData);
+        currentSymbolTable.getScope().put(id, symbolData); //overwrites variable key
     }
 
     @Override
@@ -315,5 +321,6 @@ public class SymbolTableVisitor extends KxiVisitorBase {
         SymbolData symbolData = new SymbolData(false, null, kxiParameter.getType());
         addSymbolDataToCurrentScope(kxiParameter.getId().getValue(), symbolData);
     }
+
 
 }

@@ -32,6 +32,7 @@ import compilers.util.HashString;
 import compilers.visitor.kxi.KxiVisitorBase;
 import compilers.visitor.kxi.symboltable.ScopeHandler;
 import compilers.visitor.kxi.symboltable.SymbolData;
+import compilers.visitor.kxi.symboltable.SymbolTable;
 import lombok.Getter;
 
 import java.util.ArrayList;
@@ -349,7 +350,7 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
         if (node.getTokenLiteral().getValue() == true)
             nodeStack.push(new InterLit<>(1, ScalarType.INT));
         else
-            nodeStack.push(new InterLit<>(0, ScalarType.INT));
+            nodeStack.push(new InterLit<>(-1, ScalarType.INT));
     }
 
     @Override
@@ -366,11 +367,12 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
     public void visit(ExpressionIdLit node) {
         SymbolData symbolData = scopeHandler.Identify(currentScope, node.getTokenLiteral().getValue());
         ScalarType scalarType = symbolData.getScalarType();
+        SymbolTable whatScopeIdFound = scopeHandler.getLasIdentified();
 //        boolean isStatic = symbolData.isStatic();
 //        if(scalarType == ScalarType.STRING || isStatic)
 //            nodeStack.push(new InterPtr(getFullyQualifiedName(node.getTokenLiteral().getValue()), scalarType));
 //        else
-        nodeStack.push(new InterId(getFullyQualifiedName(node.getTokenLiteral().getValue()), scalarType));
+        nodeStack.push(new InterId(whatScopeIdFound.getUniqueName() + node.getTokenLiteral().getValue(), scalarType));
     }
 
     @Override
@@ -442,8 +444,11 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
 
     @Override
     public void visit(KxiIfStatement node) {
+        pop(); //not sure about this yet
         GenericListNode genericListNode = new GenericListNode(scopeBlock);
-        InterIfStatement interIfStatement = new InterIfStatement(pop(), genericListNode, getFullyQualifiedName(HashString.updateStringHash()));
+        InterDerefStatement interDerefStatement = new InterDerefStatement((InterOperand) getRightOperand().copy());
+        InterIfStatement interIfStatement = new InterIfStatement(genericListNode, getFullyQualifiedName(HashString.updateStringHash()));
+        addStatementToCurrentScope(interDerefStatement); //ensures we have a boolean value in R2
         addStatementToCurrentScope(interIfStatement);
     }
 
