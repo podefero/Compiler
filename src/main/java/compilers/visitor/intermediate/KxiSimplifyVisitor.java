@@ -2,7 +2,9 @@ package compilers.visitor.intermediate;
 
 import compilers.ast.kxi_nodes.*;
 import compilers.ast.kxi_nodes.class_members.KxiMethod;
+import compilers.ast.kxi_nodes.expressions.AbstractKxiExpression;
 import compilers.ast.kxi_nodes.expressions.KxiDotExpression;
+import compilers.ast.kxi_nodes.expressions.KxiForWhileExpression;
 import compilers.ast.kxi_nodes.expressions.KxiMethodExpression;
 import compilers.ast.kxi_nodes.expressions.binary.arithmic.KxiDiv;
 import compilers.ast.kxi_nodes.expressions.binary.arithmic.KxiMult;
@@ -15,7 +17,10 @@ import compilers.ast.kxi_nodes.expressions.uni.KxiNot;
 import compilers.ast.kxi_nodes.expressions.uni.KxiUniPlus;
 import compilers.ast.kxi_nodes.expressions.uni.KxiUniSubtract;
 import compilers.ast.kxi_nodes.scope.KxiBlock;
+import compilers.ast.kxi_nodes.statements.KxiBreakStatement;
 import compilers.ast.kxi_nodes.statements.KxiReturnStatement;
+import compilers.ast.kxi_nodes.statements.conditional.KxiForStatement;
+import compilers.ast.kxi_nodes.statements.conditional.KxiWhileStatement;
 import compilers.ast.kxi_nodes.token_literals.IdentifierToken;
 import compilers.visitor.kxi.KxiVisitorBase;
 import compilers.visitor.kxi.symboltable.BlockScope;
@@ -28,7 +33,7 @@ import java.util.Stack;
 @AllArgsConstructor
 public class KxiSimplifyVisitor extends KxiVisitorBase {
 
-    Stack<AbstractKxiNode> kxiNodeStack;
+    String breakLoopLabel;
 
     private boolean hasNode(Class<? extends AbstractKxiNode> node, List<? extends AbstractKxiNode> list) {
         for (AbstractKxiNode abstractKxiNode : list) {
@@ -50,17 +55,21 @@ public class KxiSimplifyVisitor extends KxiVisitorBase {
 
     }
 
-//    @Override
-//    public void visit(KxiMain node) {
-//        String id = node.getId().getValue();
-//        node.getId().setValue(currentScope.getUniqueName() + id);
-//    }
+    @Override
+    public void preVisit(KxiWhileStatement node) {
+        breakLoopLabel = node.getExitLoop();
+    }
 
-//    @Override
-//    public void visit(KxiMethod node) {
-//        String id = node.getId().getValue();
-//        node.getId().setValue(currentScope.getUniqueName() + id);
-//    }
+    @Override
+    public void preVisit(KxiForStatement node) {
+        breakLoopLabel = node.getExitLoop();
+    }
+
+
+    @Override
+    public void visit(KxiBreakStatement node) {
+        node.setExitLoop(breakLoopLabel);
+    }
 
     @Override
     public void visit(KxiBlock node) {

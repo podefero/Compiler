@@ -12,12 +12,14 @@ import lombok.Getter;
 public class KxiWhileStatement extends AbstractKxiConditionalStatement {
 
     String loopLabel;
+    String exitLoop;
 
     public KxiWhileStatement(KxiBlock statement, AbstractKxiExpression conditionalExpression) {
         super(statement, conditionalExpression);
         this.statement = statement;
         this.conditionalExpression = conditionalExpression;
-        this.loopLabel =  HashString.updateStringHash();
+        this.loopLabel =  HashString.updateStringHash() + "loop";
+        this.exitLoop = loopLabel + "exit";
     }
 
     @Override

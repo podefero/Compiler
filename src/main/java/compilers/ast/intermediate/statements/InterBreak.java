@@ -2,13 +2,19 @@ package compilers.ast.intermediate.statements;
 
 import compilers.ast.GenericListNode;
 import compilers.ast.intermediate.expression.operation.InterOperation;
+import compilers.visitor.kxi.KxiVisitorBase;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 import java.util.List;
 
+@AllArgsConstructor
+@Getter
 public class InterBreak extends InterStatement {
-    List<InterOperation> operations;
+   String exitLoop;
 
-    public InterBreak(GenericListNode ops) {
-        this.operations = getNodeList(ops);
+    @Override
+    public void accept(KxiVisitorBase visit) {
+        visit.visit(this);
     }
 }

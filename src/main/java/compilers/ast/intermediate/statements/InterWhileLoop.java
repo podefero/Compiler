@@ -5,12 +5,10 @@ import lombok.Getter;
 
 @Getter
 public class InterWhileLoop extends InterStatement {
-    String label;
-    String loopLabel;
+    String loop;
 
     public InterWhileLoop(String label) {
-        this.label = label;
-        loopLabel = convertIdToLabel(label) + "loop";
+        this.loop = label;
     }
 
     @Override

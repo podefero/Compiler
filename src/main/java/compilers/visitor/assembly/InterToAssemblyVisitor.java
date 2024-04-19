@@ -217,19 +217,25 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
     }
 
 
+    @Override
+    public void visit(InterBreak interBreak) {
+        newLine();
+        comment("Break out of loop");
+        regLabel(JMP, interBreak.getExitLoop());
+    }
 
     @Override
     public void visit(InterWhileLoop node) {
         newLine();
         comment("Start of loop");
-        label(node.getLoopLabel());
+        label(node.getLoop());
     }
 
     @Override
     public void preVisit(InterWhileStatement node) {
         newLine();
         comment("Set up for while loop");
-        regAndLabel(BLT, R2, node.getIfNot());
+        regAndLabel(BLT, R2, node.getExitLoop());
     }
 
     @Override
@@ -237,7 +243,7 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
         newLine();
         comment("End of while loop");
         regLabel(JMP, node.getLoop());
-        label(node.getIfNot());
+        label(node.getExitLoop());
     }
 
     @Override

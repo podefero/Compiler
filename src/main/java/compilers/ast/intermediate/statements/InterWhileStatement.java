@@ -8,17 +8,15 @@ import java.util.List;
 
 @Getter
 public class InterWhileStatement extends InterStatement {
-    String label;
-    String ifNot;
+    String exitLoop;
     String loop;
     private List<InterStatement> ifMet;
 
-    public InterWhileStatement(GenericListNode interIfStatements, String label) {
+    public InterWhileStatement(GenericListNode interIfStatements, String loop, String exitLoop) {
         super(interIfStatements);
         this.ifMet = getNodeList(interIfStatements);
-        this.label = label;
-        ifNot = convertIdToLabel(label) + "whileExit";
-        loop = convertIdToLabel(label) + "loop";
+        this.loop = loop;
+        this.exitLoop = exitLoop;
     }
 
     @Override

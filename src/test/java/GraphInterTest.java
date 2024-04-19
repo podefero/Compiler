@@ -53,7 +53,7 @@ public class GraphInterTest {
         rootNode.accept(invalidBreakVisitor);
         invalidBreakVisitor.dumpErrorStack();
 
-        KxiSimplifyVisitor kxiSimplifyVisitor = new KxiSimplifyVisitor(new Stack<>());
+        KxiSimplifyVisitor kxiSimplifyVisitor = new KxiSimplifyVisitor("");
         rootNode.accept(kxiSimplifyVisitor);
         KxiToIntermediateVisitor kxiToIntermediateVisitor = new KxiToIntermediateVisitor(symbolTableVisitor.getScopeHandler());
         rootNode.accept(kxiToIntermediateVisitor);

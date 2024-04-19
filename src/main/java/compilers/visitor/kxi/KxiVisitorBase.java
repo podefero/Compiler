@@ -875,4 +875,13 @@ public  class KxiVisitorBase implements VisitKxi {
 
     public void preVisit(InterWhileStatement interWhileStatement) {
     }
+
+    public void visit(InterBreak interBreak) {
+    }
+
+    public void preVisit(KxiForWhileExpression kxiForWhileExpression) {
+    }
+
+    public void visit(KxiForWhileExpression kxiForWhileExpression) {
+    }
 }

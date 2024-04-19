@@ -23,7 +23,9 @@ import compilers.ast.kxi_nodes.expressions.literals.*;
 import compilers.ast.kxi_nodes.expressions.uni.KxiNot;
 import compilers.ast.kxi_nodes.expressions.uni.KxiUniPlus;
 import compilers.ast.kxi_nodes.expressions.uni.KxiUniSubtract;
+import compilers.ast.kxi_nodes.helper.KxiFordSemi;
 import compilers.ast.kxi_nodes.scope.KxiBlock;
+import compilers.ast.kxi_nodes.scope.KxiClass;
 import compilers.ast.kxi_nodes.statements.*;
 import compilers.ast.kxi_nodes.statements.conditional.KxiElseStatement;
 import compilers.ast.kxi_nodes.statements.conditional.KxiForStatement;
@@ -439,10 +441,6 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
         if (!nodeStack.empty()) pop(); //not sure about this yet
     }
 
-    @Override
-    public void visit(KxiForStatement node) {
-    }
-
 
     @Override
     public void visit(KxiElseStatement node) {
@@ -475,9 +473,11 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
 
     @Override
     public void preVisit(KxiWhileStatement node) {
+        //set up loop
         InterWhileLoop interWhileLoop = new InterWhileLoop(node.getLoopLabel());
         addStatementToCurrentScope(interWhileLoop);
     }
+
 
     @Override
     public void visit(KxiWhileStatement node) {
@@ -485,7 +485,28 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
         InterDerefStatement interDerefStatement = new InterDerefStatement((InterOperand) getRightOperand().copy());
 
         InterWhileStatement interIfStatement =
-                new InterWhileStatement(genericListNode, node.getLoopLabel());
+                new InterWhileStatement(genericListNode, node.getLoopLabel(), node.getExitLoop());
+
+        addStatementToCurrentScope(interDerefStatement);
+        addStatementToCurrentScope(interIfStatement);
+    }
+
+    @Override
+    public void preVisit(KxiForStatement node) {
+        //set up loop
+        InterWhileLoop interWhileLoop = new InterWhileLoop(node.getLoopLabel());
+        addStatementToCurrentScope(interWhileLoop);
+    }
+
+
+    @Override
+    public void visit(KxiForStatement node) {
+        if (node.getPostExpression() != null) pop();
+        GenericListNode genericListNode = new GenericListNode(scopeBlock);
+        InterDerefStatement interDerefStatement = new InterDerefStatement((InterOperand) getRightOperand().copy());
+
+        InterWhileStatement interIfStatement =
+                new InterWhileStatement(genericListNode, node.getLoopLabel(), node.getExitLoop());
 
         addStatementToCurrentScope(interDerefStatement);
         addStatementToCurrentScope(interIfStatement);
@@ -493,6 +514,8 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
 
     @Override
     public void visit(KxiBreakStatement node) {
+        InterBreak interBreak = new InterBreak(node.getExitLoop());
+        addStatementToCurrentScope(interBreak);
     }
 
     @Override
