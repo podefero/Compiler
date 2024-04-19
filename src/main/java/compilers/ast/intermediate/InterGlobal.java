@@ -1,6 +1,7 @@
 package compilers.ast.intermediate;
 
 import compilers.ast.GenericListNode;
+import compilers.ast.intermediate.expression.operation.InterOperation;
 import compilers.ast.intermediate.statements.InterFunctionalCall;
 import compilers.ast.intermediate.statements.InterStatement;
 import compilers.visitor.kxi.KxiVisitorBase;
@@ -11,8 +12,8 @@ import java.util.List;
 @Getter
 public class InterGlobal extends AbstractInterNode {
     private List<InterFunctionNode> interFunctionNode;
-    private List<InterStatement> globalInit;
-    private List<InterDirective> interDirectives;
+    private List<InterOperation> globalInit;
+    private List<InterStatement> interDirectives;
     private InterFunctionalCall functionalCall;
 
 

@@ -13,7 +13,6 @@ public class RightPtr extends InterOperand{
     private InterPtr interPtr;
     public RightPtr(InterValue interValue) {
         super(interValue);
-        this.interValue = interValue;
         this.interPtr = (InterPtr) interValue;
     }
 
