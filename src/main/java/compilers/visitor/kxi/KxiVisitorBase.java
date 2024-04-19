@@ -866,4 +866,10 @@ public  class KxiVisitorBase implements VisitKxi {
 
     public void visit(KxiElseStatement kxiElseStatement) {
     }
+
+    public void visit(InterWhileStatement interWhileStatement) {
+    }
+
+    public void visit(InterWhileLoop interWhileLoop) {
+    }
 }

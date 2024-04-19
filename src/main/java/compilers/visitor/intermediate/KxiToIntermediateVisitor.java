@@ -24,7 +24,6 @@ import compilers.ast.kxi_nodes.expressions.uni.KxiNot;
 import compilers.ast.kxi_nodes.expressions.uni.KxiUniPlus;
 import compilers.ast.kxi_nodes.expressions.uni.KxiUniSubtract;
 import compilers.ast.kxi_nodes.scope.KxiBlock;
-import compilers.ast.kxi_nodes.scope.KxiClass;
 import compilers.ast.kxi_nodes.statements.*;
 import compilers.ast.kxi_nodes.statements.conditional.KxiElseStatement;
 import compilers.ast.kxi_nodes.statements.conditional.KxiForStatement;
@@ -475,7 +474,20 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
     }
 
     @Override
+    public void preVisit(KxiWhileStatement node) {
+        InterWhileLoop interWhileLoop = new InterWhileLoop(node.getLoopLabel());
+        addStatementToCurrentScope(interWhileLoop);
+    }
+
+    @Override
     public void visit(KxiWhileStatement node) {
+        GenericListNode genericListNode = new GenericListNode(scopeBlock);
+        InterDerefStatement interDerefStatement = new InterDerefStatement((InterOperand) getRightOperand().copy());
+
+        InterWhileStatement interIfStatement =
+                new InterWhileStatement(genericListNode, node.getLoopLabel(), interDerefStatement);
+
+        addStatementToCurrentScope(interIfStatement);
     }
 
     @Override

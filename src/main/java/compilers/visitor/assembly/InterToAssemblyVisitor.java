@@ -354,21 +354,47 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
 
     @Override
     public void visit(InterLogicalLessThen node) {
+        String hash = HashString.updateStringHash();
+        String ifTrue = uniqueLabel(hash) + "_iftrue";
+        String ifNot = uniqueLabel(hash) + "_ifnot";
+        String done = uniqueLabel(hash) + "_done";
+
         newLine();
         comment("R1 < R2, result in R2");
         tryDerefInterOperand(node.getLeftOperand());
         tryDerefInterOperand(node.getRightOperand());
         twoReg(CMP, R1, R2);
+        regAndLabel(BLT, R1, ifTrue);
+        regLabel(JMP, ifNot);
+        label(ifTrue);
+        regImmInt(MOVI, R1, 1);
+        regLabel(JMP, done);
+        label(ifNot);
+        regImmInt(MOVI, R1, -1);
+        label(done);
         twoReg(MOV, R2, R1);
     }
 
     @Override
     public void visit(InterLogicalGreaterThen node) {
+        String hash = HashString.updateStringHash();
+        String ifTrue = uniqueLabel(hash) + "_iftrue";
+        String ifNot = uniqueLabel(hash) + "_ifnot";
+        String done = uniqueLabel(hash) + "_done";
+
         newLine();
         comment("R1 > R2, result in R2");
         tryDerefInterOperand(node.getLeftOperand());
         tryDerefInterOperand(node.getRightOperand());
         twoReg(CMP, R1, R2);
+        regAndLabel(BGT, R1, ifTrue);
+        regLabel(JMP, ifNot);
+        label(ifTrue);
+        regImmInt(MOVI, R1, 1);
+        regLabel(JMP, done);
+        label(ifNot);
+        regImmInt(MOVI, R1, -1);
+        label(done);
         twoReg(MOV, R2, R1);
     }
 
@@ -396,7 +422,7 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
         twoReg(CMP, R1, R2);
         comment("If zero set true");
         regAndLabel(BRZ, R1, ifTrue);
-        regAndLabel(BLT, R1, ifTrue);
+        regAndLabel(BGT, R1, ifTrue);
         regLabel(JMP, ifNot);
         label(ifTrue);
         regImmInt(MOVI, R1, 1);
@@ -421,7 +447,7 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
         twoReg(CMP, R1, R2);
         comment("If zero set true");
         regAndLabel(BRZ, R1, ifTrue);
-        regAndLabel(BGT, R1, ifTrue);
+        regAndLabel(BLT, R1, ifTrue);
         regLabel(JMP, ifNot);
         label(ifTrue);
         regImmInt(MOVI, R1, 1);

@@ -30,7 +30,7 @@ import java.util.Stack;
 public class GraphInterTest {
     @Test
     void stuff() {
-        //boolean r = 'k' && 'k';
+
     }
 
     @Test
