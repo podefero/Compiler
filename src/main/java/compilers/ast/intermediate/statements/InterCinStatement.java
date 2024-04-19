@@ -1,20 +1,23 @@
 package compilers.ast.intermediate.statements;
 
-import compilers.ast.GenericListNode;
-import compilers.ast.intermediate.expression.InterExpression;
-import compilers.ast.intermediate.expression.operation.InterOperation;
+import compilers.ast.intermediate.expression.operation.InterAssignment;
+import compilers.ast.kxi_nodes.ScalarType;
+import compilers.visitor.kxi.KxiVisitorBase;
 import lombok.Getter;
-
-import java.util.List;
 
 @Getter
 public class InterCinStatement extends InterStatement {
-    private List<InterExpression> expressionList;
-    private InterOperation operation;
+    ScalarType scalarType;
+    InterAssignment interAssignment;
+    public InterCinStatement(ScalarType scalarType, InterAssignment interAssignment) {
+        super(interAssignment);
+        this.scalarType = scalarType;
+    }
 
-    public InterCinStatement(GenericListNode expressions, InterOperation operation) {
-        super(expressions, operation);
-        this.expressionList = getNodeList(expressions);
-        this.operation = operation;
+    @Override
+    public void accept(KxiVisitorBase visit) {
+        visit.preVisit(this);
+        visitChildren(visit);
+        visit.visit(this);
     }
 }

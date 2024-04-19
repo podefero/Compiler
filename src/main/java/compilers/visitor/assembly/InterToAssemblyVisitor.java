@@ -10,9 +10,7 @@ import compilers.ast.intermediate.symboltable.ActivationRecord;
 import compilers.ast.intermediate.symboltable.FunctionData;
 import compilers.ast.intermediate.symboltable.InterSymbolTable;
 import compilers.ast.intermediate.symboltable.StackData;
-import compilers.ast.kxi_nodes.KxiMain;
 import compilers.ast.kxi_nodes.ScalarType;
-import compilers.ast.kxi_nodes.token_literals.ThisToken;
 import compilers.util.DataSizes;
 import compilers.util.HashString;
 import compilers.visitor.kxi.KxiVisitorBase;
@@ -338,6 +336,21 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
         twoReg(MOV, R3, R2);
         trap(trpVal);
 
+    }
+
+    @Override
+    public void preVisit(InterCinStatement node) {
+        if (node.getScalarType() != ScalarType.CHAR) {
+            newLine();
+            comment("CIN input Integer");
+            trap(2);
+            twoReg(MOV, R2, R3);
+        } else {
+            newLine();
+            comment("CIN input char");
+            trap(4);
+            twoReg(MOV, R2, R3);
+        }
     }
 
     @Override

@@ -520,6 +520,10 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
 
     @Override
     public void visit(KxiCinStatement node) {
+        InterCinStatement interCinStatement;
+        InterOperand leftOperand = getLeftOperand();
+        interCinStatement = new InterCinStatement(leftOperand.getInterValue().getScalarType(), new InterAssignment(leftOperand, null));
+        addStatementToCurrentScope(interCinStatement);
     }
 
     @Override

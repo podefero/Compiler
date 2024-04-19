@@ -884,4 +884,10 @@ public  class KxiVisitorBase implements VisitKxi {
 
     public void visit(KxiForWhileExpression kxiForWhileExpression) {
     }
+
+    public void visit(InterCinStatement interCinStatement) {
+    }
+
+    public void preVisit(InterCinStatement interCinStatement) {
+    }
 }
