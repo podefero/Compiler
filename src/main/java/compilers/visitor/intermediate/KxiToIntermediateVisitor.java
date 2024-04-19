@@ -51,6 +51,7 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
     private List<InterStatement> scopeBlock;
     private Stack<InterStatement> rightToLeftStack;
     private List<InterStatement> caseStatements;
+    private List<InterGlobalVariable> globalVariables;
     boolean hasCase;
     private ScopeHandler scopeHandler;
 
@@ -61,6 +62,7 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
         this.scopeHandler = scopeHandler;
         scopeBlock = new ArrayList<>();
         caseStatements = new ArrayList<>();
+        this.globalVariables = new ArrayList<>();
         hasCase = false;
     }
 
@@ -100,7 +102,7 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
     public void visit(KxiMain node) {
         GenericListNode functions = new GenericListNode(new ArrayList<>());
         GenericListNode globalDir = new GenericListNode(new ArrayList<>()); //after symbol table
-        GenericListNode globalInit = new GenericListNode(new ArrayList<>());
+        GenericListNode globalInit = new GenericListNode(globalVariables);
         InterId interId = new InterId(getFullyQualifiedName(node.getId().getValue()), ScalarType.VOID);
         InterFunctionNode interFunctionNode = new InterFunctionNode(interId, new GenericListNode(scopeBlock));
 
@@ -400,7 +402,7 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
         InterGlobalVariable interGlobalVariable = new InterGlobalVariable(interId, Directive.STR
                 , new InterLit(node.getTokenLiteral().getValue(), ScalarType.STRING));
         nodeStack.push(interId);
-        rootNode.getGlobalInit().add(interGlobalVariable);
+        globalVariables.add(interGlobalVariable);
     }
 
     @Override
