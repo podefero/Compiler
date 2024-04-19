@@ -11,6 +11,7 @@ import compilers.ast.kxi_nodes.scope.KxiBlock;
 import compilers.ast.kxi_nodes.scope.KxiCaseBlock;
 import compilers.ast.kxi_nodes.scope.KxiClass;
 import compilers.ast.kxi_nodes.statements.KxiSwitchStatement;
+import compilers.ast.kxi_nodes.statements.conditional.KxiElseStatement;
 import compilers.ast.kxi_nodes.statements.conditional.KxiForStatement;
 import compilers.ast.kxi_nodes.statements.conditional.KxiIfStatement;
 import compilers.ast.kxi_nodes.statements.conditional.KxiWhileStatement;
@@ -251,18 +252,24 @@ public class SymbolTableVisitor extends KxiVisitorBase {
     }
 
     @Override
+    public void preVisit(KxiElseStatement kxiElseStatement) {
+        setScopeUniqueName("else_" + HashString.updateStringHash());
+    }
+
+    @Override
+    public void visit(KxiElseStatement kxiElseStatement) {
+        setBlockScopeType(ScopeType.Else);
+        scopeNodeVisit();
+    }
+
+    @Override
     public void preVisit(KxiIfStatement kxiIfStatement) {
         setScopeUniqueName("if_" + HashString.updateStringHash());
     }
 
     @Override
     public void visit(KxiIfStatement kxiIfStatement) {
-        if (kxiIfStatement.getElseStatement() != null) {
-            setBlockScopeType(ScopeType.If);
-            scopeNodeVisit();
-        }
         setBlockScopeType(ScopeType.If);
-        //currentSymbolTable.setUniqueName(tableStack.peek().getUniqueName() + kxiIfStatement.hashCode());
         scopeNodeVisit();
     }
 
@@ -274,7 +281,6 @@ public class SymbolTableVisitor extends KxiVisitorBase {
     @Override
     public void visit(KxiForStatement kxiForStatement) {
         setBlockScopeType(ScopeType.For);
-        //currentSymbolTable.setUniqueName(tableStack.peek().getUniqueName() + kxiForStatement.hashCode());
         scopeNodeVisit();
     }
 

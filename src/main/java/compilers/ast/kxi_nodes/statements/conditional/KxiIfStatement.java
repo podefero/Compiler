@@ -9,10 +9,10 @@ import lombok.Getter;
 
 @Getter
 public class KxiIfStatement extends AbstractKxiConditionalStatement {
-    private KxiBlock elseStatement;
+    private KxiElseStatement elseStatement;
 
 
-    public KxiIfStatement(KxiBlock elseStatement, KxiBlock statement, AbstractKxiExpression conditionalExpression) {
+    public KxiIfStatement(KxiElseStatement elseStatement, KxiBlock statement, AbstractKxiExpression conditionalExpression) {
         super(elseStatement, statement, conditionalExpression);
         this.conditionalExpression = conditionalExpression;
         this.statement = statement;

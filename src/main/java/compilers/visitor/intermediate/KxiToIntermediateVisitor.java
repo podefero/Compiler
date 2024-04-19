@@ -24,6 +24,7 @@ import compilers.ast.kxi_nodes.expressions.uni.KxiNot;
 import compilers.ast.kxi_nodes.expressions.uni.KxiUniPlus;
 import compilers.ast.kxi_nodes.expressions.uni.KxiUniSubtract;
 import compilers.ast.kxi_nodes.scope.KxiBlock;
+import compilers.ast.kxi_nodes.scope.KxiClass;
 import compilers.ast.kxi_nodes.statements.*;
 import compilers.ast.kxi_nodes.statements.conditional.KxiForStatement;
 import compilers.ast.kxi_nodes.statements.conditional.KxiIfStatement;
@@ -434,6 +435,11 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
     }
 
     @Override
+    public void visit(KxiExpressionStatement node) {
+        if(!nodeStack.empty()) pop(); //not sure about this yet
+    }
+
+    @Override
     public void visit(KxiForStatement node) {
     }
 
@@ -444,12 +450,16 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
 
     @Override
     public void visit(KxiIfStatement node) {
-        pop(); //not sure about this yet
         GenericListNode genericListNode = new GenericListNode(scopeBlock);
-        InterDerefStatement interDerefStatement = new InterDerefStatement((InterOperand) getRightOperand().copy());
-        InterIfStatement interIfStatement = new InterIfStatement(genericListNode, getFullyQualifiedName(HashString.updateStringHash()));
-        addStatementToCurrentScope(interDerefStatement); //ensures we have a boolean value in R2
-        addStatementToCurrentScope(interIfStatement);
+        InterStatement interStatement;
+        if(node.getElseStatement() != null) {
+            interStatement = new InterElseStatement(genericListNode, getFullyQualifiedName(HashString.updateStringHash()));
+        } else {
+            InterDerefStatement interDerefStatement = new InterDerefStatement((InterOperand) getRightOperand().copy());
+            interStatement = new InterIfStatement(genericListNode, getFullyQualifiedName(HashString.updateStringHash()));
+            addStatementToCurrentScope(interDerefStatement); //ensures we have a boolean value in R2
+        }
+        addStatementToCurrentScope(interStatement);
     }
 
     @Override

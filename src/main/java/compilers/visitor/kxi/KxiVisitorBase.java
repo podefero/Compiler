@@ -26,6 +26,7 @@ import compilers.ast.kxi_nodes.scope.KxiBlock;
 import compilers.ast.kxi_nodes.scope.KxiCaseBlock;
 import compilers.ast.kxi_nodes.scope.KxiClass;
 import compilers.ast.kxi_nodes.statements.*;
+import compilers.ast.kxi_nodes.statements.conditional.KxiElseStatement;
 import compilers.ast.kxi_nodes.statements.conditional.KxiForStatement;
 import compilers.ast.kxi_nodes.statements.conditional.KxiIfStatement;
 import compilers.ast.kxi_nodes.statements.conditional.KxiWhileStatement;
@@ -853,5 +854,17 @@ public  class KxiVisitorBase implements VisitKxi {
     }
 
     public void visit(InterDerefStatement interDerefStatement) {
+    }
+
+    public void preVisit(InterElseStatement interElseStatement) {
+    }
+
+    public void visit(InterElseStatement interElseStatement) {
+    }
+
+    public void preVisit(KxiElseStatement kxiElseStatement) {
+    }
+
+    public void visit(KxiElseStatement kxiElseStatement) {
     }
 }

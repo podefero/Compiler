@@ -5,6 +5,7 @@ import compilers.ast.kxi_nodes.AbstractKxiNode;
 import compilers.ast.kxi_nodes.expressions.AbstractKxiExpression;
 import compilers.ast.kxi_nodes.scope.KxiBlock;
 import compilers.ast.kxi_nodes.statements.*;
+import compilers.ast.kxi_nodes.statements.conditional.KxiElseStatement;
 import compilers.ast.kxi_nodes.statements.conditional.KxiForStatement;
 import compilers.ast.kxi_nodes.statements.conditional.KxiIfStatement;
 import compilers.ast.kxi_nodes.statements.conditional.KxiWhileStatement;
@@ -32,8 +33,10 @@ public class KxiFactoryStatement extends AbstractKxiFactory {
             return new KxiBreakStatement();
 
         } else if (statementContext.IF() != null) {
-            if (statementContext.ELSE() != null)
-                return new KxiIfStatement(getBlock(pop(stack)), getBlock(pop(stack)), pop(stack));
+            if (statementContext.ELSE() != null) {
+                KxiElseStatement kxiElseStatement = new KxiElseStatement(getBlock(pop(stack)));
+                return new KxiIfStatement(kxiElseStatement, getBlock(pop(stack)), pop(stack));
+            }
             else
                 return new KxiIfStatement(null, getBlock(pop(stack)), pop(stack));
 
