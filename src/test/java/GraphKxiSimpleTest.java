@@ -26,7 +26,7 @@ public class GraphKxiSimpleTest {
 
         validateAST(rootNode);
 
-        KxiSimplifyVisitor kxiSimplifyVisitor = new KxiSimplifyVisitor("");
+        KxiSimplifyVisitor kxiSimplifyVisitor = new KxiSimplifyVisitor();
         rootNode.accept(kxiSimplifyVisitor);
 
 //        validateAST(rootNode);

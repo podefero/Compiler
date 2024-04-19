@@ -890,4 +890,16 @@ public  class KxiVisitorBase implements VisitKxi {
 
     public void preVisit(InterCinStatement interCinStatement) {
     }
+
+    public void preVisit(InterSwitch interSwitch) {
+    }
+
+    public void visit(InterSwitch interSwitch) {
+    }
+
+    public void visit(InterCase interCase) {
+    }
+
+    public void preVisit(InterCase interCase) {
+    }
 }

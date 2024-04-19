@@ -17,8 +17,10 @@ import compilers.ast.kxi_nodes.expressions.uni.KxiNot;
 import compilers.ast.kxi_nodes.expressions.uni.KxiUniPlus;
 import compilers.ast.kxi_nodes.expressions.uni.KxiUniSubtract;
 import compilers.ast.kxi_nodes.scope.KxiBlock;
+import compilers.ast.kxi_nodes.scope.KxiCaseBlock;
 import compilers.ast.kxi_nodes.statements.KxiBreakStatement;
 import compilers.ast.kxi_nodes.statements.KxiReturnStatement;
+import compilers.ast.kxi_nodes.statements.KxiSwitchStatement;
 import compilers.ast.kxi_nodes.statements.conditional.KxiForStatement;
 import compilers.ast.kxi_nodes.statements.conditional.KxiWhileStatement;
 import compilers.ast.kxi_nodes.token_literals.IdentifierToken;
@@ -30,10 +32,14 @@ import lombok.AllArgsConstructor;
 import java.util.List;
 import java.util.Stack;
 
-@AllArgsConstructor
 public class KxiSimplifyVisitor extends KxiVisitorBase {
 
-    String breakLoopLabel;
+    Stack<String> breakLoopStack;
+
+    public KxiSimplifyVisitor() {
+        breakLoopStack = new Stack<>();
+    }
+
 
     private boolean hasNode(Class<? extends AbstractKxiNode> node, List<? extends AbstractKxiNode> list) {
         for (AbstractKxiNode abstractKxiNode : list) {
@@ -56,19 +62,39 @@ public class KxiSimplifyVisitor extends KxiVisitorBase {
     }
 
     @Override
+    public void preVisit(KxiCaseBlock node) {
+        breakLoopStack.push(node.getExitLoop());
+    }
+
+    @Override
     public void preVisit(KxiWhileStatement node) {
-        breakLoopLabel = node.getExitLoop();
+        breakLoopStack.push(node.getExitLoop());
     }
 
     @Override
     public void preVisit(KxiForStatement node) {
-        breakLoopLabel = node.getExitLoop();
+        breakLoopStack.push(node.getExitLoop());
+    }
+
+    @Override
+    public void visit(KxiCaseBlock node) {
+        breakLoopStack.pop();
+    }
+
+    @Override
+    public void visit(KxiWhileStatement node) {
+        breakLoopStack.pop();
+    }
+
+    @Override
+    public void visit(KxiForStatement node) {
+        breakLoopStack.pop();
     }
 
 
     @Override
     public void visit(KxiBreakStatement node) {
-        node.setExitLoop(breakLoopLabel);
+        node.setExitLoop(breakLoopStack.peek());
     }
 
     @Override

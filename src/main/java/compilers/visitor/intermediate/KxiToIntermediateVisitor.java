@@ -25,6 +25,7 @@ import compilers.ast.kxi_nodes.expressions.uni.KxiUniPlus;
 import compilers.ast.kxi_nodes.expressions.uni.KxiUniSubtract;
 import compilers.ast.kxi_nodes.helper.KxiFordSemi;
 import compilers.ast.kxi_nodes.scope.KxiBlock;
+import compilers.ast.kxi_nodes.scope.KxiCaseBlock;
 import compilers.ast.kxi_nodes.scope.KxiClass;
 import compilers.ast.kxi_nodes.statements.*;
 import compilers.ast.kxi_nodes.statements.conditional.KxiElseStatement;
@@ -49,6 +50,8 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
     private InterGlobal rootNode;
     private List<InterStatement> scopeBlock;
     private Stack<InterStatement> rightToLeftStack;
+    private List<InterStatement> caseStatements;
+    boolean hasCase;
     private ScopeHandler scopeHandler;
 
 
@@ -57,10 +60,14 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
         rightToLeftStack = new Stack<>();
         this.scopeHandler = scopeHandler;
         scopeBlock = new ArrayList<>();
+        caseStatements = new ArrayList<>();
+        hasCase = false;
     }
 
     private void addStatementToCurrentScope(InterStatement interStatement) {
-        currentScope.getInterStatementList().add(interStatement);
+        //case will siphon statements, due to not being a scope.
+        if (hasCase) caseStatements.add(interStatement);
+        else currentScope.getInterStatementList().add(interStatement);
     }
 
 
@@ -436,6 +443,7 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
         super.visit(node);
     }
 
+
     @Override
     public void visit(KxiExpressionStatement node) {
         if (!nodeStack.empty()) pop(); //not sure about this yet
@@ -534,9 +542,24 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
         addStatementToCurrentScope(interCoutStatement);
     }
 
+    @Override
+    public void visit(KxiSwitchStatement kxiClass) {
+        InterSwitch interSwitch = pop();
+        InterDerefStatement interDerefStatement = new InterDerefStatement((InterOperand) getRightOperand().copy());
+        addStatementToCurrentScope(interDerefStatement);
+        addStatementToCurrentScope(interSwitch);
+
+    }
 
     @Override
-    public void visit(KxiSwitchStatement node) {
+    public void visit(KxiCaseBlock node) {
+        scopeBlock = node.getScope().getInterStatementList();
+        super.visit(node);
+
+        InterSwitch interSwitch;
+        GenericListNode genericListNode = new GenericListNode(scopeBlock);
+        interSwitch = new InterSwitch(genericListNode, node.getExitLoop());
+        nodeStack.push(interSwitch);
     }
 
     @Override
@@ -568,11 +591,33 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
     }
 
     @Override
+    public void preVisit(KxiCaseChar node) {
+        hasCase = true;
+    }
+
+    @Override
+    public void preVisit(KxiCaseInt node) {
+        hasCase = true;
+    }
+
+    @Override
     public void visit(KxiCaseChar node) {
+        List<InterStatement> interStatements = new ArrayList<>(caseStatements);
+        caseStatements.clear();
+        hasCase = false;
+        InterCase interCase = new InterCase(new InterLit<>(node.getCaseValue().getValue(), ScalarType.INT)
+                , new GenericListNode(interStatements));
+        addStatementToCurrentScope(interCase);
     }
 
     @Override
     public void visit(KxiCaseInt node) {
+        List<InterStatement> interStatements = new ArrayList<>(caseStatements);
+        caseStatements.clear();
+        hasCase = false;
+        InterCase interCase = new InterCase(new InterLit<>(node.getCaseValue().getValue(), ScalarType.INT)
+                , new GenericListNode(interStatements));
+        addStatementToCurrentScope(interCase);
     }
 
     @Override

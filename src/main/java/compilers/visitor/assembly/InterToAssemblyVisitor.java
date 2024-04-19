@@ -10,6 +10,7 @@ import compilers.ast.intermediate.symboltable.ActivationRecord;
 import compilers.ast.intermediate.symboltable.FunctionData;
 import compilers.ast.intermediate.symboltable.InterSymbolTable;
 import compilers.ast.intermediate.symboltable.StackData;
+import compilers.ast.kxi_nodes.KxiMain;
 import compilers.ast.kxi_nodes.ScalarType;
 import compilers.util.DataSizes;
 import compilers.util.HashString;
@@ -442,11 +443,27 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
 
     @Override
     public void visit(InterLogicalEqualsEquals node) {
+        String hash = HashString.updateStringHash();
+        String ifTrue = uniqueLabel(hash) + "_iftrue";
+        String ifNot = uniqueLabel(hash) + "_ifnot";
+        String done = uniqueLabel(hash) + "_done";
         newLine();
         comment("R1 == R2, result in R2");
         tryDerefInterOperand(node.getLeftOperand());
         tryDerefInterOperand(node.getRightOperand());
         twoReg(CMP, R1, R2);
+        comment("If zero set true");
+        regAndLabel(BRZ, R1, ifTrue);
+        comment("Else not true");
+        regAndLabel(BGT, R1, ifNot);
+        regAndLabel(BLT, R1, ifNot);
+        regLabel(JMP, ifNot);
+        label(ifTrue);
+        regImmInt(MOVI, R1, 1);
+        regLabel(JMP, done);
+        label(ifNot);
+        regImmInt(MOVI, R1, -1);
+        label(done);
         twoReg(MOV, R2, R1);
     }
 
@@ -584,6 +601,41 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
         comment("str R2 into R1");
         tryDerefInterOperand(node.getRightOperand());
         twoReg(STRI, R2, R1);
+    }
+
+    @Override
+    public void preVisit(InterSwitch node) {
+        newLine();
+        comment("Set R5 to hold the switch value for cases");
+        twoReg(MOV, R5, R2);
+    }
+
+    @Override
+    public void visit(InterSwitch node) {
+        newLine();
+        comment("Exit for switch");
+        label(node.getExit());
+    }
+
+    @Override
+    public void preVisit(InterCase node) {
+        newLine();
+        comment("Evaluate case " + node.getInterLit().getTerminalValue());
+        if (node.getInterLit().getScalarType() == ScalarType.INT)
+            regImmInt(MOVI, R2, (Integer) node.getInterLit().getValue());
+        else
+            regImmChar(MOVI, R2, (Character) node.getInterLit().getValue());
+        twoReg(CMP, R2, R5);
+        regAndLabel(BGT, R2, node.getExit());
+        regAndLabel(BLT, R2, node.getExit());
+
+    }
+
+    @Override
+    public void visit(InterCase node) {
+        newLine();
+        comment("Case block");
+        label(node.getExit());
     }
 
     @Override
