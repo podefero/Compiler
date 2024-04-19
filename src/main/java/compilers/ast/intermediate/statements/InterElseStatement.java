@@ -2,21 +2,20 @@ package compilers.ast.intermediate.statements;
 
 import compilers.ast.GenericListNode;
 import compilers.visitor.kxi.KxiVisitorBase;
+import lombok.Data;
 import lombok.Getter;
 
 import java.util.List;
 
-@Getter
+@Data
 public class InterElseStatement extends InterStatement {
-    String ifNot;
-    String done;
     private List<InterStatement> ifNotMet;
+    private String ifNot;
+    String done;
 
-    public InterElseStatement(GenericListNode ifNotMet, String label) {
+    public InterElseStatement(GenericListNode ifNotMet) {
         super(ifNotMet);
         this.ifNotMet = getNodeList(ifNotMet);
-        ifNot = convertIdToLabel(label) + "ifNot";
-        done = convertIdToLabel(label) + "ifDone";
     }
 
     @Override

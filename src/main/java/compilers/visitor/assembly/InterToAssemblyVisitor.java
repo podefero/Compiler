@@ -69,12 +69,12 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
     }
 
     //DIR
-    private<T> void directive(Directive directive, String label, T value) {
-        if(directive == INT)
-            directiveInt(label, (Integer)value);
-        if(directive == BYT)
+    private <T> void directive(Directive directive, String label, T value) {
+        if (directive == INT)
+            directiveInt(label, (Integer) value);
+        if (directive == BYT)
             directiveByte(label, (Character) value);
-        if(directive == Directive.STR)
+        if (directive == Directive.STR)
             directiveString(label, (String) value);
     }
 
@@ -155,7 +155,7 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
     public void visit(InterGlobalVariable node) {
         newLine();
         comment("Write variable " + node.getInterId().getId() + " to Data Segment");
-        if(node.getInterLit() != null)
+        if (node.getInterLit() != null)
             directive(node.getDirective(), node.convertIdToLabel(node.getInterId().getId()), node.getInterLit().getValue());
 
     }
@@ -168,7 +168,6 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
 //
 //
 //    }
-
 
 
     @Override
@@ -203,12 +202,33 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
     public void preVisit(InterIfStatement node) {
         newLine();
         comment("Set up for if statement");
-        regAndLabel(BLT, R2, node.getDone());
+        if (node.getInterElseStatement() != null)
+            regAndLabel(BLT, R2, node.getIfNot());
+        else
+            regAndLabel(BLT, R2, node.getDone());
+        comment("Use this for else");
+        twoReg(MOV, R4, R2);
     }
+
+
 
     @Override
     public void visit(InterIfStatement node) {
-       label(node.getDone());
+        label(node.getDone());
+    }
+
+    @Override
+    public void preVisit(InterElseStatement node) {
+        newLine();
+        comment("Set up for else statement");
+        label(node.getIfNot());
+        regAndLabel(BGT, R4, node.getDone());
+    }
+
+    @Override
+    public void visit(InterElseStatement node) {
+        newLine();
+        regLabel(JMP, node.getDone());
     }
 
     @Override
@@ -524,7 +544,7 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
         comment("setting R2 to " + interLit.getTerminalValue());
         if (interLit.getScalarType() == ScalarType.INT)
             regImmInt(MOVI, R2, (Integer) interLit.getValue());
-        else if(interLit.getScalarType() == ScalarType.CHAR)
+        else if (interLit.getScalarType() == ScalarType.CHAR)
             regImmInt(MOVI, R2, (Character) interLit.getValue());
     }
 

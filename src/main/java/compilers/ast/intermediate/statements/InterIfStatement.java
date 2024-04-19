@@ -12,16 +12,16 @@ import java.util.List;
 @Getter
 public class InterIfStatement extends InterStatement {
     String label;
-    String ifTrue;
     String ifNot;
     String done;
     private List<InterStatement> ifMet;
+    InterElseStatement interElseStatement;
 
-    public InterIfStatement(GenericListNode ifMet, String label) {
-        super(ifMet);
+    public InterIfStatement(GenericListNode ifMet, InterElseStatement interElseStatement, String label) {
+        super(interElseStatement, ifMet);
         this.ifMet = getNodeList(ifMet);
+        this.interElseStatement = interElseStatement;
         this.label = label;
-        ifTrue = convertIdToLabel(label) + "ifTrue";
         ifNot = convertIdToLabel(label) + "ifNot";
         done = convertIdToLabel(label) + "ifDone";
     }

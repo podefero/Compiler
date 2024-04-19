@@ -33,7 +33,6 @@ public interface VisitKxi {
     void visit(KxiConstructor kxiConstructor);
     void visit(KxiVariableDeclaration kxiVariableDeclaration);
 
-    void visit(KxiIfStatement kxiIfStatement);
     void visit(KxiWhileStatement kxiWhileStatement);
     void visit(KxiForStatement kxiForStatement);
     void visit(KxiReturnStatement kxiReturnStatement);

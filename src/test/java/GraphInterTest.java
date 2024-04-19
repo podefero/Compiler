@@ -84,7 +84,7 @@ public class GraphInterTest {
 
         interGlobal.accept(interToAssemblyVisitor);
 
-        AssemblyAssembleVisitor assemblyAssembleVisitor = new AssemblyAssembleVisitor(new ArrayList<>(), "");
+        AssemblyAssembleVisitor assemblyAssembleVisitor = new AssemblyAssembleVisitor(new ArrayList<>(), new Stack<>());
         AssemblyMain assemblyMain = interToAssemblyVisitor.getRootNode();
 
         assemblyMain.accept(assemblyAssembleVisitor);

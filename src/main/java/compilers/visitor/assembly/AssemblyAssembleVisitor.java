@@ -7,12 +7,13 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.util.List;
+import java.util.Stack;
 
 @AllArgsConstructor
 @Getter
 public class AssemblyAssembleVisitor extends KxiVisitorBase {
     List<String> instructions;
-    String label;
+    Stack<String> labels;
 
     @Override
     public void visit(AssemblyCode node) {
@@ -23,9 +24,8 @@ public class AssemblyAssembleVisitor extends KxiVisitorBase {
         if (operandR == null) valueR = "";
         else valueR = operandR.getValue();
 
-        if (!this.label.isEmpty()) {
-            label = this.label;
-            this.label = "";
+        if (!labels.isEmpty()) {
+            label = labels.pop();
         } else label = "";
 
         instructions.add(label + " "
@@ -45,7 +45,7 @@ public class AssemblyAssembleVisitor extends KxiVisitorBase {
 
     @Override
     public void visit(OperandLabelWrapper node) {
-        label = node.getValue();
+        labels.push(node.getValue());
     }
 
     @Override

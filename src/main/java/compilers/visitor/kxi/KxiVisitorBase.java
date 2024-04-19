@@ -97,10 +97,7 @@ public  class KxiVisitorBase implements VisitKxi {
 
     }
 
-    @Override
-    public void visit(KxiIfStatement kxiIfStatement) {
 
-    }
 
     @Override
     public void visit(KxiWhileStatement kxiWhileStatement) {
@@ -864,6 +861,8 @@ public  class KxiVisitorBase implements VisitKxi {
 
     public void preVisit(KxiElseStatement kxiElseStatement) {
     }
+
+    public void visit(KxiIfStatement kxiIfStatement){}
 
     public void visit(KxiElseStatement kxiElseStatement) {
     }

@@ -26,6 +26,7 @@ import compilers.ast.kxi_nodes.expressions.uni.KxiUniSubtract;
 import compilers.ast.kxi_nodes.scope.KxiBlock;
 import compilers.ast.kxi_nodes.scope.KxiClass;
 import compilers.ast.kxi_nodes.statements.*;
+import compilers.ast.kxi_nodes.statements.conditional.KxiElseStatement;
 import compilers.ast.kxi_nodes.statements.conditional.KxiForStatement;
 import compilers.ast.kxi_nodes.statements.conditional.KxiIfStatement;
 import compilers.ast.kxi_nodes.statements.conditional.KxiWhileStatement;
@@ -436,7 +437,7 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
 
     @Override
     public void visit(KxiExpressionStatement node) {
-        if(!nodeStack.empty()) pop(); //not sure about this yet
+        if (!nodeStack.empty()) pop(); //not sure about this yet
     }
 
     @Override
@@ -445,21 +446,32 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
 
 
     @Override
-    public void preVisit(KxiIfStatement node) {
+    public void visit(KxiElseStatement node) {
+        GenericListNode genericListNode = new GenericListNode(scopeBlock);
+        InterElseStatement interElseStatement = new InterElseStatement(genericListNode);
+        nodeStack.push(interElseStatement);
     }
 
     @Override
     public void visit(KxiIfStatement node) {
         GenericListNode genericListNode = new GenericListNode(scopeBlock);
-        InterStatement interStatement;
-        if(node.getElseStatement() != null) {
-            interStatement = new InterElseStatement(genericListNode, getFullyQualifiedName(HashString.updateStringHash()));
-        } else {
-            InterDerefStatement interDerefStatement = new InterDerefStatement((InterOperand) getRightOperand().copy());
-            interStatement = new InterIfStatement(genericListNode, getFullyQualifiedName(HashString.updateStringHash()));
-            addStatementToCurrentScope(interDerefStatement); //ensures we have a boolean value in R2
+        InterElseStatement interElseStatement = null;
+        InterDerefStatement interDerefStatement = new InterDerefStatement((InterOperand) getRightOperand().copy());
+
+        if (nodeStack.peek() instanceof InterElseStatement) {
+            interElseStatement = pop();
         }
-        addStatementToCurrentScope(interStatement);
+
+        InterIfStatement interIfStatement =
+                new InterIfStatement(genericListNode, interElseStatement, getFullyQualifiedName(HashString.updateStringHash()));
+        addStatementToCurrentScope(interDerefStatement); //ensures we have a boolean value in R2
+
+        addStatementToCurrentScope(interIfStatement);
+
+        if (interElseStatement != null) {
+            interElseStatement.setDone(interIfStatement.getDone());
+            interElseStatement.setIfNot(interIfStatement.getIfNot());
+        }
     }
 
     @Override
