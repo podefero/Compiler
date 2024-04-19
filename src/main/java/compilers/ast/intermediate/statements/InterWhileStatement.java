@@ -11,20 +11,19 @@ public class InterWhileStatement extends InterStatement {
     String label;
     String ifNot;
     String loop;
-    InterDerefStatement interDerefStatement;
     private List<InterStatement> ifMet;
 
-    public InterWhileStatement(GenericListNode interIfStatements, String label, InterDerefStatement interDerefStatement) {
-        super(interIfStatements,interDerefStatement);
+    public InterWhileStatement(GenericListNode interIfStatements, String label) {
+        super(interIfStatements);
         this.ifMet = getNodeList(interIfStatements);
-        this.interDerefStatement = interDerefStatement;
         this.label = label;
-        ifNot = convertIdToLabel(label) + "ifNot";
-        loop = convertIdToLabel(label) + "ifDone";
+        ifNot = convertIdToLabel(label) + "whileExit";
+        loop = convertIdToLabel(label) + "loop";
     }
 
     @Override
     public void accept(KxiVisitorBase visit) {
+        visit.preVisit(this);
         visitChildren(visit);
         visit.visit(this);
     }

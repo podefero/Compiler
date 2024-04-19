@@ -211,10 +211,33 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
     }
 
 
-
     @Override
     public void visit(InterIfStatement node) {
         label(node.getDone());
+    }
+
+
+
+    @Override
+    public void visit(InterWhileLoop node) {
+        newLine();
+        comment("Start of loop");
+        label(node.getLoopLabel());
+    }
+
+    @Override
+    public void preVisit(InterWhileStatement node) {
+        newLine();
+        comment("Set up for while loop");
+        regAndLabel(BLT, R2, node.getIfNot());
+    }
+
+    @Override
+    public void visit(InterWhileStatement node) {
+        newLine();
+        comment("End of while loop");
+        regLabel(JMP, node.getLoop());
+        label(node.getIfNot());
     }
 
     @Override

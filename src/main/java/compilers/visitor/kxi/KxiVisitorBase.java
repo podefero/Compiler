@@ -872,4 +872,7 @@ public  class KxiVisitorBase implements VisitKxi {
 
     public void visit(InterWhileLoop interWhileLoop) {
     }
+
+    public void preVisit(InterWhileStatement interWhileStatement) {
+    }
 }

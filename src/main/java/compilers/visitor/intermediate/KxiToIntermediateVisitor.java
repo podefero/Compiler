@@ -485,8 +485,9 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
         InterDerefStatement interDerefStatement = new InterDerefStatement((InterOperand) getRightOperand().copy());
 
         InterWhileStatement interIfStatement =
-                new InterWhileStatement(genericListNode, node.getLoopLabel(), interDerefStatement);
+                new InterWhileStatement(genericListNode, node.getLoopLabel());
 
+        addStatementToCurrentScope(interDerefStatement);
         addStatementToCurrentScope(interIfStatement);
     }
 
