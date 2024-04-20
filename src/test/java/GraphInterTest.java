@@ -80,7 +80,7 @@ public class GraphInterTest {
         InterToAssemblyVisitor interToAssemblyVisitor = new InterToAssemblyVisitor(new ArrayList<>()
                 , null
                 , interSymbolTableVisitor.getInterSymbolTable()
-                , interSymbolTableVisitor.getInterSymbolTable().getFunctionDataMap().get("main$main"));
+                , interSymbolTableVisitor. getInterSymbolTable().getFunctionDataMap().get("main$main"));
 
         interGlobal.accept(interToAssemblyVisitor);
 

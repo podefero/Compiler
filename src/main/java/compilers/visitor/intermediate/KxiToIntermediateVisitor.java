@@ -100,17 +100,17 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
 
     @Override
     public void visit(KxiMain node) {
-        GenericListNode functions = new GenericListNode(new ArrayList<>());
+        GenericListNode functions = new GenericListNode(globalFunctions);
         GenericListNode globalDir = new GenericListNode(globalVariables); //after symbol table
         GenericListNode globalInit = new GenericListNode(this.globalInit);
         InterId interId = new InterId(getFullyQualifiedName(node.getId().getValue()), ScalarType.VOID);
         InterFunctionNode interFunctionNode = new InterFunctionNode(interId, new GenericListNode(scopeBlock));
 
         InterGlobal interGlobal =
-                new InterGlobal(globalDir, globalInit, functions, new InterFunctionalCall(interId, new GenericListNode(new ArrayList<>())));
+                new InterGlobal(globalDir, globalInit, functions, new InterFunctionalCall(interId));
         rootNode = interGlobal;
 
-        rootNode.getInterFunctionNode().add(interFunctionNode);
+        rootNode.getInterFunctionNode().add(0, interFunctionNode);
 
 //        InterId interId = rootNode.getInterFunctionNode().get(0).getInterId();
 //        rootNode.getInterFunctionNode().get(0).getStatements().add(0,new InterFunctionalCall(interId, new GenericListNode(new ArrayList<>())));
@@ -118,15 +118,15 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
 
     @Override
     public void preVisit(KxiMethod node) {
-        InterId interId = new InterId(getFullyQualifiedName(node.getId().getValue()), node.getReturnType().getScalarType());
-        InterFunctionNode interFunctionNode = new InterFunctionNode(interId, new GenericListNode(new ArrayList<>()));
-        interFunctionNode.getStatements().add(new InterActivationRecord(interId));
-        rootNode.getInterFunctionNode().add(interFunctionNode);
+
     }
 
     @Override
     public void visit(KxiMethod node) {
-
+        InterId interId = new InterId(getFullyQualifiedName(node.getId().getValue()), node.getReturnType().getScalarType());
+        InterFunctionNode interFunctionNode = new InterFunctionNode(interId, new GenericListNode(scopeBlock));
+        // interFunctionNode.getStatements().add(new InterActivationRecord(interId));
+        globalFunctions.add(interFunctionNode);
     }
 
     private InterOperand getLeftOperand() {
@@ -386,8 +386,8 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
 //            nodeStack.push(new InterPtr(getFullyQualifiedName(node.getTokenLiteral().getValue()), scalarType));
 //        else
             nodeStack.push(new InterId(whatScopeIdFound.getUniqueName() + node.getTokenLiteral().getValue(), scalarType));
-        }
-        nodeStack.push(new InterId(node.getTokenLiteral().getValue(), ScalarType.UNKNOWN));
+        } else
+            nodeStack.push(new InterId(node.getTokenLiteral().getValue(), ScalarType.UNKNOWN));
     }
 
     @Override
@@ -446,6 +446,13 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
 
     @Override
     public void visit(KxiMethodExpression node) {
+        InterValue interValue = pop();
+        InterId interId;
+        if (interValue instanceof InterPtr) {
+            interId = new InterId(((InterPtr) interValue).getId(), interValue.getScalarType());
+        } else interId = (InterId) interValue;
+        InterFunctionalCall interFunctionalCall = new InterFunctionalCall(interId);
+        addStatementToCurrentScope(interFunctionalCall);
     }
 
     @Override

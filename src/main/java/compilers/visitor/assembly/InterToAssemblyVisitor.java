@@ -67,7 +67,7 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
 
         } else if (interOperand instanceof RightPtr) {
             //cant deref string or id
-            if(((RightPtr) interOperand).getInterPtr().getScalarType() != ScalarType.STRING) {
+            if (((RightPtr) interOperand).getInterPtr().getScalarType() != ScalarType.STRING) {
                 comment("Deref ptr" + interOperand.getTerminalValue());
                 twoReg(LDRI, R2, R2);
             }
@@ -77,7 +77,7 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
 
     //DIR
     private <T> void directive(Directive directive, String label, T value) {
-        if(value == null) {
+        if (value == null) {
             assemblyList.add(new AssemblyDirective(label, directive.getValue(), ""));
         } else {
             if (directive == INT)
@@ -275,7 +275,7 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
     @Override
     public void visit(InterReturn node) {
         newLine();
-        comment("Return");
+        comment("Return " + currentFunctionData.getLabel());
         comment("Get ptr to Return Address in R15");
         getFP();
         comment("Deref the ptr so R15 now has the return address");
@@ -283,7 +283,10 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
         comment("Get PFP in R14");
         getFP();
         decFP(4);
-        comment("Move SP to PFP to pop activation record");
+        twoReg(LDRI, R14, R14);
+        comment("SP = FP to pop activation record");
+        twoReg(MOV, SP, FP);
+        comment("FP = PFP ");
         twoReg(MOV, FP, R14);
         comment("push result on stack");
         leftOp(PUSH, R2);
@@ -295,9 +298,9 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
     @Override
     public void visit(InterFunctionalCall node) {
         newLine();
-        comment("Calling function " + node.getCalleeId().getId());
+        comment("Calling function " + node.getLabel());
         comment("Zero out Record");
-        getFP();
+        twoReg(MOV, R14, SP);
         regImmInt(MOVI, R0, 0);
         int size = currentFunctionData.getSize();
         for (int i = 0; i < size; i++) {
@@ -320,8 +323,12 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
         leftOp(PUSH, R15);
         comment("push pfp");
         leftOp(PUSH, R14);
-        regLabel(JMP, currentFunctionData.getLabel());
-        regLabel(JMP, "END"); //move around at some point
+        regLabel(JMP, node.getLabel());
+    }
+
+    @Override
+    public void visit(EndPog node) {
+        regLabel(JMP, "END");
     }
 
     @Override
@@ -704,7 +711,7 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
         comment("setting R1 to " + interLit.getTerminalValue());
         if (interLit.getScalarType() == ScalarType.INT)
             regImmInt(MOVI, R1, (Integer) interLit.getValue());
-        else if(interLit.getScalarType() == ScalarType.CHAR)
+        else if (interLit.getScalarType() == ScalarType.CHAR)
             regImmInt(MOVI, R1, (Character) interLit.getValue());
 
     }

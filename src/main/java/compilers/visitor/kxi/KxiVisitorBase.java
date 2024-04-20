@@ -902,4 +902,7 @@ public  class KxiVisitorBase implements VisitKxi {
 
     public void preVisit(InterCase interCase) {
     }
+
+    public void visit(EndPog endPog) {
+    }
 }

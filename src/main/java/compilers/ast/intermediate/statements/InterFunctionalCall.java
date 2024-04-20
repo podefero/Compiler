@@ -1,28 +1,28 @@
 package compilers.ast.intermediate.statements;
 
-import compilers.ast.GenericListNode;
-import compilers.ast.intermediate.InterArgs;
+import compilers.ast.GenericTerminal;
 import compilers.ast.intermediate.InterId;
 import compilers.visitor.kxi.KxiVisitorBase;
 import lombok.Getter;
 
-import java.util.List;
-
 
 @Getter
-public class InterFunctionalCall extends InterStatement {
+public class InterFunctionalCall extends InterStatement implements GenericTerminal {
     InterId calleeId;
-    List<InterArgs> interArgList;
-
-    public InterFunctionalCall(InterId calleeId, GenericListNode args) {
-        super(args);
+    String label;
+    public InterFunctionalCall(InterId calleeId) {
         this.calleeId = calleeId;
-        this.interArgList = getNodeList(args);
+        label = convertIdToLabel(calleeId.getId());
     }
 
     @Override
     public void accept(KxiVisitorBase visit) {
         visitChildren(visit);
         visit.visit(this);
+    }
+
+    @Override
+    public String getTerminalValue() {
+        return calleeId.getTerminalValue() + "()";
     }
 }
