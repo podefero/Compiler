@@ -5,11 +5,11 @@ import lombok.Getter;
 
 @Getter
 public class InterPushArg extends InterStatement {
-    InterOperand interOperands;
+    InterOperand interOperand;
 
     public InterPushArg(InterOperand operand) {
         super(operand);
-        this.interOperands = operand;
+        this.interOperand = operand;
 
     }
 }

@@ -18,6 +18,12 @@ public abstract class AbstractKxiFactory extends AbstractFactory<ParserRuleConte
         return terminalNode.getSymbol().getText();
     }
 
+    public String buildLineInfo(ParserRuleContext ctx) {
+        return "Line#: "
+                + ctx.getStart().getLine() + ":" + ctx.getStart().getCharPositionInLine()
+                + " to " + ctx.getStop().getLine() + ":" + ctx.getStop().getCharPositionInLine();
+    }
+
     @Override
     public AbstractKxiNode build(ParserRuleContext ctx, Stack<AbstractKxiNode> stack) {
         if (ctx instanceof KxiParser.ExpressionContext)

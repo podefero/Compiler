@@ -11,6 +11,7 @@ import compilers.ast.kxi_nodes.*;
 import compilers.ast.kxi_nodes.class_members.KxiConstructor;
 import compilers.ast.kxi_nodes.class_members.KxiDataMember;
 import compilers.ast.kxi_nodes.class_members.KxiMethod;
+import compilers.ast.kxi_nodes.expressions.AbstractKxiExpression;
 import compilers.ast.kxi_nodes.expressions.KxiDotExpression;
 import compilers.ast.kxi_nodes.expressions.KxiMethodExpression;
 import compilers.ast.kxi_nodes.expressions.binary.arithmic.KxiDiv;
@@ -68,6 +69,11 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
         this.globalFunctions = new ArrayList<>();
         this.globalInit = new ArrayList<>();
         hasCase = false;
+    }
+
+    private void addStatementToCurrentScopeFromLast(int i, InterStatement interStatement) {
+        int last = currentScope.getInterStatementList().size();
+        currentScope.getInterStatementList().add(last - i, interStatement);
     }
 
     private void addStatementToCurrentScope(InterStatement interStatement) {
@@ -141,6 +147,21 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
             leftOperand = new LeftOperandLit(left);
 
         return leftOperand;
+    }
+
+    private InterOperand getRightOperand(InterValue interValue) {
+        InterValue right = interValue;
+        InterOperand rightOperand;
+
+        if (right instanceof InterId) {
+            if (((InterId) right).isReturn()) rightOperand = new OperandReturn(right);
+            else rightOperand = new RightVariableStack(right);
+        } else if (right instanceof InterPtr)
+            rightOperand = new RightPtr(right);
+        else
+            rightOperand = new RightOperandLit(right);
+
+        return rightOperand;
     }
 
     private InterOperand getRightOperand() {
@@ -451,6 +472,32 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
 
     @Override
     public void visit(KxiMethodExpression node) {
+        //handle args
+        int numArgs = node.getArguments().getArguments().size();
+        Stack<InterValue> args = new Stack<>();
+
+        //get args left to right order
+        for (int i = 0; i < numArgs; i++) {
+            AbstractKxiExpression expression = node.getArguments().getArguments().get(i);
+            //get temp from binary assignment
+            if (expression instanceof AbstractBinaryAssignmentExpression) {
+                pop(); //discard
+                InterBinaryAssignmentStatement interStatement = (InterBinaryAssignmentStatement) rightToLeftStack.pop();
+
+                addStatementToCurrentScopeFromLast(i, interStatement); //just so the node is visited before others
+                InterId interId = new InterId(interStatement.getInterVariable().getInterId().getId()
+                        , interStatement.getInterVariable().getInterId().getScalarType());
+                args.push(interId);
+            } else {
+                args.push(pop());
+            }
+        }
+
+        while (!args.empty()) {
+            InterPushArg interPushArg = new InterPushArg(getRightOperand(args.pop()));
+            addStatementToCurrentScope(interPushArg);
+        }
+
         InterValue interValue = pop();
         InterId interId;
         if (interValue instanceof InterPtr) {

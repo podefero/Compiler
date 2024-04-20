@@ -553,7 +553,7 @@ EXPRESSIONS DOT
                 int argSize = expression.getArguments().size();
                 int paramSize = methodScope.getParams().size();
                 if (argSize != paramSize) {
-                    exceptionStack.push(new TypeCheckException(left.getTypeData().getType().getLineInfo()
+                    exceptionStack.push(new TypeCheckException(expression.getLineInfo()
                             , "Number of args and params don't match. args: " + argSize + " params: " + paramSize));
                     if (argSize < paramSize) leastSize = argSize;
                     else leastSize = paramSize;
