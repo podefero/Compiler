@@ -905,4 +905,7 @@ public  class KxiVisitorBase implements VisitKxi {
 
     public void visit(EndPog endPog) {
     }
+
+    public void visit(OperandReturn operandReturn) {
+    }
 }

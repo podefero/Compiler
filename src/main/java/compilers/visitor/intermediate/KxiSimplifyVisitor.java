@@ -99,12 +99,12 @@ public class KxiSimplifyVisitor extends KxiVisitorBase {
 
     @Override
     public void visit(KxiBlock node) {
-        //add return statements to methods and main (if they don't have one)
-        BlockScope blockScope = (BlockScope) node.getScope();
-        if ((blockScope.getScopeType() == ScopeType.Method || blockScope.getScopeType() == ScopeType.Main)
-                && !hasNode(KxiReturnStatement.class, node.getStatements())) {
-            node.getChildren().add(new KxiReturnStatement(null));
-        }
+//        //add return statements to methods and main (if they don't have one)
+//        BlockScope blockScope = (BlockScope) node.getScope();
+//        if ((blockScope.getScopeType() == ScopeType.Method || blockScope.getScopeType() == ScopeType.Main)
+//                && !hasNode(KxiReturnStatement.class, node.getStatements())) {
+//        }
+        node.getChildren().add(new KxiReturnStatement(null));
     }
 
 //    @Override

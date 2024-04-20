@@ -147,9 +147,10 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
         InterValue right = pop();
         InterOperand rightOperand;
 
-        if (right instanceof InterId)
-            rightOperand = new RightVariableStack(right);
-        else if (right instanceof InterPtr)
+        if (right instanceof InterId) {
+            if (((InterId) right).isReturn()) rightOperand = new OperandReturn(right);
+            else rightOperand = new RightVariableStack(right);
+        } else if (right instanceof InterPtr)
             rightOperand = new RightPtr(right);
         else
             rightOperand = new RightOperandLit(right);
@@ -188,6 +189,10 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
     @Override
     public void visit(KxiReturnStatement node) {
         InterReturn interReturn = new InterReturn();
+        if (node.getExpression() != null) {
+            InterDerefStatement interDerefStatement = new InterDerefStatement(getRightOperand());
+            addStatementToCurrentScope(interDerefStatement);
+        }
         addStatementToCurrentScope(interReturn);
     }
 
@@ -453,6 +458,8 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
         } else interId = (InterId) interValue;
         InterFunctionalCall interFunctionalCall = new InterFunctionalCall(interId);
         addStatementToCurrentScope(interFunctionalCall);
+        interId.setReturn(true);
+        nodeStack.push(interId);
     }
 
     @Override

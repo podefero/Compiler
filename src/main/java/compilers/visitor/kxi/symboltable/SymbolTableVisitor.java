@@ -116,6 +116,9 @@ public class SymbolTableVisitor extends KxiVisitorBase {
     private void addMethodScopeToClassScope(MethodScope methodScope, ClassScope classScope, String id, String lineInfo) {
         if (classScope.getMethodScopeMap().containsKey(id))
             exceptionStack.push(new SymbolTableException(lineInfo, "Duplicate Method/Constructor name " + id));
+        if(methodScope.getBlockScope().getScope().containsKey(id))
+            exceptionStack.push(new SymbolTableException(lineInfo, "Duplicate Method/Variable name " + id));
+
 
         classScope.getMethodScopeMap().put(id, methodScope);
     }
