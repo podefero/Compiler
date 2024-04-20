@@ -908,4 +908,19 @@ public  class KxiVisitorBase implements VisitKxi {
 
     public void visit(OperandReturn operandReturn) {
     }
+
+    public void visit(InterPushArg interPushArg) {
+    }
+
+    public void visit(AssemblyCodeReturnAddress assemblyCodeReturnAddress) {
+    }
+
+    public void visit(AssemblyReturnAddressDelim assemblyReturnAddressDelim) {
+    }
+
+    public void visit(EndFunctionCall endFunctionCall) {
+    }
+
+    public void preVisit(InterFunctionalCall interFunctionalCall) {
+    }
 }

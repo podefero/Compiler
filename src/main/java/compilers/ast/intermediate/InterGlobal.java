@@ -2,6 +2,7 @@ package compilers.ast.intermediate;
 
 import compilers.ast.GenericListNode;
 import compilers.ast.intermediate.expression.operation.InterOperation;
+import compilers.ast.intermediate.statements.EndFunctionCall;
 import compilers.ast.intermediate.statements.EndPog;
 import compilers.ast.intermediate.statements.InterFunctionalCall;
 import compilers.ast.intermediate.statements.InterStatement;
@@ -19,7 +20,7 @@ public class InterGlobal extends AbstractInterNode {
 
 
     public InterGlobal(GenericListNode globalData, GenericListNode globalInit, GenericListNode interFunction, InterFunctionalCall interFunctionalCall) {
-        super(interFunction, new EndPog(), interFunctionalCall, globalInit, globalData);
+        super(interFunction, new EndPog(), new EndFunctionCall(), interFunctionalCall, globalInit, globalData);
         this.interDirectives = getNodeList(globalData);
         this.globalInit = getNodeList(globalInit);
         this.interFunctionNode = getNodeList(interFunction);

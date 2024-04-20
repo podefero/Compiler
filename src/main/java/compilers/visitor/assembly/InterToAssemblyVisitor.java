@@ -296,7 +296,7 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
     }
 
     @Override
-    public void visit(InterFunctionalCall node) {
+    public void preVisit(InterFunctionalCall node) {
         newLine();
         comment("Calling function " + node.getLabel());
         comment("Zero out Record");
@@ -313,17 +313,27 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
         getFP();
         comment("SP = FP");
         setPFP();
-        comment("Get Address");
+        comment("Get Address, and calculate offset");
         setPC();
-        int offset = interSymbolTable.getFunctionDataMap().get(node.getCalleeId().getId()).getNumParam() * DataSizes.INSTRUCTION_SIZE;
-        offset += 4 * DataSizes.INSTRUCTION_SIZE; //
-        comment("Offset Address by " + offset);
-        regImmInt(ADI, R15, offset);
+        //add delim;
+        AssemblyReturnAddressDelim assemblyReturnAddressDelim = new AssemblyReturnAddressDelim(true);
+        assemblyReturnAddressDelim.setLabel(node.getLabel());
+        assemblyList.add(assemblyReturnAddressDelim);
         comment("push return address");
         leftOp(PUSH, R15);
         comment("push pfp");
         leftOp(PUSH, R14);
+    }
+
+    @Override
+    public void visit(InterFunctionalCall node) {
         regLabel(JMP, node.getLabel());
+    }
+
+    @Override
+    public void visit(EndFunctionCall node) {
+        comment("End of Function Call");
+        assemblyList.add(new AssemblyReturnAddressDelim(false));
     }
 
     @Override
@@ -635,6 +645,13 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
         newLine();
         comment("Exit for switch");
         label(node.getExit());
+    }
+
+    @Override
+    public void visit(InterPushArg node) {
+        newLine();
+        comment("Pushing " + node.getInterOperand().getInterValue().getTerminalValue());
+        leftOp(PUSH, R2);
     }
 
     @Override

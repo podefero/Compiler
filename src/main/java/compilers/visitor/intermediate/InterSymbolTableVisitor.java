@@ -5,6 +5,7 @@ import compilers.ast.intermediate.StackType;
 import compilers.ast.intermediate.statements.InterGlobalVariable;
 import compilers.ast.intermediate.statements.InterVariable;
 import compilers.ast.intermediate.symboltable.*;
+import compilers.ast.kxi_nodes.KxiMain;
 import compilers.visitor.kxi.KxiVisitorBase;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -31,6 +32,9 @@ public class InterSymbolTableVisitor extends KxiVisitorBase {
         //have two items on stack, return address and pfp
         activationRecord.pushStackItem(node.getReturnId(), StackType.PARAM);
         activationRecord.pushStackItem(node.getPfpId(), StackType.PARAM);
+        for(String param : node.getParams()) {
+            activationRecord.pushStackItem(param, StackType.PARAM);
+        }
         currentFunctionData = functionData;
         interSymbolTable.getFunctionDataMap().put(id, functionData);
     }

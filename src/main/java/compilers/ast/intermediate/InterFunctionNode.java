@@ -12,13 +12,15 @@ import java.util.List;
 public class InterFunctionNode extends AbstractInterNode {
     private InterId interId;
     private List<InterStatement> statements;
+    private List<String> params;
     private String returnId;
     private String pfpId;
 
-    public InterFunctionNode(InterId interId, GenericListNode statements) {
+    public InterFunctionNode(InterId interId, GenericListNode statements, List<String> params) {
         super(statements, interId, new InterActivationRecord(interId));
         this.interId = interId;
         this.statements = getNodeList(statements);
+        this.params = params;
         this.returnId = "return" + this.hashCode();
         this.pfpId = "pfp" + this.hashCode();
     }
