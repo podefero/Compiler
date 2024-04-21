@@ -17,7 +17,7 @@ public class LeftPtr extends InterOperand {
 
     @Override
     public GenericNode copy() {
-        LeftPtr variableStack = new LeftPtr(interValue);
+        LeftPtr variableStack = new LeftPtr((InterValue) interValue.copy());
         return variableStack;
     }
 

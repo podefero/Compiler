@@ -196,6 +196,71 @@ public class M4 {
                 "}", false);
     }
 
+    @Test
+    void imSpacedOut() {
+        test(" void main() {\n" +
+                "    cout << \"\\\\\\\"    im spaced out    \\\\\\\"\";\n" +
+                "    }", false);
+    }
+
+    @Test
+    void cout12() {
+        test("  class Cheddar {\n" +
+                "        static public int y = 1;\n" +
+                "        static public int x = x + y + 1;\n" +
+                "    }\n" +
+                "    void main() {\n" +
+                "        cout << Cheddar.y;\n" +
+                "        cout << Cheddar.x;\n" +
+                "    }", false);
+    }
+
+    @Test
+    void localFunctionVariable() {
+        test(" class Beeze {\n" +
+                "    static public void fun(){\n" +
+                "        int x;\n" +
+                "        cout << x;\n" +
+                "        x = 14;// set x location on the stack\n" +
+                "        }\n" +
+                "    }\n" +
+                "\n" +
+                "    void main() {\n" +
+                "        Beeze.fun();\n" +
+                "        Beeze.fun();\n" +
+                "    }", false);
+    }
+
+    @Test
+    void coutFuncParamsArgs() {
+        test(" class Cheese {\n" +
+                "        static public void print(int x, int y) {\n" +
+                "            cout << x;\n" +
+                "            cout << y;\n" +
+                "        }\n" +
+                "    }\n" +
+                "\n" +
+                "    void main() {\n" +
+                "        Cheese.print(3, 4);\n" +
+                "    }", false);
+    }
+
+    @Test
+    void plusEqualInCoplexExp() {
+        test(" void main(){\n" +
+                "            int c = 2;\n" +
+                "            c < 2 || (c += 5) < 2;\n" +
+                "            cout << c;\n" +
+                "            }", false);
+    }
+
+
+
+//    @Test
+//    void imSpacedOut() {
+//        test("", false);
+//    }
+
 
     void test(String input, boolean hasErrors) {
         KxiParser parser = kxiParser(input);
@@ -224,6 +289,9 @@ public class M4 {
         KxiToIntermediateVisitor kxiToIntermediateVisitor = new KxiToIntermediateVisitor(symbolTableVisitor.getScopeHandler());
         rootNode.accept(kxiToIntermediateVisitor);
 
+        drawGraph(kxiToIntermediateVisitor);
+
+
         InterSymbolTableVisitor interSymbolTableVisitor =
                 new InterSymbolTableVisitor(new InterSymbolTable(new HashMap<>(), new HashMap<>()), null);
         InterGlobal interGlobal = kxiToIntermediateVisitor.getRootNode();
@@ -235,6 +303,8 @@ public class M4 {
                 , interSymbolTableVisitor. getInterSymbolTable().getFunctionDataMap().get("main$main"));
 
         interGlobal.accept(interToAssemblyVisitor);
+
+
 
         AssemblyAssembleVisitor assemblyAssembleVisitor = new AssemblyAssembleVisitor();
         AssemblyMain assemblyMain = interToAssemblyVisitor.getRootNode();
@@ -260,7 +330,6 @@ public class M4 {
         invalidBreakVisitor.dumpErrorStack();
 
         writeAsm(assemblyAssembleVisitor);
-        drawGraph(kxiToIntermediateVisitor);
     }
 
     void writeAsm(AssemblyAssembleVisitor assemblyAssembleVisitor) {

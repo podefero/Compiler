@@ -187,11 +187,27 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
     }
 
     private void tempVariableMaker(InterOperation interOperation, ScalarType scalarType) {
-        //create temp variable
-        InterId tempId = new InterId(scalarType);
-        InterVariable interVariable = new InterVariable(tempId, interOperation);
-        addStatementToCurrentScope(interVariable);
-        nodeStack.push(tempId);
+        //if we are in a class scope than assume static
+        ClassScope classScope = scopeHandler.bubbleToClassScope(currentScope);
+        if (classScope != null) {
+            InterPtr interPtr = new InterPtr(scalarType);
+            Directive directive = getDirective(scalarType);
+            InterGlobalVariable interGlobalVariable = new InterGlobalVariable(interPtr, directive, null);
+            //copy operation
+//            InterOperand right = (InterOperand) interOperation.getRightOperand().copy();
+//            InterOperand right = (InterOperand) getRightOperand(interPtr).copy();
+            LeftPtr left = new LeftPtr((InterValue) interPtr.copy());
+            globalInit.add(interOperation);
+            globalInit.add(new InterAssignment(left, null));
+            globalVariables.add(interGlobalVariable);
+            nodeStack.push(interPtr);
+        } else {
+            InterId interId = new InterId(scalarType);
+            InterVariable interVariable = new InterVariable(interId, interOperation);
+            addStatementToCurrentScope(interVariable);
+            nodeStack.push(interId);
+        }
+
     }
 
     private void tempVariableMakerOnRight(InterOperation interOperation, ScalarType scalarType) {
@@ -414,11 +430,11 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
         if (symbolData != null) {
             ScalarType scalarType = symbolData.getScalarType();
             SymbolTable whatScopeIdFound = scopeHandler.getLasIdentified();
-//        boolean isStatic = symbolData.isStatic();
-//        if(scalarType == ScalarType.STRING || isStatic)
-//            nodeStack.push(new InterPtr(getFullyQualifiedName(node.getTokenLiteral().getValue()), scalarType));
-//        else
-            nodeStack.push(new InterId(whatScopeIdFound.getUniqueName() + node.getTokenLiteral().getValue(), scalarType));
+            boolean isStatic = symbolData.isStatic();
+            if (scalarType == ScalarType.STRING || isStatic)
+                nodeStack.push(new InterPtr(getFullyQualifiedName(node.getTokenLiteral().getValue()), scalarType));
+            else
+                nodeStack.push(new InterId(whatScopeIdFound.getUniqueName() + node.getTokenLiteral().getValue(), scalarType));
         } else
             nodeStack.push(new InterId(node.getTokenLiteral().getValue(), ScalarType.UNKNOWN));
     }
@@ -715,6 +731,16 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
     public void visit(KxiConstructor node) {
     }
 
+    private Directive getDirective(ScalarType scalarType) {
+        Directive directive;
+        if (scalarType == ScalarType.INT || scalarType == ScalarType.BOOL || scalarType == ScalarType.NULL) {
+            directive = Directive.INT;
+        } else if (scalarType == ScalarType.CHAR) directive = Directive.BYT;
+        else directive = Directive.STR;
+        return directive;
+    }
+
+
     @Override
     public void visit(KxiDataMember node) {
         //else it's a class record
@@ -724,12 +750,7 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
             Directive directive;
             InterGlobalVariable interGlobalVariable;
 
-
-            if (scalarType == ScalarType.INT || scalarType == ScalarType.BOOL || scalarType == ScalarType.NULL) {
-                directive = Directive.INT;
-            } else if (scalarType == ScalarType.CHAR) directive = Directive.BYT;
-            else directive = Directive.STR;
-
+            directive = getDirective(scalarType);
 
             interGlobalVariable = new InterGlobalVariable(interPtr, directive, null);
             globalVariables.add(interGlobalVariable);

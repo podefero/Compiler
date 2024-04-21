@@ -20,7 +20,7 @@ public class RightVariableStack extends InterOperand{
 
     @Override
     public GenericNode copy() {
-        RightVariableStack variableStack = new RightVariableStack(interValue);
+        RightVariableStack variableStack = new RightVariableStack((InterValue) interValue.copy());
         return variableStack;
     }
 

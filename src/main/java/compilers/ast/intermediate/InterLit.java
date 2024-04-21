@@ -1,5 +1,6 @@
 package compilers.ast.intermediate;
 
+import compilers.ast.GenericNode;
 import compilers.ast.kxi_nodes.ScalarType;
 import lombok.Getter;
 
@@ -14,6 +15,10 @@ public class InterLit<T> extends InterValue {
         this.scalarType = scalarType;
     }
 
+    @Override
+    public GenericNode copy() {
+        return new InterLit<>(value, scalarType);
+    }
 
     @Override
     public String getTerminalValue() {

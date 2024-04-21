@@ -71,7 +71,12 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
                 comment("Deref ptr" + interOperand.getTerminalValue());
                 twoReg(LDRI, R2, R2);
             }
-
+        } else if (interOperand instanceof LeftPtr) {
+            //cant deref string or id
+            if (((LeftPtr) interOperand).getInterPtr().getScalarType() != ScalarType.STRING) {
+                comment("Deref ptr" + interOperand.getTerminalValue());
+                twoReg(LDRI, R1, R1);
+            }
         }
     }
 
