@@ -288,8 +288,8 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
         twoReg(MOV, SP, FP);
         comment("FP = PFP ");
         twoReg(MOV, FP, R14);
-        comment("push result on stack");
-        leftOp(PUSH, R2);
+//        comment("push result on stack");
+//        leftOp(PUSH, R2);
         comment("jump to return address");
         leftOp(JMR, R15);
 
@@ -309,10 +309,9 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
         }
         //now zeroed out push return address
         comment("Pre Activation Record");
-        comment("R14(PFP) = FP");
+        comment("PFP");
+        twoReg(MOV, R13, SP);
         getFP();
-        comment("SP = FP");
-        setPFP();
         comment("Get Address, and calculate offset");
         setPC();
         //add delim;
@@ -327,6 +326,7 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
 
     @Override
     public void visit(InterFunctionalCall node) {
+        twoReg(MOV, FP, R13);
         regLabel(JMP, node.getLabel());
     }
 
@@ -651,6 +651,7 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
     public void visit(InterPushArg node) {
         newLine();
         comment("Pushing " + node.getInterOperand().getInterValue().getTerminalValue());
+        tryDerefInterOperand(node.getInterOperand());
         leftOp(PUSH, R2);
     }
 
