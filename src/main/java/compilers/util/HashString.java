@@ -1,20 +1,18 @@
 package compilers.util;
 
-import java.util.Arrays;
-
 public class HashString {
-    static private char[] stringHash = "aaaaaaaaaaaaaaa".toCharArray();
+    //static private char[] stringHash = "aaaaaaaaaaaaaaa".toCharArray();
+    static String stringHash = "";
+    static Character current = 'a';
 
     static public String updateStringHash() {
-        String hash = "";
-        for (int i = 0; i < stringHash.length; i++) {
-            if (stringHash[i] != 'z') {
-                stringHash[i]++;
-                hash += stringHash[i];
-                return hash;
-            }
+        if (current != 'z') {
+            current++;
+        } else {
+            stringHash += current;
+            current = 'a';
         }
-        return hash;
+        return stringHash + current;
     }
 
 }

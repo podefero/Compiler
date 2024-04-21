@@ -548,7 +548,7 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
         InterElseStatement interElseStatement = null;
         InterDerefStatement interDerefStatement = new InterDerefStatement((InterOperand) getRightOperand().copy());
 
-        if (nodeStack.peek() instanceof InterElseStatement) {
+        if (!nodeStack.empty() && nodeStack.peek() instanceof InterElseStatement) {
             interElseStatement = pop();
         }
 

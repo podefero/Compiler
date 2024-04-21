@@ -104,7 +104,10 @@ public class KxiSimplifyVisitor extends KxiVisitorBase {
 //        if ((blockScope.getScopeType() == ScopeType.Method || blockScope.getScopeType() == ScopeType.Main)
 //                && !hasNode(KxiReturnStatement.class, node.getStatements())) {
 //        }
-        node.getChildren().add(new KxiReturnStatement(null));
+
+        BlockScope blockScope = (BlockScope) node.getScope();
+        if ((blockScope.getScopeType() == ScopeType.Method || blockScope.getScopeType() == ScopeType.Main))
+            node.getChildren().add(new KxiReturnStatement(null));
     }
 
 //    @Override
