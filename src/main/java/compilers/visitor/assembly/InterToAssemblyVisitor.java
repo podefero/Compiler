@@ -702,10 +702,16 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
     public void visit(RightVariableStack node) {
         //instruction to load variable in R2 from stack
         newLine();
-        comment("get ptr to " + node.getInterId().getId() + " into R2 from Stack");
-        getFP();
-        decFP(interSymbolTable.getOffset(node.getInterId(), currentFunctionData));
-        twoReg(MOV, R2, R14);
+        String id = node.getInterId().getId();
+        if (interSymbolTable.getFunctionDataMap().containsKey(id)) {
+            comment("Pop stack");
+            leftOp(POP, R2);
+        } else {
+            comment("get ptr to " + node.getInterId().getId() + " into R2 from Stack");
+            getFP();
+            decFP(interSymbolTable.getOffset(node.getInterId(), currentFunctionData));
+            twoReg(MOV, R2, R14);
+        }
     }
 
     @Override
@@ -722,10 +728,16 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
     @Override
     public void visit(LeftVariableStack node) {
         newLine();
-        comment("get ptr to " + node.getInterId().getId() + " into R1 from Stack");
-        getFP();
-        decFP(interSymbolTable.getOffset(node.getInterId(), currentFunctionData));
-        twoReg(MOV, R1, R14);
+        String id = node.getInterId().getId();
+        if (interSymbolTable.getFunctionDataMap().containsKey(id)) {
+            comment("Pop stack");
+            leftOp(POP, R1);
+        } else {
+            comment("get ptr to " + node.getInterId().getId() + " into R1 from Stack");
+            getFP();
+            decFP(interSymbolTable.getOffset(node.getInterId(), currentFunctionData));
+            twoReg(MOV, R1, R14);
+        }
 
     }
 
@@ -745,8 +757,8 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
     public void visit(OperandReturn node) {
         newLine();
         comment("Pop stack");
-        if(node.isLeft())
-        leftOp(POP, R1);
+        if (node.isLeft())
+            leftOp(POP, R1);
         else leftOp(POP, R2);
     }
 }

@@ -240,6 +240,7 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
             rightOperand = new RightVariableStack((InterValue) interValue.copy());
         } else
             rightOperand = new RightOperandLit(new InterLit<>(0, ScalarType.INT));
+
         interReturn = new InterReturn(rightOperand);
         addStatementToCurrentScope(interReturn);
     }

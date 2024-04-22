@@ -405,9 +405,9 @@ public class M4 {
     void simpRecursive() {
         test("class Test {\n" +
                 "    static public int f(int count) {\n" +
-                "        if(count == 2)\n" +
+                "        if(count == 8)\n" +
                 "            return count;\n" +
-                "        f(count - 1);\n" +
+                "       return f(count - 1);\n" +
                 "    }\n" +
                 "}\n" +
                 "\n" +
@@ -427,7 +427,7 @@ public class M4 {
                 "        }\n" +
                 "    }\n" +
                 "    void main() {\n" +
-                "        cout << Leonardo.Fib(6);\n" +
+                "        cout << Leonardo.Fib(10);\n" +
                 "    }", false);
     }
 
