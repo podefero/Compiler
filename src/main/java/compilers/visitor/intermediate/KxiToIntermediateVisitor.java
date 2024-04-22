@@ -580,7 +580,12 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
     @Override
     public void visit(KxiBlock node) {
         scopeBlock = node.getScope().getInterStatementList();
+        BlockScope blockScope = (BlockScope) node.getScope();
         super.visit(node);
+        if(blockScope.getScopeType() == ScopeType.Empty) {
+            InterBlock interBlock = new InterBlock(new GenericListNode(scopeBlock));
+            addStatementToCurrentScope(interBlock);
+        }
     }
 
 

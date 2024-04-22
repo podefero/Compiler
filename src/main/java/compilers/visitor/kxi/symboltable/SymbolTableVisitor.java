@@ -106,7 +106,7 @@ public class SymbolTableVisitor extends KxiVisitorBase {
         ScalarType scalarType = symbolData.getType().getScalarType();
         boolean isStatic = symbolData.isStatic();
 
-        if (isStatic || scalarType == ScalarType.STRING) {
+        if (isStatic) {
             globalScope.getScope().put(currentSymbolTable.getUniqueName() + id, symbolData);
         } else {
             checkForDuplicateId(currentSymbolTable, id, symbolData.getType().getLineInfo());
@@ -198,13 +198,18 @@ public class SymbolTableVisitor extends KxiVisitorBase {
         kxiBlock.setScope(blockScope);
         if (uniqueNameStack.empty()) {
             blockScope.setScopeType(ScopeType.Empty);
-        }
-        else {
+            blockScope.setUniqueName("empty_" + HashString.updateStringHash());
+        } else {
             kxiBlock.getScope().setUniqueName(uniqueNameStack.pop());
-            scopeNodePreVisit(blockScope);
         }
+        scopeNodePreVisit(blockScope);
     }
 
+    @Override
+    public void visit(KxiBlock kxiBlock) {
+        BlockScope blockScope = (BlockScope) kxiBlock.getScope();
+        if (blockScope.getScopeType() == ScopeType.Empty) scopeNodeVisit();
+    }
 
     @Override
     public void preVisit(KxiCaseBlock kxiBlock) {

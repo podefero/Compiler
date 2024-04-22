@@ -149,9 +149,7 @@ public class KxiVisitorBase implements VisitKxi {
 
     @Override
     public void visit(KxiBlock kxiBlock) {
-        BlockScope blockScope = (BlockScope) kxiBlock.getScope();
-        if (blockScope.getScopeType() != ScopeType.Empty)
-            currentScope = kxiBlock.getScope().getParent();
+        currentScope = kxiBlock.getScope().getParent();
     }
 
 
@@ -413,10 +411,7 @@ public class KxiVisitorBase implements VisitKxi {
 
     @Override
     public void preVisit(KxiBlock kxiBlock) {
-        BlockScope blockScope = (BlockScope) kxiBlock.getScope();
-        if (blockScope.getScopeType() != ScopeType.Empty)
-            currentScope = kxiBlock.getScope();
-
+        currentScope = kxiBlock.getScope();
     }
 
 

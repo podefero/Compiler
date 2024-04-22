@@ -498,12 +498,77 @@ public class M4 {
     }
 
 
-//    @Test
+    @Test
+    void elseWithBlock() {
+        test("  // Else Statement With Block\n" +
+                "    void main() {\n" +
+                "        bool test = true;\n" +
+                "        int y = 1;\n" +
+                "\n" +
+                "        if(!test){\n" +
+                "        cout<<\"Fail\";\n" +
+                "        }\n" +
+                "        else{\n" +
+                "            y =5;\n" +
+                "        }\n" +
+                "        cout<< y;\n" +
+                "    }\n" +
+                "    ---\n" +
+                "    5", false);
+    }
+
+        @Test
+    void loveScopes() {
+        test("  //We are Loving Scopes\n" +
+                "    void main() {\n" +
+                "        int y = 1;\n" +
+                "        if( y < 5){\n" +
+                "            bool y = false;\n" +
+                "            {\n" +
+                "                int y = 5;\n" +
+                "                {\n" +
+                "                    char y = 'a';\n" +
+                "                    {\n" +
+                "                        string y = \"Ayo\";\n" +
+                "                        cout<< y;\n" +
+                "                    }\n" +
+                "                    cout<< y;\n" +
+                "                }\n" +
+                "                cout<< y;\n" +
+                "            }\n" +
+                "             if(y)\n" +
+                "                cout<<\"Yoink\";  \n" +
+                "            else\n" +
+                "                cout<<\"Yeet\";\n" +
+                "        }\n" +
+                "         cout<< y;\n" +
+                "    }\n" +
+                "    ---\n" +
+                "    Ayoa5Yeet1", false);
+    }
+
+        @Test
+    void nestedBlocks() {
+        test("void main() {\n" +
+                "    int y = 1;\n" +
+                "    if (y < 10) {\n" +
+                "        {\n" +
+                "            char y = 'a';\n" +
+                "            {\n" +
+                "                string y = \"hello\";\n" +
+                "                cout << y;\n" +
+                "            }\n" +
+                "            cout << y;\n" +
+                "        }\n" +
+                "        cout << y;\n" +
+                "    }\n" +
+                "}", false);
+    }
+
+    //    @Test
 //    void imSpacedOut() {
 //        test("", false);
 //    }
-
-
     void test(String input, boolean hasErrors) {
         KxiParser parser = kxiParser(input);
         AntlrToKxiVisitor antlrToKxiVisitor = new AntlrToKxiVisitor();
