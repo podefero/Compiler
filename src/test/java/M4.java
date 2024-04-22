@@ -405,7 +405,7 @@ public class M4 {
     void simpRecursive() {
         test("class Test {\n" +
                 "    static public int f(int count) {\n" +
-                "        if(count == 8)\n" +
+                "        if(count == 0)\n" +
                 "            return count;\n" +
                 "       return f(count - 1);\n" +
                 "    }\n" +

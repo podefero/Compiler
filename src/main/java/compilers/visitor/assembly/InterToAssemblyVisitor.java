@@ -59,6 +59,11 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
     }
 
     private void tryDerefInterOperand(InterOperand interOperand) {
+        if(interOperand == null) return;
+        if(interSymbolTable.getFunctionDataMap().containsKey(interOperand.getInterValue().getTerminalValue())) {
+            return;
+        }
+
         if (interOperand instanceof LeftVariableStack) {
             comment("Deref " + ((LeftVariableStack) interOperand).getInterId().getId());
             twoReg(LDRI, R1, R1);

@@ -237,7 +237,7 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
         InterOperand rightOperand;
         if (node.getExpression() != null) {
             InterValue interValue = getRightOperand().getInterValue();
-            rightOperand = new RightVariableStack((InterValue) interValue.copy());
+            rightOperand = getRightOperand((InterValue) interValue.copy());
         } else
             rightOperand = new RightOperandLit(new InterLit<>(0, ScalarType.INT));
 
