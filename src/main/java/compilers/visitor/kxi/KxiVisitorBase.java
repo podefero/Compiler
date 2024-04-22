@@ -1,5 +1,6 @@
 package compilers.visitor.kxi;
 
+import compilers.ast.GenericNode;
 import compilers.ast.assembly.*;
 import compilers.ast.intermediate.InterFunctionNode;
 import compilers.ast.intermediate.InterGlobal;

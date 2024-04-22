@@ -10,8 +10,9 @@ import compilers.visitor.antlr.AntlrToKxiVisitor;
 import compilers.visitor.assembly.AssemblyAssembleVisitor;
 import compilers.visitor.assembly.InterToAssemblyVisitor;
 import compilers.visitor.generic.GraphVizVisitor;
+import compilers.visitor.intermediate.DanglingElseVisitor;
 import compilers.visitor.intermediate.InterSymbolTableVisitor;
-import compilers.visitor.intermediate.KxiSimplifyVisitor;
+import compilers.visitor.intermediate.BreakAndReturnsVisitor;
 import compilers.visitor.intermediate.KxiToIntermediateVisitor;
 import compilers.visitor.kxi.invalid_break.InvalidBreakVisitor;
 import compilers.visitor.kxi.invalid_write.InvalidWriteVisitor;
@@ -329,7 +330,6 @@ public class M4 {
     }
 
 
-
     @Test
     void whileLoop() {
         test("  void main() {\n" +
@@ -353,8 +353,6 @@ public class M4 {
 //                "        }\n" +
 //                "    }", false);
 //    }
-
-
 
 
     @Test
@@ -415,6 +413,7 @@ public class M4 {
                 "    cout << Test.f(10);\n" +
                 "}", false);
     }
+
     @Test
     void fib() {
         test("  //First 10 fibonacci numbers\n" +
@@ -431,19 +430,72 @@ public class M4 {
                 "    }", false);
     }
 
-//    @Test
-//    void imSpacedOut() {
-//        test("", false);
-//    }
+    @Test
+    void staticVariableTest() {
+        test(" //Test static member variables\n" +
+                "    class Cheese {\n" +
+                "        static public int y = 4;\n" +
+                "        static public int x = Cheese.y + 1;\n" +
+                "        static public int z = x + y;\n" +
+                "    }\n" +
+                "    void main() {\n" +
+                "        cout << Cheese.z;\n" +
+                "    }\n" +
+                "    ---\n" +
+                "    9", false);
+    }
 
-//    @Test
-//    void imSpacedOut() {
-//        test("", false);
-//    }
+    @Test
+    void staticVariableTestTwo() {
+        test("  //Test member qualification\n" +
+                "    class Cheese {\n" +
+                "        static public int x = 90;\n" +
+                "        static public int cheesey() {\n" +
+                "            int x = 4;\n" +
+                "            return x;\n" +
+                "        }\n" +
+                "    }\n" +
+                "    void main() {\n" +
+                "        cout << Cheese.cheesey();\n" +
+                "    }\n" +
+                "    ---\n" +
+                "    4", false);
+    }
+
+    @Test
+    void staticAccessMember() {
+        test("  // Returning Classes and Accessing Members\n" +
+                "    class Yoink{\n" +
+                "        static public char me = 'z';\n" +
+                "    }\n" +
+                "    \n" +
+                "    void main() {\n" +
+                "        cout<< Yoink.me;\n" +
+                "    }\n" +
+                "    ---\n" +
+                "    z", false);
+    }
+
+    @Test
+    void danglingElse() {
+        test("void main() {\n" +
+                " if(true)\n" +
+                "    if(true)\n" +
+                "        if(false){}\n" +
+                "            else{\n" +
+                "            cout << \"hey\";\n" +
+                "        }\n" +
+                "}", false);
+    }
 
 
-
-
+    @Test
+    void ifElse() {
+        test("void main() {\n" +
+                " if(false) cout << \"true\";\n" +
+                " else cout << \"false\";\n" +
+                "}", false);
+    }
 
 
 //    @Test
@@ -474,8 +526,11 @@ public class M4 {
         rootNode.accept(invalidBreakVisitor);
         invalidBreakVisitor.dumpErrorStack();
 
-        KxiSimplifyVisitor kxiSimplifyVisitor = new KxiSimplifyVisitor();
-        rootNode.accept(kxiSimplifyVisitor);
+        BreakAndReturnsVisitor breakAndReturnsVisitor = new BreakAndReturnsVisitor();
+        rootNode.accept(breakAndReturnsVisitor);
+
+       // rootNode.accept(new DanglingElseVisitor());
+
         KxiToIntermediateVisitor kxiToIntermediateVisitor = new KxiToIntermediateVisitor(symbolTableVisitor.getScopeHandler());
         rootNode.accept(kxiToIntermediateVisitor);
 

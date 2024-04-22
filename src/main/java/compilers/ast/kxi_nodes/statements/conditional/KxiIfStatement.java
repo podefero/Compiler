@@ -6,8 +6,10 @@ import compilers.ast.kxi_nodes.statements.AbstractKxiStatement;
 import compilers.ast.kxi_nodes.statements.KxiBlockStatement;
 import compilers.visitor.kxi.KxiVisitorBase;
 import lombok.Getter;
+import lombok.Setter;
 
 @Getter
+@Setter
 public class KxiIfStatement extends AbstractKxiConditionalStatement {
     private KxiElseStatement elseStatement;
 

@@ -33,12 +33,24 @@ public class KxiFactoryStatement extends AbstractKxiFactory {
             return new KxiBreakStatement();
 
         } else if (statementContext.IF() != null) {
+            KxiElseStatement kxiElseStatement;
+            KxiBlock block;
+            AbstractKxiExpression expression;
+            KxiIfStatement kxiIfStatement;
             if (statementContext.ELSE() != null) {
-                KxiElseStatement kxiElseStatement = new KxiElseStatement(getBlock(pop(stack)));
-                return new KxiIfStatement(kxiElseStatement, getBlock(pop(stack)), pop(stack));
+                kxiElseStatement = new KxiElseStatement(getBlock(pop(stack)));
+                block = getBlock(pop(stack));
+                expression = pop(stack);
+                kxiIfStatement = new KxiIfStatement(kxiElseStatement, block, expression);
+                kxiElseStatement.setParent(kxiIfStatement);
+            } else {
+                block = getBlock(pop(stack));
+                expression = pop(stack);
+                kxiIfStatement = new KxiIfStatement(null, block, expression);
             }
-            else
-                return new KxiIfStatement(null, getBlock(pop(stack)), pop(stack));
+            block.setParent(kxiIfStatement);
+            expression.setParent(kxiIfStatement);
+            return kxiIfStatement;
 
         } else if (statementContext.WHILE() != null) {
             return new KxiWhileStatement(getBlock(pop(stack)), pop(stack));

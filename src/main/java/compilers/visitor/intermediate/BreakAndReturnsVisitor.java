@@ -1,42 +1,25 @@
 package compilers.visitor.intermediate;
 
 import compilers.ast.kxi_nodes.*;
-import compilers.ast.kxi_nodes.class_members.KxiMethod;
-import compilers.ast.kxi_nodes.expressions.AbstractKxiExpression;
-import compilers.ast.kxi_nodes.expressions.KxiDotExpression;
-import compilers.ast.kxi_nodes.expressions.KxiForWhileExpression;
-import compilers.ast.kxi_nodes.expressions.KxiMethodExpression;
-import compilers.ast.kxi_nodes.expressions.binary.arithmic.KxiDiv;
-import compilers.ast.kxi_nodes.expressions.binary.arithmic.KxiMult;
-import compilers.ast.kxi_nodes.expressions.binary.arithmic.KxiPlus;
-import compilers.ast.kxi_nodes.expressions.binary.arithmic.KxiSubtract;
-import compilers.ast.kxi_nodes.expressions.binary.assignment.*;
-import compilers.ast.kxi_nodes.expressions.binary.conditional.*;
 import compilers.ast.kxi_nodes.expressions.literals.*;
-import compilers.ast.kxi_nodes.expressions.uni.KxiNot;
-import compilers.ast.kxi_nodes.expressions.uni.KxiUniPlus;
-import compilers.ast.kxi_nodes.expressions.uni.KxiUniSubtract;
 import compilers.ast.kxi_nodes.scope.KxiBlock;
 import compilers.ast.kxi_nodes.scope.KxiCaseBlock;
 import compilers.ast.kxi_nodes.statements.KxiBreakStatement;
 import compilers.ast.kxi_nodes.statements.KxiReturnStatement;
-import compilers.ast.kxi_nodes.statements.KxiSwitchStatement;
 import compilers.ast.kxi_nodes.statements.conditional.KxiForStatement;
 import compilers.ast.kxi_nodes.statements.conditional.KxiWhileStatement;
-import compilers.ast.kxi_nodes.token_literals.IdentifierToken;
 import compilers.visitor.kxi.KxiVisitorBase;
 import compilers.visitor.kxi.symboltable.BlockScope;
 import compilers.visitor.kxi.symboltable.ScopeType;
-import lombok.AllArgsConstructor;
 
 import java.util.List;
 import java.util.Stack;
 
-public class KxiSimplifyVisitor extends KxiVisitorBase {
+public class BreakAndReturnsVisitor extends KxiVisitorBase {
 
     Stack<String> breakLoopStack;
 
-    public KxiSimplifyVisitor() {
+    public BreakAndReturnsVisitor() {
         breakLoopStack = new Stack<>();
     }
 

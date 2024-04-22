@@ -10,8 +10,9 @@ import compilers.visitor.antlr.AntlrToKxiVisitor;
 import compilers.visitor.assembly.AssemblyAssembleVisitor;
 import compilers.visitor.assembly.InterToAssemblyVisitor;
 import compilers.visitor.generic.GraphVizVisitor;
+import compilers.visitor.intermediate.DanglingElseVisitor;
 import compilers.visitor.intermediate.InterSymbolTableVisitor;
-import compilers.visitor.intermediate.KxiSimplifyVisitor;
+import compilers.visitor.intermediate.BreakAndReturnsVisitor;
 import compilers.visitor.intermediate.KxiToIntermediateVisitor;
 import compilers.visitor.kxi.invalid_break.InvalidBreakVisitor;
 import compilers.visitor.kxi.invalid_write.InvalidWriteVisitor;
@@ -53,8 +54,11 @@ public class GraphInterTest {
         rootNode.accept(invalidBreakVisitor);
         invalidBreakVisitor.dumpErrorStack();
 
-        KxiSimplifyVisitor kxiSimplifyVisitor = new KxiSimplifyVisitor();
-        rootNode.accept(kxiSimplifyVisitor);
+        BreakAndReturnsVisitor breakAndReturnsVisitor = new BreakAndReturnsVisitor();
+        rootNode.accept(breakAndReturnsVisitor);
+
+        rootNode.accept(new DanglingElseVisitor());
+
         KxiToIntermediateVisitor kxiToIntermediateVisitor = new KxiToIntermediateVisitor(symbolTableVisitor.getScopeHandler());
         rootNode.accept(kxiToIntermediateVisitor);
 

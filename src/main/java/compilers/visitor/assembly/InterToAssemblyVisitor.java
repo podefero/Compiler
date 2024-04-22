@@ -272,9 +272,10 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
     @Override
     public void preVisit(InterElseStatement node) {
         newLine();
-        comment("Set up for else statement");
+        regLabel(JMP, node.getDone());
+        comment("else statement");
         label(node.getIfNot());
-        regAndLabel(BGT, R4, node.getDone());
+        //regAndLabel(BGT, R4, node.getDone());
     }
 
     @Override

@@ -5,8 +5,7 @@ import compilers.util.InputHandler;
 import compilers.util.OutputHandler;
 import compilers.visitor.antlr.AntlrToKxiVisitor;
 import compilers.visitor.generic.GraphVizVisitor;
-import compilers.visitor.intermediate.KxiSimplifyVisitor;
-import compilers.visitor.intermediate.KxiToIntermediateVisitor;
+import compilers.visitor.intermediate.BreakAndReturnsVisitor;
 import compilers.visitor.kxi.invalid_break.InvalidBreakVisitor;
 import compilers.visitor.kxi.invalid_write.InvalidWriteVisitor;
 import compilers.visitor.kxi.symboltable.SymbolTableVisitor;
@@ -26,8 +25,8 @@ public class GraphKxiSimpleTest {
 
         validateAST(rootNode);
 
-        KxiSimplifyVisitor kxiSimplifyVisitor = new KxiSimplifyVisitor();
-        rootNode.accept(kxiSimplifyVisitor);
+        BreakAndReturnsVisitor breakAndReturnsVisitor = new BreakAndReturnsVisitor();
+        rootNode.accept(breakAndReturnsVisitor);
 
 //        validateAST(rootNode);
 

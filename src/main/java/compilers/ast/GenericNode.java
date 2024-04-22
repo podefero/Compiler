@@ -3,14 +3,17 @@ package compilers.ast;
 
 import compilers.visitor.kxi.KxiVisitorBase;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 @Getter
+@Setter
 public abstract class GenericNode {
     protected List<GenericNode> children;
+    protected GenericNode parent;
 
     public GenericNode(GenericNode... children) {
         this.children = createList(children);
