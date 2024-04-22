@@ -17,7 +17,7 @@ public class InterFunctionalCall extends InterStatement  {
     String label;
     int numOfArgs;
     public InterFunctionalCall(InterId calleeId, GenericListNode args) {
-        super(args);
+        super(args, calleeId);
         this.calleeId = calleeId;
         this.interArgsList = getNodeList(args);
         label = convertIdToLabel(calleeId.getId());

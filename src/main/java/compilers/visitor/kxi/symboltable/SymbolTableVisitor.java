@@ -36,6 +36,7 @@ public class SymbolTableVisitor extends KxiVisitorBase {
     private SymbolTable currentSymbolTable;
     private List<String> allIds;
     private int nameCounter;
+    boolean emptyBlock;
 
     public SymbolTableVisitor() {
         super();
@@ -116,7 +117,7 @@ public class SymbolTableVisitor extends KxiVisitorBase {
     private void addMethodScopeToClassScope(MethodScope methodScope, ClassScope classScope, String id, String lineInfo) {
         if (classScope.getMethodScopeMap().containsKey(id))
             exceptionStack.push(new SymbolTableException(lineInfo, "Duplicate Method/Constructor name " + id));
-        if(methodScope.getBlockScope().getScope().containsKey(id))
+        if (methodScope.getBlockScope().getScope().containsKey(id))
             exceptionStack.push(new SymbolTableException(lineInfo, "Duplicate Method/Variable name " + id));
 
 
@@ -190,13 +191,20 @@ public class SymbolTableVisitor extends KxiVisitorBase {
         scopeNodeVisit();
     }
 
+
     @Override
     public void preVisit(KxiBlock kxiBlock) {
         BlockScope blockScope = new BlockScope();
         kxiBlock.setScope(blockScope);
-        kxiBlock.getScope().setUniqueName(uniqueNameStack.pop());
-        scopeNodePreVisit(blockScope);
+        if (uniqueNameStack.empty()) {
+            blockScope.setScopeType(ScopeType.Empty);
+        }
+        else {
+            kxiBlock.getScope().setUniqueName(uniqueNameStack.pop());
+            scopeNodePreVisit(blockScope);
+        }
     }
+
 
     @Override
     public void preVisit(KxiCaseBlock kxiBlock) {

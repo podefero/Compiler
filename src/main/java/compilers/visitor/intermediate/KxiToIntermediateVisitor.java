@@ -49,6 +49,7 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
     private InterGlobal rootNode;
     private List<InterStatement> scopeBlock;
     private Stack<InterStatement> rightToLeftStack;
+    private Stack<InterStatement> rightToLeftStackGlobal;
     private List<InterStatement> caseStatements;
     private List<InterGlobalVariable> globalVariables;
     private List<InterOperation> globalInit;
@@ -60,6 +61,7 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
     public KxiToIntermediateVisitor(ScopeHandler scopeHandler) {
         nodeStack = new Stack<>();
         rightToLeftStack = new Stack<>();
+        rightToLeftStackGlobal = new Stack<>();
         this.scopeHandler = scopeHandler;
         scopeBlock = new ArrayList<>();
         caseStatements = new ArrayList<>();
@@ -188,25 +190,12 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
 
     private void tempVariableMaker(InterOperation interOperation, ScalarType scalarType) {
         //if we are in a class scope than assume static
-        ClassScope classScope = scopeHandler.bubbleToClassScope(currentScope);
-        if (classScope != null) {
-            InterPtr interPtr = new InterPtr(scalarType);
-            Directive directive = getDirective(scalarType);
-            InterGlobalVariable interGlobalVariable = new InterGlobalVariable(interPtr, directive, null);
-            //copy operation
-//            InterOperand right = (InterOperand) interOperation.getRightOperand().copy();
-//            InterOperand right = (InterOperand) getRightOperand(interPtr).copy();
-            LeftPtr left = new LeftPtr((InterValue) interPtr.copy());
-            globalInit.add(interOperation);
-            globalInit.add(new InterAssignment(left, null));
-            globalVariables.add(interGlobalVariable);
-            nodeStack.push(interPtr);
-        } else {
-            InterId interId = new InterId(scalarType);
-            InterVariable interVariable = new InterVariable(interId, interOperation);
-            addStatementToCurrentScope(interVariable);
-            nodeStack.push(interId);
-        }
+
+        InterId interId = new InterId(scalarType);
+        InterVariable interVariable = new InterVariable(interId, interOperation);
+        addStatementToCurrentScope(interVariable);
+        nodeStack.push(interId);
+
 
     }
 
@@ -285,12 +274,32 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
         while (!rightToLeftStack.empty()) addStatementToCurrentScope(rightToLeftStack.pop());
     }
 
+    private void convertToGlobalBinaryAssignmentArithmic(InterOperand leftOperand, InterOperand rightOperand, InterOperation arithmic, ScalarType scalarType) {
+        InterPtr interPtr = new InterPtr(scalarType);
+        Directive directive = getDirective(scalarType);
+
+        InterGlobalVariable interGlobalVariable = new InterGlobalVariable(interPtr, directive, null);
+        RightPtr rightPtr = new RightPtr(interPtr);
+        InterAssignment interAssignment = new InterAssignment((InterOperand) leftOperand.copy(), rightPtr);
+
+        globalVariables.add(interGlobalVariable);
+        rightToLeftStackGlobal.push(new InterBinaryAssignmentStatementGlobal(arithmic, interAssignment));
+        nodeStack.push(interPtr);
+    }
+
     @Override
     public void visit(KxiDivEquals node) {
+
         InterOperand rightOperand = getRightOperand();
         InterOperand leftOperand = getLeftOperand();
 
         InterBinaryDivide interBinaryPlus = new InterBinaryDivide((InterOperand) leftOperand.copy(), (InterOperand) rightOperand.copy());
+
+        if (scopeHandler.bubbleToClassScope(currentScope) != null) {
+            convertToGlobalBinaryAssignmentArithmic(leftOperand, rightOperand, interBinaryPlus, ScalarType.INT);
+            return;
+        }
+
         InterId tempId = new InterId(ScalarType.INT);
         InterVariable interVariable = new InterVariable(tempId, interBinaryPlus);
 
@@ -307,6 +316,10 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
         InterOperand leftOperand = getLeftOperand();
 
         InterBinaryMult interBinaryPlus = new InterBinaryMult((InterOperand) leftOperand.copy(), (InterOperand) rightOperand.copy());
+        if (scopeHandler.bubbleToClassScope(currentScope) != null) {
+            convertToGlobalBinaryAssignmentArithmic(leftOperand, rightOperand, interBinaryPlus, ScalarType.INT);
+            return;
+        }
         InterId tempId = new InterId(ScalarType.INT);
         InterVariable interVariable = new InterVariable(tempId, interBinaryPlus);
 
@@ -324,6 +337,10 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
         InterOperand leftOperand = getLeftOperand();
 
         InterBinaryPlus interBinaryPlus = new InterBinaryPlus((InterOperand) leftOperand.copy(), (InterOperand) rightOperand.copy());
+        if (scopeHandler.bubbleToClassScope(currentScope) != null) {
+            convertToGlobalBinaryAssignmentArithmic(leftOperand, rightOperand, interBinaryPlus, ScalarType.INT);
+            return;
+        }
         InterId tempId = new InterId(ScalarType.INT);
         InterVariable interVariable = new InterVariable(tempId, interBinaryPlus);
 
@@ -340,6 +357,10 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
         InterOperand leftOperand = getLeftOperand();
 
         InterBinarySubtract interBinaryPlus = new InterBinarySubtract((InterOperand) leftOperand.copy(), (InterOperand) rightOperand.copy());
+        if (scopeHandler.bubbleToClassScope(currentScope) != null) {
+            convertToGlobalBinaryAssignmentArithmic(leftOperand, rightOperand, interBinaryPlus, ScalarType.INT);
+            return;
+        }
         InterId tempId = new InterId(ScalarType.INT);
         InterVariable interVariable = new InterVariable(tempId, interBinaryPlus);
 
@@ -431,9 +452,10 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
             ScalarType scalarType = symbolData.getScalarType();
             SymbolTable whatScopeIdFound = scopeHandler.getLasIdentified();
             boolean isStatic = symbolData.isStatic();
-            if (scalarType == ScalarType.STRING || isStatic)
-                nodeStack.push(new InterPtr(getFullyQualifiedName(node.getTokenLiteral().getValue()), scalarType));
-            else
+            if (isStatic) {
+                ClassScope classScope = scopeHandler.bubbleToClassScope(currentScope);
+                nodeStack.push(new InterPtr(classScope.getUniqueName() + node.getTokenLiteral().getValue(), scalarType));
+            } else
                 nodeStack.push(new InterId(whatScopeIdFound.getUniqueName() + node.getTokenLiteral().getValue(), scalarType));
         } else
             nodeStack.push(new InterId(node.getTokenLiteral().getValue(), ScalarType.UNKNOWN));
@@ -446,6 +468,7 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
 
     @Override
     public void visit(ExpressionNullLit node) {
+        nodeStack.push(new InterLit<>(0, ScalarType.INT));
     }
 
     @Override
@@ -673,7 +696,18 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
 
             InterVariable interVariable;
             if (node.getInitializer() != null) {
-                InterOperand rightOperand = getRightOperand();
+                InterOperand rightOperand;
+
+                //If we have assignment arithmic change order of statements. And right hand of variable
+                if (!rightToLeftStack.empty()) {
+                    while (!rightToLeftStack.empty()) addStatementToCurrentScope(rightToLeftStack.pop());
+                    InterBinaryAssignmentStatement binEquals
+                            = (InterBinaryAssignmentStatement) currentScope.getInterStatementList().get(currentScope.getInterStatementList().size() - 1);
+                    rightOperand = (InterOperand) new RightVariableStack(binEquals.getInterVariable().getInterId()).copy();
+                } else {
+                    rightOperand = getRightOperand();
+                }
+
                 if (rightOperand instanceof RightPtr)
                     interVariable = new InterVariable(varId, new InterPtrAssignment(leftVariableStack, rightOperand));
                 else
@@ -681,6 +715,7 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
             } else {
                 interVariable = new InterVariable(varId, null);
             }
+
             addStatementToCurrentScope(interVariable);
         }
     }
@@ -756,7 +791,21 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
             globalVariables.add(interGlobalVariable);
 
             if (node.getVariableDeclaration().getInitializer() != null) {
-                InterAssignment interAssignment = new InterAssignment(new LeftPtr(interPtr), getRightOperand());
+                InterOperand rightOperand = null;
+                if (!rightToLeftStackGlobal.empty()) {
+                    while (!rightToLeftStackGlobal.empty()) {
+                        InterBinaryAssignmentStatementGlobal binGlob = (InterBinaryAssignmentStatementGlobal) rightToLeftStackGlobal.pop();
+                        globalInit.add(binGlob.getInterArithmic());
+                        globalInit.add(binGlob.getInterAssignment());
+
+                        if (rightToLeftStackGlobal.size() == 1)
+                            rightOperand = (InterOperand) binGlob.getInterArithmic().getRightOperand().copy();
+                    }
+                } else {
+                    rightOperand = getRightOperand();
+                }
+
+                InterAssignment interAssignment = new InterAssignment(new LeftPtr(interPtr), rightOperand);
                 globalInit.add(interAssignment);
             }
 

@@ -8,5 +8,6 @@ public enum ScopeType {
     Switch,
     Method,
     Main,
-    Constructor
+    Constructor,
+    Empty
 }

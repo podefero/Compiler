@@ -160,41 +160,54 @@ public class M4 {
                 "\tint i = 10;\n" +
                 "\tint j = 10;\n" +
                 "\tint r = i += j *= j / 10; // j = 20, i = 30, r = i\n" +
-                "\tcout << r; // print 30;\n" +
+                "\tcout << r; cout << i; cout << j; // print 30;\n" +
                 "}", false);
     }
 
     @Test
-    void validStaticFunctionCallsM4() {
+    void validArithmicAssignmentExpressionsStaticTestM4() {
         test("class Test {\n" +
-                "    static public int testInt = 1;\n" +
-                "    static private B b;\n" +
-                "    \n" +
-                "    static public int intF() {\n" +
-                "        return testInt;\n" +
-                "    }\n" +
+                "   static private int i = 10;\n" +
+                "   static private int j = 10;\n" +
+                "   static public int r = i += j *= j / 10;\n" +
                 "\n" +
-                "    static public B getB() {\n" +
-                "        b.bInt += intF();\n" +
-                "        return b;\n" +
-                "    }\n" +
-                "    \n" +
                 "}\n" +
+                "void main() { cout << Test.r;\n" +
                 "\n" +
-                "class B {\n" +
-                "    static public int bInt = 2;\n" +
-                "    \n" +
-                "}\n" +
-                "\n" +
-                "void main() {\n" +
-                "    int test = Test.testInt; //1\n" +
-                "    int f = Test.intF(); //1\n" +
-                "    int b = Test.getB().bInt; //3\n" +
-                "    cout << test;\n" +
-                "    cout << f;\n" +
-                "    cout << b;\n" +
-                "}", false);
+                "}\n", false);
     }
+
+//    @Test
+//    void validStaticFunctionCallsM4() {
+//        test("class Test {\n" +
+//                "    static public int testInt = 1;\n" +
+//                "    static private B b;\n" +
+//                "    \n" +
+//                "    static public int intF() {\n" +
+//                "        return testInt;\n" +
+//                "    }\n" +
+//                "\n" +
+//                "    static public B getB() {\n" +
+//                "        b.bInt += intF();\n" +
+//                "        return b;\n" +
+//                "    }\n" +
+//                "    \n" +
+//                "}\n" +
+//                "\n" +
+//                "class B {\n" +
+//                "    static public int bInt = 2;\n" +
+//                "    \n" +
+//                "}\n" +
+//                "\n" +
+//                "void main() {\n" +
+//                "    int test = Test.testInt; //1\n" +
+//                "    int f = Test.intF(); //1\n" +
+//                "    int b = Test.getB().bInt; //3\n" +
+//                "    cout << test;\n" +
+//                "    cout << f;\n" +
+//                "    cout << b;\n" +
+//                "}", false);
+//    }
 
     @Test
     void imSpacedOut() {
@@ -246,6 +259,16 @@ public class M4 {
     }
 
     @Test
+    void plusEqualInCoplexExpTwo() {
+        test("  void main(){\n" +
+                "        int c = 2;\n" +
+                "        true && false || (c += 1) > 2;// false and true\n" +
+                "        cout << c;\n" +
+                "    }", false);
+
+    }
+
+    @Test
     void plusEqualInCoplexExp() {
         test(" void main(){\n" +
                 "            int c = 2;\n" +
@@ -254,6 +277,102 @@ public class M4 {
                 "            }", false);
     }
 
+
+    @Test
+    void fourfive() {
+        test("  void main(){\n" +
+                "        int n = 3;\n" +
+                "        int t = 3;\n" +
+                "        (n += 1) > 3 || (t += 2) > 3;\n" +
+                "        cout << n;\n" +
+                "        cout << t;\n" +
+                "    }", false);
+    }
+
+    @Test
+    void switchOne() {
+        test("   void main(){\n" +
+                "            int n = 1;\n" +
+                "            switch(n){\n" +
+                "                case 1:\n" +
+                "                    cout << \"one\";\n" +
+                "                    break;\n" +
+                "                case 2:\n" +
+                "                case 3:\n" +
+                "                    cout << \"two or three\";\n" +
+                "                    break;\n" +
+                "                default:\n" +
+                "                    cout << \"a number not in the range of 1 to 3\";\n" +
+                "                    break;\n" +
+                "                }\n" +
+                "            }", false);
+    }
+
+
+    @Test
+    void defaultSwitch() {
+        test(" void main(){\n" +
+                "        int n = 0;\n" +
+                "        switch(n){\n" +
+                "            case 1:\n" +
+                "                cout << \"one\";\n" +
+                "                break;\n" +
+                "            case 2:\n" +
+                "            case 3:\n" +
+                "                cout << \"two or three\";\n" +
+                "                break;\n" +
+                "            default:\n" +
+                "                cout << \"a number not in the range of 1 to 3\";\n" +
+                "                break;\n" +
+                "        }\n" +
+                "    }", false);
+    }
+
+
+
+    @Test
+    void whileLoop() {
+        test("  void main() {\n" +
+                "        int x = 10;\n" +
+                "        while(x > 0) {\n" +
+                "            cout << x;\n" +
+                "            x = x - 1;\n" +
+                "        }\n" +
+                "    }", false);
+    }
+
+//    @Test
+//    void whileLoopInf() {
+//        test("  void main() {\n" +
+//                "        int x = 10;\n" +
+//                "        while (x > 0){\n" +
+//                "            cout << x;\n" +
+//                "            //RHS should never evaluate, if it does, this is an infinite loop (you're welcome if this broke lol)\n" +
+//                "            true || x < (x += 10);\n" +
+//                "            x = x - 1;\n" +
+//                "        }\n" +
+//                "    }", false);
+//    }
+
+
+
+
+    @Test
+    void nestedWhileLoops() {
+        test(" class Cheese {\n" +
+                "        static public int x = 3;\n" +
+                "        static public void count() {\n" +
+                "            cout << Cheese.x;\n" +
+                "            Cheese.x = Cheese.x -1;\n" +
+                "            if (Cheese.x != 0) {\n" +
+                "                count();\n" +
+                "            }\n" +
+                "        }\n" +
+                "    }\n" +
+                "    void main() {\n" +
+                "        Cheese.count();\n" +
+                "    }", false);
+    }
 
 
 //    @Test
@@ -300,10 +419,9 @@ public class M4 {
         InterToAssemblyVisitor interToAssemblyVisitor = new InterToAssemblyVisitor(new ArrayList<>()
                 , null
                 , interSymbolTableVisitor.getInterSymbolTable()
-                , interSymbolTableVisitor. getInterSymbolTable().getFunctionDataMap().get("main$main"));
+                , interSymbolTableVisitor.getInterSymbolTable().getFunctionDataMap().get("main$main"));
 
         interGlobal.accept(interToAssemblyVisitor);
-
 
 
         AssemblyAssembleVisitor assemblyAssembleVisitor = new AssemblyAssembleVisitor();

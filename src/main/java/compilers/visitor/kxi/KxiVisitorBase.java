@@ -32,13 +32,15 @@ import compilers.ast.kxi_nodes.statements.conditional.KxiIfStatement;
 import compilers.ast.kxi_nodes.statements.conditional.KxiWhileStatement;
 import compilers.ast.kxi_nodes.token_literals.*;
 import compilers.exceptions.CompilerException;
+import compilers.visitor.kxi.symboltable.BlockScope;
+import compilers.visitor.kxi.symboltable.ScopeType;
 import compilers.visitor.kxi.symboltable.SymbolTable;
 import lombok.Getter;
 
 import java.util.Stack;
 
 @Getter
-public  class KxiVisitorBase implements VisitKxi {
+public class KxiVisitorBase implements VisitKxi {
 
     protected Stack<CompilerException> exceptionStack;
     protected SymbolTable currentScope;
@@ -98,7 +100,6 @@ public  class KxiVisitorBase implements VisitKxi {
     }
 
 
-
     @Override
     public void visit(KxiWhileStatement kxiWhileStatement) {
 
@@ -147,7 +148,9 @@ public  class KxiVisitorBase implements VisitKxi {
 
     @Override
     public void visit(KxiBlock kxiBlock) {
-        currentScope = kxiBlock.getScope().getParent();
+        BlockScope blockScope = (BlockScope) kxiBlock.getScope();
+        if (blockScope.getScopeType() != ScopeType.Empty)
+            currentScope = kxiBlock.getScope().getParent();
     }
 
 
@@ -409,7 +412,9 @@ public  class KxiVisitorBase implements VisitKxi {
 
     @Override
     public void preVisit(KxiBlock kxiBlock) {
-        currentScope = kxiBlock.getScope();
+        BlockScope blockScope = (BlockScope) kxiBlock.getScope();
+        if (blockScope.getScopeType() != ScopeType.Empty)
+            currentScope = kxiBlock.getScope();
 
     }
 
@@ -862,7 +867,8 @@ public  class KxiVisitorBase implements VisitKxi {
     public void preVisit(KxiElseStatement kxiElseStatement) {
     }
 
-    public void visit(KxiIfStatement kxiIfStatement){}
+    public void visit(KxiIfStatement kxiIfStatement) {
+    }
 
     public void visit(KxiElseStatement kxiElseStatement) {
     }
@@ -922,5 +928,8 @@ public  class KxiVisitorBase implements VisitKxi {
     }
 
     public void preVisit(InterFunctionalCall interFunctionalCall) {
+    }
+
+    public void visit(InterBinaryAssignmentStatementGlobal interBinaryAssignmentStatementGlobal) {
     }
 }
