@@ -145,11 +145,14 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
     }
 
     private InterOperand getLeftOperand() {
-        InterValue left = pop();
+        InterValue left;
+        if (!nodeStack.isEmpty()) left = pop();
+        else return null;
         InterOperand leftOperand;
 
         if (left instanceof InterId)
-            leftOperand = new LeftVariableStack(left);
+            if (((InterId) left).isReturn()) leftOperand = new OperandReturn(left, true);
+            else leftOperand = new LeftVariableStack(left);
         else if (left instanceof InterPtr)
             leftOperand = new LeftPtr(left);
         else
@@ -163,7 +166,7 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
         InterOperand rightOperand;
 
         if (right instanceof InterId) {
-            if (((InterId) right).isReturn()) rightOperand = new OperandReturn(right);
+            if (((InterId) right).isReturn()) rightOperand = new OperandReturn(right, false);
             else rightOperand = new RightVariableStack(right);
         } else if (right instanceof InterPtr)
             rightOperand = new RightPtr(right);
@@ -174,11 +177,13 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
     }
 
     private InterOperand getRightOperand() {
-        InterValue right = pop();
+        InterValue right;
+        if (!nodeStack.isEmpty()) right = pop();
+        else return null;
         InterOperand rightOperand;
 
         if (right instanceof InterId) {
-            if (((InterId) right).isReturn()) rightOperand = new OperandReturn(right);
+            if (((InterId) right).isReturn()) rightOperand = new OperandReturn(right, false);
             else rightOperand = new RightVariableStack(right);
         } else if (right instanceof InterPtr)
             rightOperand = new RightPtr(right);
@@ -190,11 +195,18 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
 
     private void tempVariableMaker(InterOperation interOperation, ScalarType scalarType) {
         //if we are in a class scope than assume static
-
-        InterId interId = new InterId(scalarType);
-        InterVariable interVariable = new InterVariable(interId, interOperation);
-        addStatementToCurrentScope(interVariable);
-        nodeStack.push(interId);
+        if (currentScope instanceof ClassScope) {
+            InterPtr interPtr = new InterPtr(scalarType);
+            globalVariables.add(new InterGlobalVariable(interPtr, getDirective(scalarType), null));
+            globalInit.add(interOperation);
+            globalInit.add(new InterAssignment(new LeftPtr((InterValue) interPtr.copy()), null));
+            nodeStack.push(interPtr);
+        } else {
+            InterId interId = new InterId(scalarType);
+            InterVariable interVariable = new InterVariable(interId, interOperation);
+            addStatementToCurrentScope(interVariable);
+            nodeStack.push(interId);
+        }
 
 
     }
@@ -221,11 +233,14 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
 
     @Override
     public void visit(KxiReturnStatement node) {
-        InterReturn interReturn = new InterReturn();
+        InterReturn interReturn;
+        InterOperand rightOperand;
         if (node.getExpression() != null) {
-            InterDerefStatement interDerefStatement = new InterDerefStatement(getRightOperand());
-            addStatementToCurrentScope(interDerefStatement);
-        }
+            InterValue interValue = getRightOperand().getInterValue();
+            rightOperand = new RightVariableStack((InterValue) interValue.copy());
+        } else
+            rightOperand = new RightOperandLit(new InterLit<>(0, ScalarType.INT));
+        interReturn = new InterReturn(rightOperand);
         addStatementToCurrentScope(interReturn);
     }
 
@@ -775,6 +790,13 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
         return directive;
     }
 
+    InterOperation getOperationFromVariable() {
+        //pop id and see if it matches from stack(list)
+        InterVariable interVariable = (InterVariable) currentScope.getInterStatementList().remove(currentScope.getInterStatementList().size() - 1);
+        return interVariable.getInterOperation();
+
+    }
+
 
     @Override
     public void visit(KxiDataMember node) {
@@ -791,21 +813,7 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
             globalVariables.add(interGlobalVariable);
 
             if (node.getVariableDeclaration().getInitializer() != null) {
-                InterOperand rightOperand = null;
-                if (!rightToLeftStackGlobal.empty()) {
-                    while (!rightToLeftStackGlobal.empty()) {
-                        InterBinaryAssignmentStatementGlobal binGlob = (InterBinaryAssignmentStatementGlobal) rightToLeftStackGlobal.pop();
-                        globalInit.add(binGlob.getInterArithmic());
-                        globalInit.add(binGlob.getInterAssignment());
-
-                        if (rightToLeftStackGlobal.size() == 1)
-                            rightOperand = (InterOperand) binGlob.getInterArithmic().getRightOperand().copy();
-                    }
-                } else {
-                    rightOperand = getRightOperand();
-                }
-
-                InterAssignment interAssignment = new InterAssignment(new LeftPtr(interPtr), rightOperand);
+                InterAssignment interAssignment = new InterAssignment(new LeftPtr(interPtr), getRightOperand());
                 globalInit.add(interAssignment);
             }
 

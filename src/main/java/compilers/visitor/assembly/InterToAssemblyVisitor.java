@@ -12,6 +12,7 @@ import compilers.ast.intermediate.symboltable.InterSymbolTable;
 import compilers.ast.intermediate.symboltable.StackData;
 import compilers.ast.kxi_nodes.KxiMain;
 import compilers.ast.kxi_nodes.ScalarType;
+import compilers.ast.kxi_nodes.scope.KxiBlock;
 import compilers.util.DataSizes;
 import compilers.util.HashString;
 import compilers.visitor.kxi.KxiVisitorBase;
@@ -293,8 +294,9 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
         twoReg(MOV, SP, FP);
         comment("FP = PFP ");
         twoReg(MOV, FP, R14);
-//        comment("push result on stack");
-//        leftOp(PUSH, R2);
+        comment("push result on stack");
+        tryDerefInterOperand(node.getRightOperand());
+        leftOp(PUSH, R2);
         comment("jump to return address");
         leftOp(JMR, R15);
 
@@ -308,7 +310,7 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
         twoReg(MOV, R14, SP);
         regImmInt(MOVI, R0, 0);
         int size = currentFunctionData.getSize();
-        for (int i = 0; i < size; i++) {
+        for (int i = 0; i < size + 1; i++) { //i = 1 for return value
             decFP(i * DataSizes.INT_SIZE);
             twoReg(STRI, R0, R14); //store 0 in stack ptr
         }
@@ -737,5 +739,14 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
         else if (interLit.getScalarType() == ScalarType.CHAR)
             regImmInt(MOVI, R1, (Character) interLit.getValue());
 
+    }
+
+    @Override
+    public void visit(OperandReturn node) {
+        newLine();
+        comment("Pop stack");
+        if(node.isLeft())
+        leftOp(POP, R1);
+        else leftOp(POP, R2);
     }
 }

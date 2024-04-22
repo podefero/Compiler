@@ -6,9 +6,10 @@ import lombok.Getter;
 
 @Getter
 public class OperandReturn extends InterOperand{
-
-    public OperandReturn(InterValue interValue) {
+    boolean left;
+    public OperandReturn(InterValue interValue, boolean left) {
         super(interValue);
+        this.left = left;
     }
 
     @Override

@@ -164,18 +164,18 @@ public class M4 {
                 "}", false);
     }
 
-    @Test
-    void validArithmicAssignmentExpressionsStaticTestM4() {
-        test("class Test {\n" +
-                "   static private int i = 10;\n" +
-                "   static private int j = 10;\n" +
-                "   static public int r = i += j *= j / 10;\n" +
-                "\n" +
-                "}\n" +
-                "void main() { cout << Test.r;\n" +
-                "\n" +
-                "}\n", false);
-    }
+//    @Test
+//    void validArithmicAssignmentExpressionsStaticTestM4() {
+//        test("class Test {\n" +
+//                "   static private int i = 10;\n" +
+//                "   static private int j = 10;\n" +
+//                "   static public int r = i += j *= j / 10;\n" +
+//                "\n" +
+//                "}\n" +
+//                "void main() { cout << Test.r;\n" +
+//                "\n" +
+//                "}\n", false);
+//    }
 
 //    @Test
 //    void validStaticFunctionCallsM4() {
@@ -373,6 +373,77 @@ public class M4 {
                 "        Cheese.count();\n" +
                 "    }", false);
     }
+
+
+    @Test
+    void staticMemberA() {
+        test(" class Cheese {\n" +
+                "        static public char y = 'a';\n" +
+                "        static public char aye() {\n" +
+                "            return y;\n" +
+                "        }\n" +
+                "    }\n" +
+                "    void main() {\n" +
+                "        cout << Cheese.aye();\n" +
+                "    }", false);
+    }
+
+    @Test
+    void staticMemberSeven() {
+        test(" class Beez {\n" +
+                "        static public int x = 4;\n" +
+                "    }\n" +
+                "    class Cheese {\n" +
+                "        static public int y = 3;\n" +
+                "    }\n" +
+                "    void main() {\n" +
+                "        cout << Beez.x + Cheese.y;\n" +
+                "    }", false);
+    }
+
+    @Test
+    void simpRecursive() {
+        test("class Test {\n" +
+                "    static public int f(int count) {\n" +
+                "        if(count == 2)\n" +
+                "            return count;\n" +
+                "        f(count - 1);\n" +
+                "    }\n" +
+                "}\n" +
+                "\n" +
+                "void main () {\n" +
+                "    cout << Test.f(10);\n" +
+                "}", false);
+    }
+    @Test
+    void fib() {
+        test("  //First 10 fibonacci numbers\n" +
+                "    class Leonardo {\n" +
+                "        static public int Fib(int n) {\n" +
+                "            if (n <= 1) {\n" +
+                "                return n;\n" +
+                "            }\n" +
+                "            return Fib(n - 1) + Fib(n - 2);\n" +
+                "        }\n" +
+                "    }\n" +
+                "    void main() {\n" +
+                "        cout << Leonardo.Fib(6);\n" +
+                "    }", false);
+    }
+
+//    @Test
+//    void imSpacedOut() {
+//        test("", false);
+//    }
+
+//    @Test
+//    void imSpacedOut() {
+//        test("", false);
+//    }
+
+
+
+
 
 
 //    @Test

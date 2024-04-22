@@ -28,6 +28,7 @@ public enum OpCodes {
     STR("STR"),
     STRI("STR"),
     PUSH("PUSH"),
+    POP("POP"),
     TRP("TRP");
     private final String value;
 
