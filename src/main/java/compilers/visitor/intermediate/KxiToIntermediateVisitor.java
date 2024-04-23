@@ -664,14 +664,17 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
     }
 
     @Override
-    public void visit(KxiPostForExpression kxiClass) {
-        nodeStack.push(rightToLeftStack.pop());
+    public void visit(KxiPostForExpression node) {
+        pop();
+        node.setInterBinaryAssignmentStatement(rightToLeftStack.pop());
     }
 
     @Override
     public void visit(KxiForStatement node) {
         InterStatement postStatement = null;
-        if (node.getPostExpression() != null) postStatement = pop();
+        if (node.getPostExpression() != null) {
+            postStatement = node.getPostExpression().getInterBinaryAssignmentStatement();
+        }
         scopeBlock.add(postStatement);
         GenericListNode genericListNode = new GenericListNode(scopeBlock);
         InterDerefStatement interDerefStatement = new InterDerefStatement((InterOperand) getRightOperand().copy());
@@ -681,6 +684,7 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
 
         addStatementToCurrentScope(interDerefStatement);
         addStatementToCurrentScope(interIfStatement);
+        pop();
 
     }
 

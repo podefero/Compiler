@@ -823,6 +823,171 @@ public class M4 {
                 "}", false);
     }
 
+        @Test
+    void cMinusTestProg() {
+        test("void main() {\n" +
+                "    // Test for loop\n" +
+                "    int i = 0;\n" +
+                "    for (i; i < 5; i+=1) {\n" +
+                "        cout << \"For loop iteration: \";\n" +
+                "        cout << i;\n" +
+                "        cout << '\\n';\n" +
+                "    }\n" +
+                "\n" +
+                "    // Test while loop\n" +
+                "    int j = 0;\n" +
+                "    while (j < 5) {\n" +
+                "        cout << \"While loop iteration: \";\n" +
+                "        cout << j;\n" +
+                "        cout << '\\n';\n" +
+                "        j+=1;\n" +
+                "    }\n" +
+                "\n" +
+                "    // Test if statement with logical expressions\n" +
+                "    int a = 5;\n" +
+                "    int b = 10;\n" +
+                "    if (a < b && b > 0) {\n" +
+                "        cout << \"If statement with logical AND: true\";\n" +
+                "        cout << '\\n';\n" +
+                "    }\n" +
+                "    if (a > b || b > 0) {\n" +
+                "        cout << \"If statement with logical OR: true\";\n" +
+                "        cout << '\\n';\n" +
+                "    }\n" +
+                "\n" +
+                "    // Test switch statement\n" +
+                "    int choice = 2;\n" +
+                "    switch (choice) {\n" +
+                "        case 1:\n" +
+                "            cout << \"Switch case 1\";\n" +
+                "            cout << '\\n';\n" +
+                "            break;\n" +
+                "        case 2:\n" +
+                "            cout << \"Switch case 2\";\n" +
+                "            cout << '\\n';\n" +
+                "            break;\n" +
+                "        default:\n" +
+                "            cout << \"Default case\";\n" +
+                "            cout << '\\n';\n" +
+                "    }\n" +
+                "\n" +
+                "    // Test data types\n" +
+                "    int intValue = 10;\n" +
+                "    char charValue = 'a';\n" +
+                "    string stringValue = \"Hello, World!\";\n" +
+                "\n" +
+                "    cout << \"Integer value: \"; \n" +
+                "    cout << intValue;\n" +
+                "    cout << '\\n';\n" +
+                "    cout << \"Character value: \"; \n" +
+                "    cout << charValue; \n" +
+                "    cout << '\\n';\n" +
+                "    cout << \"String value: \"; \n" +
+                "    cout << stringValue; \n" +
+                "    cout << '\\n';\n" +
+                "\n" +
+                "    // Test nested loops and blocks\n" +
+                "    int x = 0;\n" +
+                "    for (x; x < 3; x+=1) {\n" +
+                "        cout << \"Outer loop iteration: \";\n" +
+                "        cout << x;\n" +
+                "        cout << '\\n';\n" +
+                "        int y = 0;\n" +
+                "        for (y; y < 2; y+=1) {\n" +
+                "            cout << \"Inner loop iteration: \";\n" +
+                "            cout << y; \n" +
+                "            cout << '\\n';\n" +
+                "        }\n" +
+                "    }\n" +
+                "}\n", false);
+    }
+        @Test
+    void forLoopTest() {
+        test("void main() {\n" +
+                "    // Test for loop\n" +
+                "    int i = 5;\n" +
+                "    for (i; i < 5; i-=1) {\n" +
+                "        cout << \"For loop iteration: \";\n" +
+                "        cout << i;\n" +
+                "        cout << '\\n';\n" +
+                "    }\n" +
+                "    }\n", false);
+    }
+
+        @Test
+    void logicalExp() {
+        test("void main() {\n" +
+                "     // Test if statement with logical expressions\n" +
+                "    int a = 5;\n" +
+                "    int b = 10;\n" +
+                "    if (a < b && b > 0) {\n" +
+                "        cout << \"If statement with logical AND: true\";\n" +
+                "        cout << '\\n';\n" +
+                "    }\n" +
+                "    if (a > b || b > 0) {\n" +
+                "        cout << \"If statement with logical OR: true\";\n" +
+                "        cout << '\\n';\n" +
+                "    }\n" +
+                "}\n", false);
+    }
+
+        @Test
+    void testSwitchStatement() {
+        test("void main() {\n" +
+                "    // Test switch statement\n" +
+                "    int choice = 2;\n" +
+                "    switch (choice) {\n" +
+                "        case 1:\n" +
+                "            cout << \"Switch case 1\";\n" +
+                "            cout << '\\n';\n" +
+                "            break;\n" +
+                "        case 2:\n" +
+                "            cout << \"Switch case 2\";\n" +
+                "            cout << '\\n';\n" +
+                "            break;\n" +
+                "        default:\n" +
+                "            cout << \"Default case\";\n" +
+                "            cout << '\\n';\n" +
+                "    }\n" +
+                "}\n", false);
+    }
+        @Test
+    void dataTypes() {
+        test("void main() {\n" +
+                "    // Test data types\n" +
+                "    int intValue = 10;\n" +
+                "    char charValue = 'a';\n" +
+                "    string stringValue = \"Hello, World!\";\n" +
+                "\n" +
+                "    cout << \"Integer value: \";\n" +
+                "    cout << intValue;\n" +
+                "    cout << '\\n';\n" +
+                "    cout << \"Character value: \";\n" +
+                "    cout << charValue;\n" +
+                "    cout << '\\n';\n" +
+                "    cout << \"String value: \";\n" +
+                "    cout << stringValue;\n" +
+                "    cout << '\\n';\n" +
+                "}\n", false);
+    }
+        @Test
+    void nestedLoops() {
+        test("void main() {\n" +
+                "   // Test nested loops and blocks\n" +
+                "    int x = 0;\n" +
+                "    for (x; x < 3; x+=1) {\n" +
+                "        cout << \"Outer loop iteration: \";\n" +
+                "        cout << x;\n" +
+                "        cout << '\\n';\n" +
+                "        int y = 0;\n" +
+                "        for (y; y < 2; y+=1) {\n" +
+                "            cout << \"Inner loop iteration: \";\n" +
+                "            cout << y;\n" +
+                "            cout << '\\n';\n" +
+                "        }\n" +
+                "    }\n" +
+                "}\n", false);
+    }
     //    @Test
 //    void imSpacedOut() {
 //        test("", false);
