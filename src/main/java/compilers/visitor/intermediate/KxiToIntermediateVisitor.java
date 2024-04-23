@@ -5,6 +5,7 @@ import compilers.ast.GenericNode;
 import compilers.ast.assembly.Directive;
 import compilers.ast.intermediate.*;
 import compilers.ast.intermediate.InterOperand.*;
+import compilers.ast.intermediate.expression.InterExpression;
 import compilers.ast.intermediate.expression.operation.*;
 import compilers.ast.intermediate.statements.*;
 import compilers.ast.kxi_nodes.*;
@@ -564,8 +565,16 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
 
         List<InterPushArg> interPushArgs = new ArrayList<>();
         while (!args.empty()) {
-            InterPushArg interPushArg = new InterPushArg(getRightOperand(args.pop()));
+            InterOperand rightOperand = getRightOperand(args.pop());
+
+            if (rightOperand instanceof OperandReturn) {
+                InterOperand rightOperandCopy = (InterOperand) rightOperand.copy();
+                addStatementToCurrentScope(new InterExpressionStatement(rightOperandCopy));
+                ((OperandReturn) rightOperand).setArgumentValue(true);
+            }
+            InterPushArg interPushArg = new InterPushArg(rightOperand);
             interPushArgs.add(interPushArg);
+
         }
 
         InterFunctionalCall interFunctionalCall = new InterFunctionalCall(interId, new GenericListNode(interPushArgs));
@@ -582,7 +591,7 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
         scopeBlock = node.getScope().getInterStatementList();
         BlockScope blockScope = (BlockScope) node.getScope();
         super.visit(node);
-        if(blockScope.getScopeType() == ScopeType.Empty) {
+        if (blockScope.getScopeType() == ScopeType.Empty) {
             InterBlock interBlock = new InterBlock(new GenericListNode(scopeBlock));
             addStatementToCurrentScope(interBlock);
         }

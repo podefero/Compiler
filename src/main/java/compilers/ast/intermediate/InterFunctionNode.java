@@ -17,7 +17,7 @@ public class InterFunctionNode extends AbstractInterNode {
     private String pfpId;
 
     public InterFunctionNode(InterId interId, GenericListNode statements, List<String> params) {
-        super(statements, interId, new InterActivationRecord(interId));
+        super(statements, new InterActivationRecord((InterId) interId.copy()));
         this.interId = interId;
         this.statements = getNodeList(statements);
         this.params = params;

@@ -59,8 +59,8 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
     }
 
     private void tryDerefInterOperand(InterOperand interOperand) {
-        if(interOperand == null) return;
-        if(interSymbolTable.getFunctionDataMap().containsKey(interOperand.getInterValue().getTerminalValue())) {
+        if (interOperand == null) return;
+        if (interSymbolTable.getFunctionDataMap().containsKey(interOperand.getInterValue().getTerminalValue())) {
             return;
         }
 
@@ -761,10 +761,12 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
 
     @Override
     public void visit(OperandReturn node) {
-        newLine();
-        comment("Pop stack");
-        if (node.isLeft())
-            leftOp(POP, R1);
-        else leftOp(POP, R2);
+        if (!node.isArgumentValue()) {
+            newLine();
+            comment("Pop stack");
+            if (node.isLeft())
+                leftOp(POP, R1);
+            else leftOp(POP, R2);
+        }
     }
 }

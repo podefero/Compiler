@@ -565,10 +565,38 @@ public class M4 {
                 "}", false);
     }
 
+        @Test
+    void nestedFunction() {
+        test("  // Nested Reference to Class Function outside of Class Scope\n" +
+                "       class B {\n" +
+                "\n" +
+                "        static public int gimmeInt(){\n" +
+                "            return 15;\n" +
+                "        }\n" +
+                "        static public void eatingInt(int x){\n" +
+                "            cout<< x;\n" +
+                "        }\n" +
+                "    }\n" +
+                "    \n" +
+                "    void main() {\n" +
+                "        B.eatingInt(B.gimmeInt());\n" +
+                "    }\n" +
+                "    ---\n" +
+                "    15", false);
+    }
     //    @Test
 //    void imSpacedOut() {
 //        test("", false);
 //    }
+    //    @Test
+//    void imSpacedOut() {
+//        test("", false);
+//    }
+    //    @Test
+//    void imSpacedOut() {
+//        test("", false);
+//    }
+
     void test(String input, boolean hasErrors) {
         KxiParser parser = kxiParser(input);
         AntlrToKxiVisitor antlrToKxiVisitor = new AntlrToKxiVisitor();
