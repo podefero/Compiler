@@ -29,36 +29,40 @@ public class OutputHandler {
     }
 
     private void writeFile(String content, String filePath) throws IOException {
-        if (!useStdout) {
-            FileWriter writer = new FileWriter(filePath);
-            writer.write(content);
-            writer.close();
-        } else
-            System.out.println(content);
-
+        FileWriter writer = new FileWriter(filePath);
+        writer.write(content);
+        writer.close();
     }
 
     public void outputAsm(String asm) throws IOException {
-        writeFile(asm, getRelativeOutputFile("asm"));
+        String file = getRelativeOutputFile("asm");
+        if (file.isEmpty()) System.out.println(asm);
+        else
+            writeFile(asm, file);
     }
 
     public void outputLex(String lex) throws IOException {
-        writeFile(lex, getRelativeOutputFile("lex"));
+        String file = getRelativeOutputFile("lex");
+        if (file.isEmpty()) System.out.println(lex);
+        else
+            writeFile(lex, file);
     }
 
     public void outputAST(MutableGraph graph) throws IOException {
-        if (!useStdout)
-            Graphviz.fromGraph(graph).width(1920).height(1080).render(Format.DOT).toFile(new File(getRelativeOutputFile("dot")));
+        String file = getRelativeOutputFile("dot");
+        if (file.isEmpty()) System.out.println(Graphviz.fromGraph(graph).render(Format.DOT));
         else
-            System.out.println(Graphviz.fromGraph(graph).render(Format.DOT));
+            Graphviz.fromGraph(graph).width(1920).height(1080).render(Format.DOT).toFile(new File(getRelativeOutputFile("dot")));
     }
 
 
     private String getRelativeOutputFile(String fileExtension) throws IOException {
-        for (String file : outputFiles) {
-            if (file.endsWith("." + fileExtension)) return fileExtension + "/" + file;
+        if (outputFiles != null) {
+            for (String file : outputFiles) {
+                if (file.endsWith("." + fileExtension)) return file;
+            }
         }
-        throw new IOException("Can't find relative file for " + fileExtension + " extension\nOutputFile Arguments: " + outputFileArgs);
+        return "";
     }
 
 }

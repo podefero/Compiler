@@ -19,6 +19,7 @@ public class AntlrToKxiVisitor<Void> extends AbstractParseTreeVisitor<Void> impl
     private AbstractKxiNode rootNode;
     private final KxiParseHelper parseHelper;
     private final AbstractKxiFactory factory;
+    boolean hasError;
 
     public AntlrToKxiVisitor() {
         nodeStack = new Stack<>();
@@ -34,13 +35,15 @@ public class AntlrToKxiVisitor<Void> extends AbstractParseTreeVisitor<Void> impl
 
     private void transformNode(ParserRuleContext ctx) {
 //        nodeStack.push(factory.build(ctx, nodeStack));
-        try {
-            AbstractKxiNode node = factory.build(ctx, nodeStack);
-            node.setLineInfo(buildLineInfo(ctx));
-            nodeStack.push(node);
-        } catch (ClassCastException ex) {
-            nodeStack.push(new KxiInvalidNode(ctx, nodeStack, ex));
-            System.out.println(ex.getStackTrace());
+        if(!hasError) {
+            try {
+                AbstractKxiNode node = factory.build(ctx, nodeStack);
+                node.setLineInfo(buildLineInfo(ctx));
+                nodeStack.push(node);
+            } catch (RuntimeException ex) {
+                hasError = true;
+                throw new RuntimeException("Can't parse " + ctx.getStart().getText() + " at line " + ctx.getStart().getLine());
+            }
         }
     }
 

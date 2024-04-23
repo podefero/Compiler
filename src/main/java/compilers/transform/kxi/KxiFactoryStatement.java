@@ -113,7 +113,7 @@ public class KxiFactoryStatement extends AbstractKxiFactory {
 
         }
 
-        return super.build(ctx, stack);
+        return null;
     }
 
     private KxiBlock getBlock(AbstractKxiStatement statement) {

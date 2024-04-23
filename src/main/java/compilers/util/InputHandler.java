@@ -4,6 +4,7 @@ import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 
 import java.io.*;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 public class InputHandler {
@@ -51,15 +52,19 @@ public class InputHandler {
         StringBuilder multiLineInput = new StringBuilder();
         String line;
 
-        while (!(line = scanner.nextLine()).isEmpty()) {
-            multiLineInput.append(line).append("\n");
+        try {
+            while (!(line = scanner.nextLine()).isEmpty()) {
+                multiLineInput.append(line).append("\n");
+            }
+        } catch (NoSuchElementException e) {
+            // End of input reached
+        } finally {
+            scanner.close();
         }
 
-        scanner.close();
         InputStream inputStream = new ByteArrayInputStream(multiLineInput.toString().getBytes());
         return inputStream;
     }
-
     public void setUseStdin(boolean useStdin) {
         this.useStdin = useStdin;
     }

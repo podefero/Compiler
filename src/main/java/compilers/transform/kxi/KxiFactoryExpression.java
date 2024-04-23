@@ -139,6 +139,6 @@ public class KxiFactoryExpression extends AbstractKxiFactory {
                     break;
             }
         }
-        return new KxiInvalidNode(ctx, stack, null);
+        return null;
     }
 }

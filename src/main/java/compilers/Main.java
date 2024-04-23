@@ -2,7 +2,9 @@ package compilers;
 
 import compilers.antlr.KxiLexer;
 import compilers.antlr.KxiParser;
+import compilers.ast.assembly.AssemblyMain;
 import compilers.ast.intermediate.InterGlobal;
+import compilers.ast.intermediate.symboltable.InterSymbolTable;
 import compilers.ast.kxi_nodes.AbstractKxiNode;
 import compilers.ast.kxi_nodes.KxiMain;
 import compilers.commandargs.ArgumentFlags;
@@ -11,7 +13,11 @@ import compilers.exceptions.ParserErrorListener;
 import compilers.util.InputHandler;
 import compilers.util.OutputHandler;
 import compilers.visitor.antlr.AntlrToKxiVisitor;
+import compilers.visitor.assembly.AssemblyAssembleVisitor;
+import compilers.visitor.assembly.InterToAssemblyVisitor;
 import compilers.visitor.generic.GraphVizVisitor;
+import compilers.visitor.intermediate.BreakAndReturnsVisitor;
+import compilers.visitor.intermediate.InterSymbolTableVisitor;
 import compilers.visitor.intermediate.KxiToIntermediateVisitor;
 import compilers.visitor.kxi.invalid_break.InvalidBreakVisitor;
 import compilers.visitor.kxi.invalid_write.InvalidWriteVisitor;
@@ -19,9 +25,13 @@ import compilers.visitor.kxi.symboltable.ScopeHandler;
 import compilers.visitor.kxi.symboltable.SymbolTable;
 import compilers.visitor.kxi.symboltable.SymbolTableVisitor;
 import compilers.visitor.kxi.typecheck.TypeCheckerVisitor;
+import org.antlr.v4.runtime.CommonToken;
 import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.Token;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Stack;
 
 public class Main {
@@ -36,15 +46,17 @@ public class Main {
     }
 
     static void lexing(ArgumentFlags argumentFlags, InputHandler inputHandler, OutputHandler outputHandler) {
-        System.out.println("Lexing");
         KxiLexer kxiLexer = new KxiLexer(inputHandler.fileToCharStream());
+
+        // Get the token stream
+        CommonTokenStream tokens = new CommonTokenStream(kxiLexer);
 
         if (argumentFlags.printTokens) {
             try {
                 printTokens(kxiLexer, outputHandler);
             } catch (IOException e) {
                 //print to stdout if file is not found
-                System.out.println(kxiLexer.printTokens());
+                System.out.println(e.getMessage());
             }
         }
         if (argumentFlags.parseTree) parseTree(new CommonTokenStream(kxiLexer), argumentFlags, outputHandler);
@@ -56,21 +68,16 @@ public class Main {
 
     static void parseTree(CommonTokenStream tokenStream, ArgumentFlags argumentFlags, OutputHandler outputHandler) {
         KxiParser parser = new KxiParser(tokenStream);
-        parser.removeErrorListeners();
-        parser.addErrorListener(new ParserErrorListener());
 
-        //catch any syntax errors
+        KxiMain kxiMain = null;
         try {
-            parser.compilationUnit();
-        } catch (ParseException ex) {
+            AntlrToKxiVisitor antlrToKxiVisitor = new AntlrToKxiVisitor();
+            antlrToKxiVisitor.visitCompilationUnit(parser.compilationUnit());
+            kxiMain = (KxiMain) antlrToKxiVisitor.getRootNode();
+        } catch (RuntimeException ex) {
             System.out.println(ex.getMessage());
             return;
         }
-
-        AntlrToKxiVisitor antlrToKxiVisitor = new AntlrToKxiVisitor();
-        antlrToKxiVisitor.visitCompilationUnit(parser.compilationUnit());
-
-        KxiMain kxiMain = (KxiMain) antlrToKxiVisitor.getRootNode();
 
         if (argumentFlags.printASTDiagram) {
             try {
@@ -118,7 +125,7 @@ public class Main {
             invalidBreakVisitor.dumpErrorStack();
         }
 
-        if(argumentFlags.compile && !hasError) {
+        if (argumentFlags.compile && !hasError) {
             try {
                 compile(rootNode, outputHandler, symbolTableVisitor.getScopeHandler());
             } catch (IOException e) {
@@ -128,10 +135,32 @@ public class Main {
     }
 
     static void compile(AbstractKxiNode rootNode, OutputHandler outputHandler, ScopeHandler scopeHandler) throws IOException {
+        BreakAndReturnsVisitor breakAndReturnsVisitor = new BreakAndReturnsVisitor();
+        rootNode.accept(breakAndReturnsVisitor);
+
+
         KxiToIntermediateVisitor kxiToIntermediateVisitor = new KxiToIntermediateVisitor(scopeHandler);
         rootNode.accept(kxiToIntermediateVisitor);
-        InterGlobal interRoot = (InterGlobal) kxiToIntermediateVisitor.getRootNode();
-       // outputHandler.outputAsm(interRoot.getJmpToMain().gatherAssembly());
+
+        InterSymbolTableVisitor interSymbolTableVisitor =
+                new InterSymbolTableVisitor(new InterSymbolTable(new HashMap<>(), new HashMap<>()), null);
+
+        InterGlobal interGlobal = kxiToIntermediateVisitor.getRootNode();
+        interGlobal.accept(interSymbolTableVisitor);
+
+        InterToAssemblyVisitor interToAssemblyVisitor = new InterToAssemblyVisitor(new ArrayList<>()
+                , null
+                , interSymbolTableVisitor.getInterSymbolTable()
+                , interSymbolTableVisitor.getInterSymbolTable().getFunctionDataMap().get("main$main"));
+
+        interGlobal.accept(interToAssemblyVisitor);
+
+
+        AssemblyAssembleVisitor assemblyAssembleVisitor = new AssemblyAssembleVisitor();
+        AssemblyMain assemblyMain = interToAssemblyVisitor.getRootNode();
+
+        assemblyMain.accept(assemblyAssembleVisitor);
+
     }
 
 }
