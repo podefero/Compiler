@@ -5,6 +5,7 @@ import compilers.ast.GenericListNode;
 import compilers.ast.kxi_nodes.AbstractKxiNode;
 import compilers.ast.kxi_nodes.expressions.AbstractKxiExpression;
 import compilers.ast.kxi_nodes.expressions.KxiPostForExpression;
+import compilers.ast.kxi_nodes.expressions.KxiPreForExpression;
 import compilers.ast.kxi_nodes.scope.KxiBlock;
 import compilers.ast.kxi_nodes.statements.*;
 import compilers.ast.kxi_nodes.statements.conditional.KxiElseStatement;
@@ -61,34 +62,34 @@ public class KxiFactoryStatement extends AbstractKxiFactory {
 
         } else if (statementContext.FOR() != null) {
 
-            List<ParseTree> foundExpressions = new ArrayList<>();
+            AbstractKxiStatement statement = pop(stack);
+            KxiPostForExpression postExpression = null;
+            AbstractKxiExpression conditionalExpression = null;
+            KxiPreForExpression preExpression = null;
+
+            int section = 0;
             List<ParseTree> forChildren = statementContext.children;
-            for (int i = 0; i < forChildren.size(); i++) {
+
+            for (int i = forChildren.size() - 1; i >= 0; i--) {
                 ParseTree parseTree = forChildren.get(i);
+                if (parseTree instanceof KxiParser.ExpressionContext) {
+                    if (section == 0) {
+                        postExpression = new KxiPostForExpression(pop(stack));
+                        postExpression.setLineInfo(buildLineInfo(ctx));
+
+                    } else if (section == 1) {
+                        conditionalExpression = pop(stack);
+                    } else if (section == 2) {
+                        preExpression = new KxiPreForExpression(pop(stack));
+                        preExpression.setLineInfo(buildLineInfo(ctx));
+                    }
+                }
                 if (parseTree instanceof TerminalNodeImpl) {
                     if (((TerminalNodeImpl) parseTree).getSymbol().getType() == SEMICOLON) {
-                        foundExpressions.add(forChildren.get(i - 1));
+                        section += 1;
                     }
                 }
             }
-
-            AbstractKxiStatement statement = pop(stack);
-            KxiPostForExpression postExpression = null;
-            AbstractKxiExpression conditionalExpression;
-            AbstractKxiExpression preExpression = null;
-
-            if (foundExpressions.get(1) instanceof ExpressionContext)
-                postExpression = new KxiPostForExpression(pop(stack));
-            if (foundExpressions.get(0) instanceof ExpressionContext) preExpression = pop(stack);
-
-//            if (statementContext.children.get(6) instanceof ExpressionContext)
-//                postExpression = pop(stack);
-
-            conditionalExpression = pop(stack);
-
-//            if (statementContext.children.get(2) instanceof ExpressionContext)
-//                preExpression = pop(stack);
-
             return new KxiForStatement(getBlock(statement), postExpression, conditionalExpression, preExpression);
 
 

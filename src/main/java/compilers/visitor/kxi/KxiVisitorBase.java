@@ -934,4 +934,10 @@ public class KxiVisitorBase implements VisitKxi {
 
     public void visit(KxiPostForExpression kxiPostForExpression) {
     }
+
+    public void preVisit(KxiPreForExpression kxiPreForExpression) {
+    }
+
+    public void visit(KxiPreForExpression kxiPreForExpression) {
+    }
 }

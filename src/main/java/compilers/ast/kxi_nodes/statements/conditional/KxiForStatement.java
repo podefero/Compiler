@@ -1,6 +1,8 @@
 package compilers.ast.kxi_nodes.statements.conditional;
 
 import compilers.ast.kxi_nodes.expressions.AbstractKxiExpression;
+import compilers.ast.kxi_nodes.expressions.KxiPostForExpression;
+import compilers.ast.kxi_nodes.expressions.KxiPreForExpression;
 import compilers.ast.kxi_nodes.helper.KxiFordSemi;
 import compilers.ast.kxi_nodes.scope.KxiBlock;
 import compilers.ast.kxi_nodes.statements.AbstractKxiStatement;
@@ -15,10 +17,10 @@ import lombok.Setter;
 public class KxiForStatement extends AbstractKxiConditionalStatement {
     String loopLabel;
     String exitLoop;
-    private AbstractKxiExpression postExpression;
-    private AbstractKxiExpression preExpression;
+    private KxiPostForExpression postExpression;
+    private KxiPreForExpression preExpression;
 
-    public KxiForStatement(KxiBlock statement, AbstractKxiExpression postExpression, AbstractKxiExpression conditionalExpression, AbstractKxiExpression preExpression) {
+    public KxiForStatement(KxiBlock statement, KxiPostForExpression postExpression, AbstractKxiExpression conditionalExpression, KxiPreForExpression preExpression) {
         super(statement, postExpression, new KxiFordSemi(), conditionalExpression, new KxiFordSemi(), preExpression);
         this.statement = statement;
         this.postExpression = postExpression;

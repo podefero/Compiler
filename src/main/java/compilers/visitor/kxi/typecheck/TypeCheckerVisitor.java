@@ -639,20 +639,22 @@ EXPRESSIONS DOT
     }
 
     @Override
-    public void visit(KxiForStatement statement) {
-        if (statement.getPostExpression() != null) {
-            if (resultTypeStack.pop().getScalarType() != ScalarType.INT)
-                exceptionStack.push(new TypeCheckException(statement.getLineInfo(), "For statement PostExpression requires INT"));
-        }
+    public void visit(KxiPostForExpression node) {
+        if (resultTypeStack.pop().getScalarType() != ScalarType.INT)
+            exceptionStack.push(new TypeCheckException(node.getLineInfo(), "For statement PostExpression requires INT"));
+    }
 
+    @Override
+    public void visit(KxiPreForExpression node) {
+        if (resultTypeStack.pop().getScalarType() != ScalarType.INT)
+            exceptionStack.push(new TypeCheckException(node.getLineInfo(), "For statement PreExpression requires INT"));
+    }
+
+
+    @Override
+    public void visit(KxiForStatement statement) {
         if (resultTypeStack.pop().getScalarType() != ScalarType.BOOL)
             exceptionStack.push(new TypeCheckException(statement.getLineInfo(), "For statement requires bool expression"));
-
-        if (statement.getPreExpression() != null) {
-            if (resultTypeStack.pop().getScalarType() != ScalarType.INT)
-                exceptionStack.push(new TypeCheckException(statement.getLineInfo(), "For statement PreExpression requires INT"));
-        }
-
     }
 
     @Override
