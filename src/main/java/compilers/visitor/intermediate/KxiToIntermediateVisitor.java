@@ -323,7 +323,7 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
         RightVariableStack rightVar = new RightVariableStack(tempId);
         InterAssignment interAssignment = new InterAssignment((InterOperand) leftOperand.copy(), rightVar);
 
-        nodeStack.push(rightOperand.getInterValue());
+        nodeStack.push(leftOperand.getInterValue());
         rightToLeftStack.push(new InterBinaryAssignmentStatement(interAssignment, interVariable));
     }
 
@@ -343,7 +343,7 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
         RightVariableStack rightVar = new RightVariableStack(tempId);
         InterAssignment interAssignment = new InterAssignment((InterOperand) leftOperand.copy(), rightVar);
 
-        nodeStack.push(rightOperand.getInterValue());
+        nodeStack.push(leftOperand.getInterValue());
         rightToLeftStack.push(new InterBinaryAssignmentStatement(interAssignment, interVariable));
     }
 
@@ -364,7 +364,7 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
         RightVariableStack rightVar = new RightVariableStack(tempId);
         InterAssignment interAssignment = new InterAssignment((InterOperand) leftOperand.copy(), rightVar);
 
-        nodeStack.push(rightOperand.getInterValue());
+        nodeStack.push(leftOperand.getInterValue());
         rightToLeftStack.push(new InterBinaryAssignmentStatement(interAssignment, interVariable));
     }
 
@@ -384,7 +384,7 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
         RightVariableStack rightVar = new RightVariableStack(tempId);
         InterAssignment interAssignment = new InterAssignment((InterOperand) leftOperand.copy(), rightVar);
 
-        nodeStack.push(rightOperand.getInterValue());
+        nodeStack.push(leftOperand.getInterValue());
         rightToLeftStack.push(new InterBinaryAssignmentStatement(interAssignment, interVariable));
     }
 

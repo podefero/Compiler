@@ -735,6 +735,63 @@ public class M4 {
                 "    cout << x; //Ensure the value that prints is the same as your input\n" +
                 "}", false);
     }
+        @Test
+    void ifElseTest() {
+        test("void main() {\n" +
+                "    int m = 0;\n" +
+                "    int n = 0;\n" +
+                "    if( m == 0) {\n" +
+                "        cout << n += 1;\n" +
+                "    } else if (m > 0 && n == 0) {\n" +
+                "        cout << m -=1;\n" +
+                "    } else {\n" +
+                "        cout << n;\n" +
+                "    }\n" +
+                "}", false);
+    }
+
+    @Test
+    void ifElseTestTwo() {
+        test("void main() {\n" +
+                "    int m = 1;\n" +
+                "    int n = 0;\n" +
+                "    if( m == 0) {\n" +
+                "        cout << n += 1;\n" +
+                "    } else if (m > 0 && n == 0) {\n" +
+                "        cout << m -=1;\n" +
+                "    } else {\n" +
+                "        cout << n;\n" +
+                "    }\n" +
+                "}", false);
+    }
+
+    @Test
+    void ifElseTestThree() {
+        test("void main() {\n" +
+                "    int m = 1;\n" +
+                "    int n = 5;\n" +
+                "    if( m == 0) {\n" +
+                "        cout << n += 1;\n" +
+                "    } else if (m > 0 && n == 0) {\n" +
+                "        cout << m -=1;\n" +
+                "    } else {\n" +
+                "        cout << n;\n" +
+                "    }\n" +
+                "}", false);
+    }
+        @Test
+    void binaryArithAssign() {
+        test("void main() {\n" +
+                "  int m = 10;\n" +
+                "  int n = 10;\n" +
+                "  cout << m-=1;\n" +
+                "  cout << n+=1;\n" +
+                "}", false);
+    }
+    //    @Test
+//    void imSpacedOut() {
+//        test("", false);
+//    }
     //    @Test
 //    void imSpacedOut() {
 //        test("", false);
