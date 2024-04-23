@@ -161,6 +161,8 @@ public class Main {
 
         assemblyMain.accept(assemblyAssembleVisitor);
 
+        outputHandler.outputAsm(assemblyAssembleVisitor.getAsm());
+
     }
 
 }

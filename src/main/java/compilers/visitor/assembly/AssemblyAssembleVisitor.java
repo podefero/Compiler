@@ -20,6 +20,14 @@ public class AssemblyAssembleVisitor extends KxiVisitorBase {
         returnDelimiters = new ArrayDeque<>();
     }
 
+    public String getAsm() {
+        String asm = "";
+        for (String code : instructions) {
+            asm += code + "\n";
+        }
+        return asm;
+    }
+
     String assembleCode(String label, String opCodes, Operand operandL, Operand operandR) {
         if (!labelStack.isEmpty() && label.isEmpty()) label = labelStack.pop();
         String left = operandL.getValue();
@@ -75,7 +83,7 @@ public class AssemblyAssembleVisitor extends KxiVisitorBase {
             startNode.setEnd(instructions.size());
             int totalInst = (startNode.getEnd() - startNode.getStart()) + 1;
             int offset = Math.abs(totalInst - currentNumComments) * DataSizes.INSTRUCTION_SIZE;
-           // currentNumComments = 0;
+            // currentNumComments = 0;
             instructions.add(startNode.getStart()
                     , assembleCode("", OpCodes.ADI.getValue(), new OperandReg(Registers.R15), new OperandInteger(offset)));
         }

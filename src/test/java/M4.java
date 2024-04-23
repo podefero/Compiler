@@ -988,6 +988,22 @@ public class M4 {
                 "    }\n" +
                 "}\n", false);
     }
+        @Test
+    void forLoopExpression() {
+        test("void main() {\n" +
+                "  // Test nested for loops\n" +
+                "    int i;\n" +
+                "    for (i; i < 3; i = i + 1) {\n" +
+                "        cout << i;\n" +
+                "    }\n" +
+                "}\n", false);
+    }
+        @Test
+    void helloWorld() {
+        test("void main() {\n" +
+                "    cout << \"hello world\";\n" +
+                "}", false);
+    }
     //    @Test
 //    void imSpacedOut() {
 //        test("", false);
