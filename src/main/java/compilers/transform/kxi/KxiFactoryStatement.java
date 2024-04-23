@@ -4,6 +4,7 @@ import compilers.antlr.KxiParser;
 import compilers.ast.GenericListNode;
 import compilers.ast.kxi_nodes.AbstractKxiNode;
 import compilers.ast.kxi_nodes.expressions.AbstractKxiExpression;
+import compilers.ast.kxi_nodes.expressions.KxiPostForExpression;
 import compilers.ast.kxi_nodes.scope.KxiBlock;
 import compilers.ast.kxi_nodes.statements.*;
 import compilers.ast.kxi_nodes.statements.conditional.KxiElseStatement;
@@ -72,12 +73,13 @@ public class KxiFactoryStatement extends AbstractKxiFactory {
             }
 
             AbstractKxiStatement statement = pop(stack);
-            AbstractKxiExpression postExpression = null;
+            KxiPostForExpression postExpression = null;
             AbstractKxiExpression conditionalExpression;
             AbstractKxiExpression preExpression = null;
 
-            if(foundExpressions.get(1) instanceof ExpressionContext) postExpression = pop(stack);
-            if(foundExpressions.get(0) instanceof ExpressionContext) preExpression = pop(stack);
+            if (foundExpressions.get(1) instanceof ExpressionContext)
+                postExpression = new KxiPostForExpression(pop(stack));
+            if (foundExpressions.get(0) instanceof ExpressionContext) preExpression = pop(stack);
 
 //            if (statementContext.children.get(6) instanceof ExpressionContext)
 //                postExpression = pop(stack);

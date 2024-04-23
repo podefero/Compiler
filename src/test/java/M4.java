@@ -700,10 +700,41 @@ public class M4 {
                 "        }\n" +
                 "    }\n" +
                 "    void main() {\n" +
-                "        cout << Ackerman.ackerman(3, 4);\n" +
+                "        cout << Ackerman.ackerman(1, 1);\n" +
                 "    }\n" +
                 "    ---\n" +
                 "    125", false);
+    }
+
+    @Test
+    void ackermanSub() {
+        test("class Ack {\n" +
+                "    static public int ack(int m, int n) {\n" +
+                "        if(m==0) {\n" +
+                "            return n + 1;\n" +
+                "        }\n" +
+                "    }\n" +
+                "}\n" +
+                "\n" +
+                "void main() {\n" +
+                "    cout << Ack.ack(3, 4);\n" +
+                "}\n -- 5", false);
+    }
+
+    @Test
+    void javaAck() {
+        System.out.println(testAck(1, 1));
+
+    }
+
+    int testAck(int m, int n) {
+        if (m == 0) {
+            return n + 1;
+        } else if (m > 0 && n == 0) {
+            return testAck(m - 1, 1);
+        } else {
+            return testAck(m - 1, testAck(m, n - 1));
+        }
     }
 
     @Test
@@ -719,7 +750,7 @@ public class M4 {
                 "    This Prints", false);
     }
 
-        @Test
+    @Test
     void cinTest() {
         test("void main() {\n" +
                 "    int x;\n" +
@@ -727,7 +758,8 @@ public class M4 {
                 "    cout << x; //Ensure the value that prints is the same as your input\n" +
                 "}", false);
     }
-        @Test
+
+    @Test
     void cinTestTwo() {
         test("void main() {\n" +
                 "    char x;\n" +
@@ -735,7 +767,8 @@ public class M4 {
                 "    cout << x; //Ensure the value that prints is the same as your input\n" +
                 "}", false);
     }
-        @Test
+
+    @Test
     void ifElseTest() {
         test("void main() {\n" +
                 "    int m = 0;\n" +
@@ -779,7 +812,8 @@ public class M4 {
                 "    }\n" +
                 "}", false);
     }
-        @Test
+
+    @Test
     void binaryArithAssign() {
         test("void main() {\n" +
                 "  int m = 10;\n" +
@@ -788,6 +822,7 @@ public class M4 {
                 "  cout << n+=1;\n" +
                 "}", false);
     }
+
     //    @Test
 //    void imSpacedOut() {
 //        test("", false);

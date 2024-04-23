@@ -928,4 +928,10 @@ public class KxiVisitorBase implements VisitKxi {
 
     public void visit(InterBinaryAssignmentStatementGlobal interBinaryAssignmentStatementGlobal) {
     }
+
+    public void preVisit(KxiPostForExpression kxiPostForExpression) {
+    }
+
+    public void visit(KxiPostForExpression kxiPostForExpression) {
+    }
 }

@@ -10,7 +10,7 @@ public class KxiForWhileExpression extends AbstractKxiExpression {
 //    private AbstractKxiExpression postExpression;
 //    private AbstractKxiExpression preExpression;
 
-    public KxiForWhileExpression(AbstractKxiExpression postExpression, AbstractKxiExpression conditionalExpression, AbstractKxiExpression preExpression) {
+    public KxiForWhileExpression(KxiPostForExpression postExpression, AbstractKxiExpression conditionalExpression, AbstractKxiExpression preExpression) {
         super(postExpression, conditionalExpression, preExpression);
     }
 

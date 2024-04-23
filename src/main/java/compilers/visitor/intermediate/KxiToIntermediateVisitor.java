@@ -15,6 +15,7 @@ import compilers.ast.kxi_nodes.class_members.KxiMethod;
 import compilers.ast.kxi_nodes.expressions.AbstractKxiExpression;
 import compilers.ast.kxi_nodes.expressions.KxiDotExpression;
 import compilers.ast.kxi_nodes.expressions.KxiMethodExpression;
+import compilers.ast.kxi_nodes.expressions.KxiPostForExpression;
 import compilers.ast.kxi_nodes.expressions.binary.arithmic.KxiDiv;
 import compilers.ast.kxi_nodes.expressions.binary.arithmic.KxiMult;
 import compilers.ast.kxi_nodes.expressions.binary.arithmic.KxiPlus;
@@ -465,10 +466,9 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
     @Override
     public void visit(ExpressionIdLit node) {
         SymbolData symbolData = scopeHandler.Identify(currentScope, node.getTokenLiteral().getValue());
-        if(node.getTokenLiteral().getValue().equals("main")) {
+        if (node.getTokenLiteral().getValue().equals("main")) {
             nodeStack.push(new InterId(scopeHandler.getGlobalScope().getMainScope().getBlockScope().getUniqueName() + "main", ScalarType.VOID));
-        }
-        else if (symbolData != null) {
+        } else if (symbolData != null) {
             ScalarType scalarType = symbolData.getScalarType();
             SymbolTable whatScopeIdFound = scopeHandler.getLasIdentified();
             boolean isStatic = symbolData.isStatic();
@@ -663,10 +663,16 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
         addStatementToCurrentScope(interWhileLoop);
     }
 
+    @Override
+    public void visit(KxiPostForExpression kxiClass) {
+        nodeStack.push(rightToLeftStack.pop());
+    }
 
     @Override
     public void visit(KxiForStatement node) {
-        if (node.getPostExpression() != null) pop();
+        InterStatement postStatement = null;
+        if (node.getPostExpression() != null) postStatement = pop();
+        scopeBlock.add(postStatement);
         GenericListNode genericListNode = new GenericListNode(scopeBlock);
         InterDerefStatement interDerefStatement = new InterDerefStatement((InterOperand) getRightOperand().copy());
 
@@ -675,6 +681,7 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
 
         addStatementToCurrentScope(interDerefStatement);
         addStatementToCurrentScope(interIfStatement);
+
     }
 
     @Override
