@@ -465,7 +465,10 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
     @Override
     public void visit(ExpressionIdLit node) {
         SymbolData symbolData = scopeHandler.Identify(currentScope, node.getTokenLiteral().getValue());
-        if (symbolData != null) {
+        if(node.getTokenLiteral().getValue().equals("main")) {
+            nodeStack.push(new InterId(scopeHandler.getGlobalScope().getMainScope().getBlockScope().getUniqueName() + "main", ScalarType.VOID));
+        }
+        else if (symbolData != null) {
             ScalarType scalarType = symbolData.getScalarType();
             SymbolTable whatScopeIdFound = scopeHandler.getLasIdentified();
             boolean isStatic = symbolData.isStatic();

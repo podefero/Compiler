@@ -1,5 +1,6 @@
 package compilers.transform.kxi;
 
+import compilers.antlr.KxiParser;
 import compilers.ast.GenericListNode;
 import compilers.ast.kxi_nodes.AbstractKxiNode;
 import compilers.ast.kxi_nodes.expressions.AbstractKxiExpression;
@@ -10,13 +11,15 @@ import compilers.ast.kxi_nodes.statements.conditional.KxiForStatement;
 import compilers.ast.kxi_nodes.statements.conditional.KxiIfStatement;
 import compilers.ast.kxi_nodes.statements.conditional.KxiWhileStatement;
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.tree.ParseTree;
+import org.antlr.v4.runtime.tree.TerminalNode;
+import org.antlr.v4.runtime.tree.TerminalNodeImpl;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
-import static compilers.antlr.KxiParser.ExpressionContext;
-import static compilers.antlr.KxiParser.StatementContext;
+import static compilers.antlr.KxiParser.*;
 
 public class KxiFactoryStatement extends AbstractKxiFactory {
     @Override
@@ -56,18 +59,33 @@ public class KxiFactoryStatement extends AbstractKxiFactory {
             return new KxiWhileStatement(getBlock(pop(stack)), pop(stack));
 
         } else if (statementContext.FOR() != null) {
+
+            List<ParseTree> foundExpressions = new ArrayList<>();
+            List<ParseTree> forChildren = statementContext.children;
+            for (int i = 0; i < forChildren.size(); i++) {
+                ParseTree parseTree = forChildren.get(i);
+                if (parseTree instanceof TerminalNodeImpl) {
+                    if (((TerminalNodeImpl) parseTree).getSymbol().getType() == SEMICOLON) {
+                        foundExpressions.add(forChildren.get(i - 1));
+                    }
+                }
+            }
+
             AbstractKxiStatement statement = pop(stack);
             AbstractKxiExpression postExpression = null;
             AbstractKxiExpression conditionalExpression;
             AbstractKxiExpression preExpression = null;
 
-            if (statementContext.children.get(6) instanceof ExpressionContext)
-                postExpression = pop(stack);
+            if(foundExpressions.get(1) instanceof ExpressionContext) postExpression = pop(stack);
+            if(foundExpressions.get(0) instanceof ExpressionContext) preExpression = pop(stack);
+
+//            if (statementContext.children.get(6) instanceof ExpressionContext)
+//                postExpression = pop(stack);
 
             conditionalExpression = pop(stack);
 
-            if (statementContext.children.get(2) instanceof ExpressionContext)
-                preExpression = pop(stack);
+//            if (statementContext.children.get(2) instanceof ExpressionContext)
+//                preExpression = pop(stack);
 
             return new KxiForStatement(getBlock(statement), postExpression, conditionalExpression, preExpression);
 

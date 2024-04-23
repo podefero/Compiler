@@ -517,7 +517,7 @@ public class M4 {
                 "    5", false);
     }
 
-        @Test
+    @Test
     void loveScopes() {
         test("  //We are Loving Scopes\n" +
                 "    void main() {\n" +
@@ -547,7 +547,7 @@ public class M4 {
                 "    Ayoa5Yeet1", false);
     }
 
-        @Test
+    @Test
     void nestedBlocks() {
         test("void main() {\n" +
                 "    int y = 1;\n" +
@@ -565,7 +565,7 @@ public class M4 {
                 "}", false);
     }
 
-        @Test
+    @Test
     void nestedFunction() {
         test("  // Nested Reference to Class Function outside of Class Scope\n" +
                 "       class B {\n" +
@@ -584,19 +584,161 @@ public class M4 {
                 "    ---\n" +
                 "    15", false);
     }
-    //    @Test
-//    void imSpacedOut() {
-//        test("", false);
-//    }
-    //    @Test
-//    void imSpacedOut() {
-//        test("", false);
-//    }
-    //    @Test
-//    void imSpacedOut() {
-//        test("", false);
-//    }
 
+    //TODO for post exp happen after loop
+    @Test
+    void ForNestedWhile() {
+        test("   // For Loop nested in While Loop\n" +
+                "    void main() {\n" +
+                "        int x = 10;\n" +
+                "        while(x > 0){\n" +
+                "            cout<<\"Ready\";\n" +
+                "            for(;x > 0;x -=1){\n" +
+                "                cout<<x;\n" +
+                "            }\n" +
+                "            cout<< \"Stop\";\n" +
+                "        }\n" +
+                "        }\n" +
+                "    ---\n" +
+                "    Ready10987654321Stop", false);
+    }
+
+    @Test
+    void whileLoopFor() {
+        test("void main() {\n" +
+                "    int x = 10;\n" +
+                "    while(x > 0){\n" +
+                "        x-=1;\n" +
+                "    }\n" +
+                " \n" +
+                "}\n", false);
+    }
+
+
+    @Test
+    void callMaininMain() {
+        test("  // Make sure that you can call main within main\n" +
+                "    class B{\n" +
+                "        static public int counter= 5;\n" +
+                "    }\n" +
+                "\n" +
+                "    void main(){\n" +
+                "        int c = 5;\n" +
+                "        if(B.counter > 0){\n" +
+                "            B.counter -=1;\n" +
+                "            cout<< B.counter;\n" +
+                "                main();\n" +
+                "        }\n" +
+                "        cout<< c;\n" +
+                "        cout<<\"End\";\n" +
+                "    }\n" +
+                "    ---\n" +
+                "    432105End5End5End5End5End5End", false);
+    }
+
+    @Test
+    void doubleParamRecur() {
+        test(" // Testing Recursion but with two Parameters in case your code works for just one\n" +
+                "    class  B {\n" +
+                "        static public int doubleRecursion(int y, int r){\n" +
+                "\n" +
+                "            if(y < 1 || r < 1){\n" +
+                "                return y;\n" +
+                "            }\n" +
+                "            else{\n" +
+                "                cout<< y;\n" +
+                "                cout<< r;\n" +
+                "                doubleRecursion(y-1, r-1);\n" +
+                "            }\n" +
+                "        }\n" +
+                "    }\n" +
+                "    \n" +
+                "    void main(){\n" +
+                "        B.doubleRecursion(8,9);\n" +
+                "    }\n" +
+                "    ---\n" +
+                "    8978675645342312", false);
+    }
+
+    @Test
+    void recusionParams() {
+        test(" // Testing Recursion when using local variables as well as params;\n" +
+                "    class  B {\n" +
+                "        static public int doubleRecursion(int y, int r){\n" +
+                "            int c;\n" +
+                "            c = 1;\n" +
+                "            if(y < 1 || r < 1){\n" +
+                "                return y;\n" +
+                "            }\n" +
+                "            else{\n" +
+                "                cout<< y;\n" +
+                "                cout<< r;\n" +
+                "                doubleRecursion(y-c, r-c);\n" +
+                "            }\n" +
+                "        }\n" +
+                "    }\n" +
+                "        \n" +
+                "    void main(){\n" +
+                "        B.doubleRecursion(8,9);\n" +
+                "    }\n" +
+                "    ---\n" +
+                "    8978675645342312", false);
+    }
+
+    //TODO fix
+    @Test
+    void ackerman() {
+        test("  class Ackerman {\n" +
+                "        static public int ackerman(int m, int n) {\n" +
+                "            if (m == 0) {\n" +
+                "                return n +1;\n" +
+                "            } else if (m > 0 && n == 0) {\n" +
+                "                return ackerman(m - 1, 1);\n" +
+                "            } else {\n" +
+                "                return ackerman(m - 1, ackerman(m, n - 1));\n" +
+                "            }\n" +
+                "        }\n" +
+                "    }\n" +
+                "    void main() {\n" +
+                "        cout << Ackerman.ackerman(3, 4);\n" +
+                "    }\n" +
+                "    ---\n" +
+                "    125", false);
+    }
+
+    @Test
+    void mainRetEarly() {
+        test("     //Testing early return from main\n" +
+                "    void main(){\n" +
+                "\n" +
+                "        cout<< \"This Prints\";\n" +
+                "        return;\n" +
+                "        cout<<\"This doesn't print\";\n" +
+                "    }\n" +
+                "    ---\n" +
+                "    This Prints", false);
+    }
+
+        @Test
+    void cinTest() {
+        test("void main() {\n" +
+                "    int x;\n" +
+                "    cin >> x;\n" +
+                "    cout << x; //Ensure the value that prints is the same as your input\n" +
+                "}", false);
+    }
+        @Test
+    void cinTestTwo() {
+        test("void main() {\n" +
+                "    char x;\n" +
+                "    cin >> x;\n" +
+                "    cout << x; //Ensure the value that prints is the same as your input\n" +
+                "}", false);
+    }
+    //    @Test
+//    void imSpacedOut() {
+//        test("", false);
+//    }
     void test(String input, boolean hasErrors) {
         KxiParser parser = kxiParser(input);
         AntlrToKxiVisitor antlrToKxiVisitor = new AntlrToKxiVisitor();
@@ -622,7 +764,7 @@ public class M4 {
         BreakAndReturnsVisitor breakAndReturnsVisitor = new BreakAndReturnsVisitor();
         rootNode.accept(breakAndReturnsVisitor);
 
-       // rootNode.accept(new DanglingElseVisitor());
+        // rootNode.accept(new DanglingElseVisitor());
 
         KxiToIntermediateVisitor kxiToIntermediateVisitor = new KxiToIntermediateVisitor(symbolTableVisitor.getScopeHandler());
         rootNode.accept(kxiToIntermediateVisitor);

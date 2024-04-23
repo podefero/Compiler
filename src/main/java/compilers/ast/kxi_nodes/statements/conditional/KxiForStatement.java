@@ -8,8 +8,10 @@ import compilers.ast.kxi_nodes.statements.KxiBlockStatement;
 import compilers.util.HashString;
 import compilers.visitor.kxi.KxiVisitorBase;
 import lombok.Getter;
+import lombok.Setter;
 
 @Getter
+@Setter
 public class KxiForStatement extends AbstractKxiConditionalStatement {
     String loopLabel;
     String exitLoop;
@@ -31,7 +33,7 @@ public class KxiForStatement extends AbstractKxiConditionalStatement {
     public void accept(KxiVisitorBase visit) {
         visit.preVisit(this);
         visitChildren(visit);
-        acceptAbstractKxi(visit);
         visit.visit(this);
+        acceptAbstractKxi(visit);
     }
 }

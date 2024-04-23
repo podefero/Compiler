@@ -26,6 +26,27 @@ public class M3Tests {
     }
 
     @Test
+    void arrayMemberAccess() {
+        test("class Thing {\n" +
+                "        public int x = 4;\n" +
+                "    }\n" +
+                "    void main() {\n" +
+                "        Thing[] x = new Thing[1];\n" +
+                "        x[1].x;\n" +
+                "    }\n" +
+                "    \"\"\",\n" +
+                "    \"\"\"\n" +
+                "    class Sauce {\n" +
+                "        public int x = 4;\n" +
+                "    }\n" +
+                "    void main() {\n" +
+                "        Sauce[][] x = new Sauce[][1];\n" +
+                "        Sauce[] y = x[1];\n" +
+                "        y[1].x = 4;\n" +
+                "    }", false);
+    }
+
+    @Test
     void duplicateLocalVar() {
         test("void main() {\n" +
                 "      int x = 5;\n" +
