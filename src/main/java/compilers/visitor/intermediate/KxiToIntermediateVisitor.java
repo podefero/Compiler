@@ -5,7 +5,6 @@ import compilers.ast.GenericNode;
 import compilers.ast.assembly.Directive;
 import compilers.ast.intermediate.*;
 import compilers.ast.intermediate.InterOperand.*;
-import compilers.ast.intermediate.expression.InterExpression;
 import compilers.ast.intermediate.expression.operation.*;
 import compilers.ast.intermediate.statements.*;
 import compilers.ast.kxi_nodes.*;
@@ -26,10 +25,8 @@ import compilers.ast.kxi_nodes.expressions.literals.*;
 import compilers.ast.kxi_nodes.expressions.uni.KxiNot;
 import compilers.ast.kxi_nodes.expressions.uni.KxiUniPlus;
 import compilers.ast.kxi_nodes.expressions.uni.KxiUniSubtract;
-import compilers.ast.kxi_nodes.helper.KxiFordSemi;
 import compilers.ast.kxi_nodes.scope.KxiBlock;
 import compilers.ast.kxi_nodes.scope.KxiCaseBlock;
-import compilers.ast.kxi_nodes.scope.KxiClass;
 import compilers.ast.kxi_nodes.statements.*;
 import compilers.ast.kxi_nodes.statements.conditional.KxiElseStatement;
 import compilers.ast.kxi_nodes.statements.conditional.KxiForStatement;
@@ -131,14 +128,14 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
         ClassScope classScope = scopeHandler.bubbleToClassScope(currentScope);
         MethodScope methodScope = null;
         if (classScope != null)
-            methodScope = classScope.getMethodScopeMap().get(node.getId().getValue());
+            methodScope = classScope.getMethodScopeMap().get(node.getIdToken().getValue());
 
-        InterId interId = new InterId(getFullyQualifiedName(node.getId().getValue()), node.getReturnType().getScalarType());
+        InterId interId = new InterId(getFullyQualifiedName(node.getIdToken().getValue()), node.getReturnType().getScalarType());
         List<String> params = new ArrayList<>();
 
         for (int i = 0; i < paramSize; i++) {
             if (methodScope != null)
-                params.add(methodScope.getBlockScope().getUniqueName() + node.getParameters().get(i).getId().getValue());
+                params.add(methodScope.getBlockScope().getUniqueName() + node.getParameters().get(i).getIdToken().getValue());
         }
 
         InterFunctionNode interFunctionNode = new InterFunctionNode(interId, new GenericListNode(scopeBlock), params);
@@ -735,7 +732,7 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
     @Override
     public void visit(KxiVariableDeclaration node) {
         if (!node.isPartOfDataMember()) {
-            InterId varId = new InterId(getFullyQualifiedName(node.getId().getValue()), node.getType().getScalarType());
+            InterId varId = new InterId(getFullyQualifiedName(node.getIdToken().getValue()), node.getType().getScalarType());
 
             //Stack Var
             LeftVariableStack leftVariableStack = new LeftVariableStack(varId);
@@ -834,7 +831,7 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
         //else it's a class record
         if (node.isStatic()) {
             ScalarType scalarType = node.getVariableDeclaration().getType().getScalarType();
-            InterPtr interPtr = new InterPtr(getFullyQualifiedName(node.getVariableDeclaration().getId().getValue()), scalarType);
+            InterPtr interPtr = new InterPtr(getFullyQualifiedName(node.getVariableDeclaration().getIdToken().getValue()), scalarType);
             Directive directive;
             InterGlobalVariable interGlobalVariable;
 

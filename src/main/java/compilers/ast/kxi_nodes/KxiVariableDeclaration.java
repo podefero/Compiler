@@ -4,20 +4,21 @@ import compilers.ast.kxi_nodes.expressions.AbstractKxiExpression;
 import compilers.ast.kxi_nodes.token_literals.IdentifierToken;
 import compilers.visitor.kxi.KxiVisitorBase;
 import lombok.Data;
-import lombok.Getter;
 
 @Data
 public class KxiVariableDeclaration extends AbstractKxiNode {
     private AbstractKxiExpression initializer;
-    private IdentifierToken id;
+    private IdentifierToken idToken;
     private KxiAbstractType type;
     private boolean partOfDataMember;
+    String id;
 
-    public KxiVariableDeclaration(AbstractKxiExpression initializer, IdentifierToken id, KxiAbstractType type) {
-        super(initializer, id, type);
+    public KxiVariableDeclaration(AbstractKxiExpression initializer, IdentifierToken idToken, KxiAbstractType type) {
+        super(initializer, idToken, type);
         this.initializer = initializer;
-        this.id = id;
+        this.idToken = idToken;
         this.type = type;
+        this.id = idToken.getValue();
     }
 
     @Override

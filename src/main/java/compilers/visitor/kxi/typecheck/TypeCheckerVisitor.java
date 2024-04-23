@@ -2,7 +2,6 @@ package compilers.visitor.kxi.typecheck;
 
 import compilers.ast.kxi_nodes.*;
 import compilers.ast.kxi_nodes.class_members.KxiDataMember;
-import compilers.ast.kxi_nodes.class_members.KxiMethod;
 import compilers.ast.kxi_nodes.expressions.*;
 import compilers.ast.kxi_nodes.expressions.binary.arithmic.KxiDiv;
 import compilers.ast.kxi_nodes.expressions.binary.arithmic.KxiMult;
@@ -308,7 +307,7 @@ public class TypeCheckerVisitor extends KxiVisitorBase {
 
         if (variableDeclaration.getInitializer() != null) {
             ResultType leftOver = resultTypeStack.pop(); // pop to preserve order
-            pushNewResult(variableDeclaration.getId().getValue()
+            pushNewResult(variableDeclaration.getIdToken().getValue()
                     , new SymbolData(false, null, variableDeclaration.getType())
                     , currentScope);
             resultTypeStack.push(leftOver);
@@ -320,9 +319,9 @@ public class TypeCheckerVisitor extends KxiVisitorBase {
         } else if (variableDeclaration.getType().getScalarType() == ScalarType.ID) {
             ClassScope classScope = scopeHandler.getClassScope(variableDeclaration.getType().getKxiType().getIdName().getValue());
             if (classScope == null)
-                exceptionStack.push(new TypeCheckException(variableDeclaration.getLineInfo(), variableDeclaration.getId().getValue() + " does not refer to a valid class"));
+                exceptionStack.push(new TypeCheckException(variableDeclaration.getLineInfo(), variableDeclaration.getIdToken().getValue() + " does not refer to a valid class"));
         } else if (variableDeclaration.getType().getScalarType() == ScalarType.VOID) {
-            exceptionStack.push(new TypeCheckException(variableDeclaration.getLineInfo(), variableDeclaration.getId().getValue() + " can't be void"));
+            exceptionStack.push(new TypeCheckException(variableDeclaration.getLineInfo(), variableDeclaration.getIdToken().getValue() + " can't be void"));
         }
 
     }
@@ -735,7 +734,7 @@ EXPRESSIONS DOT
         if (parameter.getType().getKxiType().getScalarType() == ScalarType.ID) {
             String id = parameter.getType().getKxiType().getIdName().getValue();
             if (scopeHandler.getClassScope(id) == null)
-                exceptionStack.push(new TypeCheckException(parameter.getLineInfo(), "Invalid Parameter: (missing class) " + parameter.getId().getValue()));
+                exceptionStack.push(new TypeCheckException(parameter.getLineInfo(), "Invalid Parameter: (missing class) " + parameter.getIdToken().getValue()));
 
 
         }
@@ -750,7 +749,7 @@ EXPRESSIONS DOT
                 if (resultType.containsFlag(ResultFlag.This)) {
                     exceptionStack.push(new TypeCheckException(dataMember.getLineInfo()
                             , "Non-static field '"
-                            + dataMember.getVariableDeclaration().getId().getValue()
+                            + dataMember.getVariableDeclaration().getIdToken().getValue()
                             + "' cannot be referenced from a static context"));
                 }
             }
