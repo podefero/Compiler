@@ -1815,6 +1815,12 @@ public class M3Tests {
 //    }
 
     @Test
+    void invalidMethodExp() {
+        test("void main() {\n" +
+                "  5 + 5 ();\n" +
+                "}\n", true);
+    }
+    @Test
     void validBoolFunctionAnd() {
         test("class A {\n" +
                 "    static public bool f(){}\n" +

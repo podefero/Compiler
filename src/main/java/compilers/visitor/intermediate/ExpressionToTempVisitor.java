@@ -11,7 +11,12 @@ import compilers.ast.kxi_nodes.ScalarType;
 import compilers.ast.kxi_nodes.expressions.binary.AbstractKxiBinaryOperation;
 import compilers.ast.kxi_nodes.expressions.binary.arithmic.*;
 import compilers.ast.kxi_nodes.expressions.binary.assignment.*;
+import compilers.ast.kxi_nodes.expressions.binary.conditional.*;
 import compilers.ast.kxi_nodes.expressions.literals.*;
+import compilers.ast.kxi_nodes.expressions.uni.AbstractKxiUniOperation;
+import compilers.ast.kxi_nodes.expressions.uni.KxiNot;
+import compilers.ast.kxi_nodes.expressions.uni.KxiUniPlus;
+import compilers.ast.kxi_nodes.expressions.uni.KxiUniSubtract;
 import compilers.visitor.kxi.KxiVisitorBase;
 
 import java.lang.reflect.InvocationTargetException;
@@ -108,6 +113,14 @@ public class ExpressionToTempVisitor extends KxiVisitorBase {
         valueStack.push(interId);
     }
 
+    private void setUnaryOp(InterOperation interOperation, AbstractKxiUniOperation binaryOp) {
+        InterId interId = new InterId(ScalarType.INT);
+        InterVariable interVariable = new InterVariable(interId, interOperation);
+        binaryOp.setInterVariable(interVariable);
+        binaryOp.setInterOperation(interOperation);
+        valueStack.push(interId);
+    }
+
     private void setBinaryOpNoPush(InterOperation interOperation, AbstractKxiBinaryOperation binaryOp) {
         InterId interId = new InterId(ScalarType.INT);
         InterVariable interVariable = new InterVariable(interId, interOperation);
@@ -196,10 +209,80 @@ public class ExpressionToTempVisitor extends KxiVisitorBase {
     }
 
     @Override
+    public void visit(KxiLessThen node) {
+        InterOperation interOperation = getBinaryOperation(node.getLineInfo(), InterLogicalLessThen.class);
+        setBinaryOp(interOperation, node);
+    }
+
+    @Override
+    public void visit(KxiGreaterThen node) {
+        InterOperation interOperation = getBinaryOperation(node.getLineInfo(), InterLogicalGreaterThen.class);
+        setBinaryOp(interOperation, node);
+    }
+
+    @Override
+    public void visit(KxiGreaterEqualsThen node) {
+        InterOperation interOperation = getBinaryOperation(node.getLineInfo(), InterLogicalGreaterThen.class);
+        setBinaryOp(interOperation, node);
+    }
+
+    @Override
+    public void visit(KxiLessEqualsThen node) {
+        InterOperation interOperation = getBinaryOperation(node.getLineInfo(), InterLogicalLessThen.class);
+        setBinaryOp(interOperation, node);
+    }
+
+    @Override
+    public void visit(KxiEqualsEquals node) {
+        InterOperation interOperation = getBinaryOperation(node.getLineInfo(), InterLogicalEqualsEquals.class);
+        setBinaryOp(interOperation, node);
+    }
+
+    @Override
+    public void visit(KxiNotEquals node) {
+        InterOperation interOperation = getBinaryOperation(node.getLineInfo(), InterLogicalNotEquals.class);
+        setBinaryOp(interOperation, node);
+    }
+
+    @Override
+    public void visit(KxiAnd node) {
+        InterOperation interOperation = getBinaryOperation(node.getLineInfo(), InterLogicalAnd.class);
+        setBinaryOp(interOperation, node);
+    }
+
+    @Override
+    public void visit(KxiOr node) {
+        InterOperation interOperation = getBinaryOperation(node.getLineInfo(), InterLogicalOr.class);
+        setBinaryOp(interOperation, node);
+    }
+
+    @Override
+    public void visit(KxiNot node) {
+        InterOperation interOperation =
+                new InterLogicalNot(new LeftOperandLit(new InterLit<>(-1, ScalarType.INT)), getOperand(false, node.getLineInfo()));
+        setUnaryOp(interOperation, node);
+    }
+
+    @Override
+    public void visit(KxiUniPlus node) {
+        valueStack.pop();
+        InterOperation interOperation =
+                new InterEmptyOperator(null, null);
+        setUnaryOp(interOperation, node);
+    }
+
+    @Override
+    public void visit(KxiUniSubtract node) {
+        InterOperand rightOperand = getOperand(false, node.getLineInfo());
+        InterOperation interOperation =
+                new InterUnarySubOperator(null, rightOperand);
+        setUnaryOp(interOperation, node);
+    }
+
+    @Override
     public void visit(KxiEquals node) {
         if (valueStack.size() >= 2) {
             InterOperation interOperation = getBinaryOperation(node.getLineInfo(), InterAssignment.class);
-            //setBinaryOp(interOperation, node);
             node.setInterAssignment((InterAssignment) interOperation);
         }
     }

@@ -1,9 +1,13 @@
 package compilers.ast.kxi_nodes;
 
+import compilers.ast.intermediate.expression.InterExpression;
+import compilers.ast.intermediate.statements.InterStatement;
 import compilers.ast.kxi_nodes.expressions.AbstractKxiExpression;
 import compilers.ast.kxi_nodes.token_literals.IdentifierToken;
 import compilers.visitor.kxi.KxiVisitorBase;
 import lombok.Data;
+
+import java.util.List;
 
 @Data
 public class KxiVariableDeclaration extends AbstractKxiNode {
@@ -11,6 +15,7 @@ public class KxiVariableDeclaration extends AbstractKxiNode {
     private IdentifierToken idToken;
     private KxiAbstractType type;
     private boolean partOfDataMember;
+    private List<InterExpression> interStatements;
     String id;
 
     public KxiVariableDeclaration(AbstractKxiExpression initializer, IdentifierToken idToken, KxiAbstractType type) {

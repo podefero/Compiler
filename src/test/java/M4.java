@@ -1057,6 +1057,7 @@ public class M4 {
 
         rootNode.accept(new FullyLoadedIdVisitor(symbolTableVisitor.getScopeHandler()));
         rootNode.accept(new ExpressionToTempVisitor());
+        rootNode.accept(new InterStatementsSetupVisitor());
 
         KxiToIntermediateVisitor kxiToIntermediateVisitor = new KxiToIntermediateVisitor(symbolTableVisitor.getScopeHandler());
         rootNode.accept(kxiToIntermediateVisitor);
