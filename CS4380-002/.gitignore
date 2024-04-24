@@ -1,0 +1,29 @@
+# Compiled Object files
+*.o
+*.ko
+*.obj
+*.elf
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Executables
+*.exe
+*.out
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# IDE specific files
+.vscode/
+.idea/
+compile_commands.json
+cmake-build-debug/
+# Dependency directories
+bin/
+build/
+lib/
+
