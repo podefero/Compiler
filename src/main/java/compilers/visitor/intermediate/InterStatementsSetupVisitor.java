@@ -1,6 +1,7 @@
 package compilers.visitor.intermediate;
 
 import compilers.ast.intermediate.expression.InterExpression;
+import compilers.ast.kxi_nodes.KxiArguments;
 import compilers.ast.kxi_nodes.KxiVariableDeclaration;
 import compilers.ast.kxi_nodes.expressions.KxiPostForExpression;
 import compilers.ast.kxi_nodes.expressions.KxiPreForExpression;
@@ -45,52 +46,52 @@ public class InterStatementsSetupVisitor extends KxiVisitorBase {
 
     @Override
     public void visit(KxiIfStatement node) {
-        node.setInterStatements(dumpExpressions());
+        node.setInterExpressions(dumpExpressions());
     }
 
     @Override
     public void visit(KxiWhileStatement node) {
-        node.setInterStatements(dumpExpressions());
+        node.setInterExpressions(dumpExpressions());
     }
 
     @Override
     public void visit(KxiPreForExpression node) {
-        node.setInterStatements(dumpExpressions());
+        node.setInterExpressions(dumpExpressions());
     }
 
     @Override
     public void visit(KxiPostForExpression node) {
-        node.setInterStatements(dumpExpressions());
+        node.setInterExpressions(dumpExpressions());
     }
 
     @Override
     public void visit(KxiForStatement node) {
-        node.setInterStatements(dumpExpressions());
+        node.setInterExpressions(dumpExpressions());
     }
 
     @Override
     public void visit(KxiReturnStatement node) {
-        node.setInterStatements(dumpExpressions());
+        node.setInterExpressions(dumpExpressions());
     }
 
     @Override
     public void visit(KxiCoutStatement node) {
-        node.setInterStatements(dumpExpressions());
+        node.setInterExpressions(dumpExpressions());
     }
 
     @Override
     public void visit(KxiCinStatement node) {
-        node.setInterStatements(dumpExpressions());
+        node.setInterExpressions(dumpExpressions());
     }
 
     @Override
     public void visit(KxiSwitchStatement node) {
-        node.setInterStatements(dumpExpressions());
+        node.setInterExpressions(dumpExpressions());
     }
 
     @Override
     public void visit(KxiExpressionStatement node) {
-        node.setInterStatements(dumpExpressions());
+        node.setInterExpressions(dumpExpressions());
     }
 
     public void visit(KxiVariableDeclaration node) {

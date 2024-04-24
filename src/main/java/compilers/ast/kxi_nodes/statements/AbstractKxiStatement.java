@@ -2,7 +2,6 @@ package compilers.ast.kxi_nodes.statements;
 
 import compilers.ast.GenericNode;
 import compilers.ast.intermediate.expression.InterExpression;
-import compilers.ast.intermediate.statements.InterStatement;
 import compilers.ast.kxi_nodes.AbstractKxiNode;
 import compilers.visitor.kxi.KxiVisitorBase;
 import lombok.Getter;
@@ -13,7 +12,7 @@ import java.util.List;
 @Setter
 @Getter
 public abstract class AbstractKxiStatement extends AbstractKxiNode {
-    protected List<InterExpression> interStatements;
+    protected List<InterExpression> interExpressions;
 
     public AbstractKxiStatement(GenericNode... genericNodes) {
         super(genericNodes);

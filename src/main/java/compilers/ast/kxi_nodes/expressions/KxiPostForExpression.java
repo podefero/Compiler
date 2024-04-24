@@ -1,7 +1,6 @@
 package compilers.ast.kxi_nodes.expressions;
 
 import compilers.ast.intermediate.expression.InterExpression;
-import compilers.ast.intermediate.statements.InterStatement;
 import compilers.visitor.kxi.KxiVisitorBase;
 import lombok.Getter;
 import lombok.Setter;
@@ -12,7 +11,7 @@ import java.util.List;
 @Setter
 public class KxiPostForExpression extends AbstractKxiExpression {
     private AbstractKxiExpression expression;
-    private List<InterExpression> interStatements;
+    private List<InterExpression> interExpressions;
 
     public KxiPostForExpression(AbstractKxiExpression expression) {
         super(expression);
