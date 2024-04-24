@@ -4,6 +4,8 @@ import compilers.ast.GenericListNode;
 import compilers.ast.GenericTerminal;
 import compilers.ast.intermediate.InterArgs;
 import compilers.ast.intermediate.InterId;
+import compilers.ast.intermediate.InterValue;
+import compilers.ast.kxi_nodes.ScalarType;
 import compilers.visitor.kxi.KxiVisitorBase;
 import lombok.Getter;
 
@@ -11,15 +13,12 @@ import java.util.List;
 
 
 @Getter
-public class InterFunctionalCall extends InterStatement  {
+public class InterFunctionalCall extends InterValue {
     InterId calleeId;
-    List<InterArgs> interArgsList;
     String label;
-    int numOfArgs;
-    public InterFunctionalCall(InterId calleeId, GenericListNode args) {
-        super(args, calleeId);
+    public InterFunctionalCall(InterId calleeId, ScalarType scalarType) {
+        super(scalarType);
         this.calleeId = calleeId;
-        this.interArgsList = getNodeList(args);
         label = convertIdToLabel(calleeId.getId());
     }
 
@@ -30,4 +29,8 @@ public class InterFunctionalCall extends InterStatement  {
         visit.visit(this);
     }
 
+    @Override
+    public String getTerminalValue() {
+        return calleeId.getTerminalValue();
+    }
 }

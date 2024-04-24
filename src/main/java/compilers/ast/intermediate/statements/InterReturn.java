@@ -1,15 +1,15 @@
 package compilers.ast.intermediate.statements;
 
+import compilers.ast.GenericListNode;
 import compilers.ast.intermediate.InterOperand.InterOperand;
 import compilers.visitor.kxi.KxiVisitorBase;
 import lombok.Getter;
 
 @Getter
 public class InterReturn extends InterStatement {
-    InterOperand rightOperand;
-    public InterReturn(InterOperand rightOperand) {
-        super(rightOperand);
-        this.rightOperand = rightOperand;
+    public InterReturn(GenericListNode expression) {
+        super(expression);
+        this.interExpressionList = getNodeList(expression);
     }
 
     @Override

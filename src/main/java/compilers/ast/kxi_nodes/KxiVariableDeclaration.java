@@ -1,6 +1,7 @@
 package compilers.ast.kxi_nodes;
 
 import compilers.ast.intermediate.expression.InterExpression;
+import compilers.ast.intermediate.expression.InterVariable;
 import compilers.ast.intermediate.statements.InterStatement;
 import compilers.ast.kxi_nodes.expressions.AbstractKxiExpression;
 import compilers.ast.kxi_nodes.token_literals.IdentifierToken;
@@ -16,6 +17,7 @@ public class KxiVariableDeclaration extends AbstractKxiNode {
     private KxiAbstractType type;
     private boolean partOfDataMember;
     private List<InterExpression> interStatements;
+    private InterVariable interVariable;
     String id;
 
     public KxiVariableDeclaration(AbstractKxiExpression initializer, IdentifierToken idToken, KxiAbstractType type) {

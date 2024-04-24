@@ -1,6 +1,7 @@
 package compilers.ast.kxi_nodes.scope;
 
 import compilers.ast.GenericListNode;
+import compilers.ast.intermediate.statements.InterBlock;
 import compilers.ast.kxi_nodes.statements.AbstractKxiStatement;
 import compilers.visitor.kxi.KxiVisitorBase;
 import compilers.visitor.kxi.symboltable.SymbolTable;
@@ -14,6 +15,7 @@ import java.util.List;
 public class KxiBlock extends AbstractKxiStatement{
     private SymbolTable scope;
     private List<AbstractKxiStatement> statements;
+    InterBlock interBlock;
 
     public KxiBlock(GenericListNode statements) {
         super(statements);

@@ -1,8 +1,10 @@
 package compilers.visitor.intermediate;
 
+import compilers.ast.intermediate.InterArgs;
 import compilers.ast.intermediate.expression.InterExpression;
 import compilers.ast.kxi_nodes.KxiArguments;
 import compilers.ast.kxi_nodes.KxiVariableDeclaration;
+import compilers.ast.kxi_nodes.expressions.KxiMethodExpression;
 import compilers.ast.kxi_nodes.expressions.KxiPostForExpression;
 import compilers.ast.kxi_nodes.expressions.KxiPreForExpression;
 import compilers.ast.kxi_nodes.expressions.binary.arithmic.KxiDiv;
@@ -97,6 +99,13 @@ public class InterStatementsSetupVisitor extends KxiVisitorBase {
     public void visit(KxiVariableDeclaration node) {
         if (node.getInitializer() != null)
             node.setInterStatements(dumpExpressions());
+    }
+
+    @Override
+    public void visit(KxiMethodExpression node) {
+        for(InterArgs arg : node.getInterArgsList()) {
+            pushExpression(arg);
+        }
     }
 
     @Override

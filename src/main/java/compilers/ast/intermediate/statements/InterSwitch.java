@@ -11,11 +11,13 @@ import java.util.List;
 @Getter
 public class InterSwitch extends InterStatement {
     String exit;
-    List<InterStatement> interStatements;
+    List<InterCase> interCaseList;
+    List<InterStatement> defaultStatements;
 
-    public InterSwitch(GenericListNode statements, String exit) {
-        super(statements);
-        this.interStatements = getNodeList(statements);
+    public InterSwitch(GenericListNode expression, GenericListNode cases, GenericListNode statements, String exit) {
+        super(statements, cases, expression);
+        this.interCaseList = getNodeList(cases);
+        this.defaultStatements = getNodeList(statements);
         this.exit = exit;
     }
 

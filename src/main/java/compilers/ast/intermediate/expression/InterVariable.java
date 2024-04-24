@@ -1,4 +1,4 @@
-package compilers.ast.intermediate.statements;
+package compilers.ast.intermediate.expression;
 
 import compilers.ast.intermediate.InterId;
 import compilers.ast.intermediate.expression.InterExpression;

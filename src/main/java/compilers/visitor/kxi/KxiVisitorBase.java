@@ -1,10 +1,11 @@
 package compilers.visitor.kxi;
 
-import compilers.ast.GenericNode;
 import compilers.ast.assembly.*;
+import compilers.ast.intermediate.InterArgs;
 import compilers.ast.intermediate.InterFunctionNode;
 import compilers.ast.intermediate.InterGlobal;
 import compilers.ast.intermediate.InterOperand.*;
+import compilers.ast.intermediate.expression.InterVariable;
 import compilers.ast.intermediate.expression.operation.*;
 import compilers.ast.intermediate.statements.*;
 import compilers.ast.kxi_nodes.*;
@@ -33,8 +34,6 @@ import compilers.ast.kxi_nodes.statements.conditional.KxiIfStatement;
 import compilers.ast.kxi_nodes.statements.conditional.KxiWhileStatement;
 import compilers.ast.kxi_nodes.token_literals.*;
 import compilers.exceptions.CompilerException;
-import compilers.visitor.kxi.symboltable.BlockScope;
-import compilers.visitor.kxi.symboltable.ScopeType;
 import compilers.visitor.kxi.symboltable.SymbolTable;
 import lombok.Getter;
 
@@ -939,5 +938,8 @@ public class KxiVisitorBase implements VisitKxi {
     }
 
     public void visit(KxiPreForExpression kxiPreForExpression) {
+    }
+
+    public void visit(InterArgs interArgs) {
     }
 }

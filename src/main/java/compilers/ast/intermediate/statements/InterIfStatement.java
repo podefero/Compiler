@@ -14,13 +14,14 @@ public class InterIfStatement extends InterStatement {
     String label;
     String ifNot;
     String done;
-    private List<InterStatement> ifMet;
+    InterStatement ifMet;
     InterElseStatement interElseStatement;
 
-    public InterIfStatement(GenericListNode ifMet, InterElseStatement interElseStatement, String label) {
-        super(interElseStatement, ifMet);
-        this.ifMet = getNodeList(ifMet);
+    public InterIfStatement(GenericListNode expression, InterStatement ifMet, InterElseStatement interElseStatement, String label) {
+        super(interElseStatement, ifMet, expression);
+        this.ifMet = ifMet;
         this.interElseStatement = interElseStatement;
+        this.interExpressionList = getNodeList(expression);
         this.label = label;
         ifNot = convertIdToLabel(label) + "ifNot";
         done = convertIdToLabel(label) + "ifDone";

@@ -1,13 +1,16 @@
 package compilers.visitor.intermediate;
 
-import compilers.ast.intermediate.InterId;
-import compilers.ast.intermediate.InterLit;
+import compilers.ast.assembly.Directive;
+import compilers.ast.intermediate.*;
 import compilers.ast.intermediate.InterOperand.*;
-import compilers.ast.intermediate.InterPtr;
-import compilers.ast.intermediate.InterValue;
 import compilers.ast.intermediate.expression.operation.*;
-import compilers.ast.intermediate.statements.InterVariable;
+import compilers.ast.intermediate.statements.InterFunctionalCall;
+import compilers.ast.intermediate.expression.InterVariable;
+import compilers.ast.intermediate.statements.InterGlobalVariable;
+import compilers.ast.kxi_nodes.KxiMain;
 import compilers.ast.kxi_nodes.ScalarType;
+import compilers.ast.kxi_nodes.expressions.KxiDotExpression;
+import compilers.ast.kxi_nodes.expressions.KxiMethodExpression;
 import compilers.ast.kxi_nodes.expressions.binary.AbstractKxiBinaryOperation;
 import compilers.ast.kxi_nodes.expressions.binary.arithmic.*;
 import compilers.ast.kxi_nodes.expressions.binary.assignment.*;
@@ -20,6 +23,8 @@ import compilers.ast.kxi_nodes.expressions.uni.KxiUniSubtract;
 import compilers.visitor.kxi.KxiVisitorBase;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Stack;
 
 public class ExpressionToTempVisitor extends KxiVisitorBase {
@@ -59,6 +64,8 @@ public class ExpressionToTempVisitor extends KxiVisitorBase {
                 operand = new RightVariableStack(interValue);
             } else if (interValue instanceof InterPtr)
                 operand = new RightPtr(interValue);
+            else if (interValue instanceof InterFunctionalCall)
+                operand = new OperandReturn(interValue, false);
             else
                 operand = new RightOperandLit(interValue);
         } else {
@@ -66,6 +73,8 @@ public class ExpressionToTempVisitor extends KxiVisitorBase {
                 operand = new LeftVariableStack(interValue);
             } else if (interValue instanceof InterPtr)
                 operand = new LeftPtr(interValue);
+            else if (interValue instanceof InterFunctionalCall)
+                operand = new OperandReturn(interValue, true);
             else
                 operand = new LeftOperandLit(interValue);
         }
@@ -77,23 +86,25 @@ public class ExpressionToTempVisitor extends KxiVisitorBase {
         InterOperand operand;
         interValue = (InterValue) interValue.copy();
 
-        if (left) {
-            if (interValue instanceof InterId) {
-                operand = new LeftVariableStack(interValue);
-            } else if (interValue instanceof InterPtr)
-                operand = new LeftPtr(interValue);
-            else
-                operand = new LeftOperandLit(interValue);
-        } else {
+        if (!left) {
             if (interValue instanceof InterId) {
                 operand = new RightVariableStack(interValue);
             } else if (interValue instanceof InterPtr)
                 operand = new RightPtr(interValue);
+            else if (interValue instanceof InterFunctionalCall)
+                operand = new OperandReturn(interValue, false);
             else
                 operand = new RightOperandLit(interValue);
-
+        } else {
+            if (interValue instanceof InterId) {
+                operand = new LeftVariableStack(interValue);
+            } else if (interValue instanceof InterPtr)
+                operand = new LeftPtr(interValue);
+            else if (interValue instanceof InterFunctionalCall)
+                operand = new OperandReturn(interValue, true);
+            else
+                operand = new LeftOperandLit(interValue);
         }
-
         return operand;
     }
 
@@ -154,6 +165,38 @@ public class ExpressionToTempVisitor extends KxiVisitorBase {
     @Override
     public void visit(ExpressionNullLit node) {
         valueStack.push(new InterLit<>(0, ScalarType.INT));
+    }
+
+    @Override
+    public void visit(ExpressionStringLit node) {
+        InterPtr interId = new InterPtr(ScalarType.STRING);
+        InterGlobalVariable interGlobalVariable = new InterGlobalVariable(interId, Directive.STR
+                , new InterLit(node.getTokenLiteral().getValue(), ScalarType.STRING));
+        valueStack.push(interId);
+        node.setGlobalVariable(interGlobalVariable);
+    }
+
+//    @Override
+//    public void visit(KxiDotExpression node) {
+//        InterId interId = (InterId) valueStack.pop();
+//        InterPtr interPtr = interId.convertToPtr();
+//        valueStack.push(interPtr);
+//    }
+
+    @Override
+    public void visit(KxiMethodExpression node) {
+        int size = node.getArguments().getArguments().size();
+        List<InterArgs> interArgsList = new ArrayList<>();
+
+        for (int i = 0; i < size; i++) {
+            InterArgs interArgs = new InterArgs(getOperand(false, node.getLineInfo()));
+            interArgsList.add(interArgs);
+        }
+
+        node.setInterArgsList(interArgsList);
+        InterId interid = (InterId) valueStack.pop();
+        InterFunctionalCall interFunctionalCall = new InterFunctionalCall(interid, interid.getScalarType());
+        valueStack.push(interFunctionalCall);
     }
 
     @Override

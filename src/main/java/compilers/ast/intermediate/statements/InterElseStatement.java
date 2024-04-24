@@ -9,13 +9,13 @@ import java.util.List;
 
 @Data
 public class InterElseStatement extends InterStatement {
-    private List<InterStatement> ifNotMet;
+    private InterStatement ifNotMet;
     private String ifNot;
     String done;
 
-    public InterElseStatement(GenericListNode ifNotMet) {
+    public InterElseStatement(InterStatement ifNotMet) {
         super(ifNotMet);
-        this.ifNotMet = getNodeList(ifNotMet);
+        this.ifNotMet = ifNotMet;
     }
 
     @Override

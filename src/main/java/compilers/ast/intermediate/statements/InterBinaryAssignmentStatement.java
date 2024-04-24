@@ -1,5 +1,6 @@
 package compilers.ast.intermediate.statements;
 
+import compilers.ast.intermediate.expression.InterVariable;
 import compilers.ast.intermediate.expression.operation.InterOperation;
 import compilers.visitor.kxi.KxiVisitorBase;
 import lombok.Getter;

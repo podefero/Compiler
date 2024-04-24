@@ -1,11 +1,10 @@
 package compilers.ast.kxi_nodes.expressions.binary;
 
 import compilers.ast.intermediate.expression.operation.InterOperation;
-import compilers.ast.intermediate.statements.InterVariable;
+import compilers.ast.intermediate.expression.InterVariable;
 import compilers.ast.kxi_nodes.expressions.AbstractKxiExpression;
 import compilers.visitor.kxi.KxiVisitorBase;
 import lombok.Data;
-import lombok.Getter;
 
 @Data
 public abstract class AbstractKxiBinaryOperation extends AbstractKxiExpression {
