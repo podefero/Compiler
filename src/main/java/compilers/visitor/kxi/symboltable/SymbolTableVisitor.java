@@ -263,47 +263,59 @@ public class SymbolTableVisitor extends KxiVisitorBase {
 
     @Override
     public void preVisit(KxiElseStatement kxiElseStatement) {
-        setScopeUniqueName("else_" + HashString.updateStringHash());
+        if (kxiElseStatement.getStatement() instanceof KxiBlock)
+            setScopeUniqueName("else_" + HashString.updateStringHash());
     }
 
     @Override
     public void visit(KxiElseStatement kxiElseStatement) {
-        setBlockScopeType(ScopeType.Else);
-        scopeNodeVisit();
+        if (kxiElseStatement.getStatement() instanceof KxiBlock) {
+            setBlockScopeType(ScopeType.Else);
+            scopeNodeVisit();
+        }
     }
 
     @Override
     public void preVisit(KxiIfStatement kxiIfStatement) {
-        setScopeUniqueName("if_" + HashString.updateStringHash());
+        if (kxiIfStatement.getStatement() instanceof KxiBlock)
+            setScopeUniqueName("if_" + HashString.updateStringHash());
     }
 
     @Override
     public void visit(KxiIfStatement kxiIfStatement) {
-        setBlockScopeType(ScopeType.If);
-        scopeNodeVisit();
+        if (kxiIfStatement.getStatement() instanceof KxiBlock) {
+            setBlockScopeType(ScopeType.If);
+            scopeNodeVisit();
+        }
     }
 
     @Override
     public void preVisit(KxiForStatement kxiForStatement) {
-        setScopeUniqueName("for_" + HashString.updateStringHash());
+        if (kxiForStatement.getStatement() instanceof KxiBlock) {
+            setScopeUniqueName("for_" + HashString.updateStringHash());
+        }
     }
 
     @Override
     public void visit(KxiForStatement kxiForStatement) {
-        setBlockScopeType(ScopeType.For);
-        scopeNodeVisit();
+        if (kxiForStatement.getStatement() instanceof KxiBlock) {
+            setBlockScopeType(ScopeType.For);
+            scopeNodeVisit();
+        }
     }
 
     @Override
     public void preVisit(KxiWhileStatement kxiWhileStatement) {
-        setScopeUniqueName("while_" + HashString.updateStringHash());
+        if (kxiWhileStatement.getStatement() instanceof KxiBlock)
+            setScopeUniqueName("while_" + HashString.updateStringHash());
     }
 
     @Override
     public void visit(KxiWhileStatement kxiWhileStatement) {
-        setBlockScopeType(ScopeType.While);
-        //currentSymbolTable.setUniqueName(tableStack.peek().getUniqueName() + kxiWhileStatement.hashCode());
-        scopeNodeVisit();
+        if (kxiWhileStatement.getStatement() instanceof KxiBlock) {
+            setBlockScopeType(ScopeType.While);
+            scopeNodeVisit();
+        }
     }
 
     @Override
@@ -314,7 +326,6 @@ public class SymbolTableVisitor extends KxiVisitorBase {
     @Override
     public void visit(KxiSwitchStatement kxiSwitchStatement) {
         setBlockScopeType(ScopeType.Switch);
-        //currentSymbolTable.setUniqueName(tableStack.peek().getUniqueName() + kxiSwitchStatement.hashCode());
         scopeNodeVisit();
     }
 

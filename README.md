@@ -1,15 +1,19 @@
 # Compilers
 _By: Nathan Jones_
-## How to run program
+## How to compile
 ```bash
 #First build it
-./build.sh
-
-#Then run it
-./run.sh [arguments]
+./compile.sh [arguments]
 # Arguments are: [-h] [-l] [-p] [-s] [-c] [-a] [-o [FILE [FILE ...]]] [-i [KXI [KXI ...]]]
 ```
-## How to run test
+
 ```bash
-./runTests.sh
+#If this is first time installing then we need to build the emulator
+./buildVM
+```
+
+
+```bash
+#Then to exeute
+./execute.sh <asmFile>
 ```

@@ -9,7 +9,7 @@ import lombok.Getter;
 
 @Getter
 public abstract class AbstractKxiConditionalStatement extends AbstractKxiStatement {
-    protected KxiBlock statement;
+    protected AbstractKxiStatement statement;
     protected AbstractKxiExpression conditionalExpression;
 
     public AbstractKxiConditionalStatement(GenericNode... genericNodes) {

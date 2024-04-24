@@ -26,7 +26,7 @@ public class KxiParser extends Parser {
 		SUBTRACT=44, MULT=45, DIVIDE=46, PLUSEQUALS=47, SUBEQUALS=48, MULTEQUALS=49, 
 		DIVEQUALS=50, OUTSTREAM=51, INSTREAM=52, DOT=53, COMMA=54, COLON=55, IDENTIFIER=56, 
 		CHARLIT=57, STRINGLIT=58, INTLIT=59, COMMENT=60, MULTI_COMMENT=61, WS=62, 
-		NEWLINE=63, UNKNOWN=64;
+		UNKNOWN=63;
 	public static final int
 		RULE_compilationUnit = 0, RULE_classDefinition = 1, RULE_scalarType = 2, 
 		RULE_type = 3, RULE_modifier = 4, RULE_classMemberDefinition = 5, RULE_dataMemberDeclaration = 6, 
@@ -66,7 +66,7 @@ public class KxiParser extends Parser {
 			"LESSTHEN", "GREATERTHEN", "AND", "OR", "NOT", "PLUS", "SUBTRACT", "MULT", 
 			"DIVIDE", "PLUSEQUALS", "SUBEQUALS", "MULTEQUALS", "DIVEQUALS", "OUTSTREAM", 
 			"INSTREAM", "DOT", "COMMA", "COLON", "IDENTIFIER", "CHARLIT", "STRINGLIT", 
-			"INTLIT", "COMMENT", "MULTI_COMMENT", "WS", "NEWLINE", "UNKNOWN"
+			"INTLIT", "COMMENT", "MULTI_COMMENT", "WS", "UNKNOWN"
 		};
 	}
 	private static final String[] _SYMBOLIC_NAMES = makeSymbolicNames();
@@ -1354,9 +1354,6 @@ public class KxiParser extends Parser {
 			return getRuleContext(ExpressionContext.class,i);
 		}
 		public TerminalNode RPARENTH() { return getToken(KxiParser.RPARENTH, 0); }
-		public TerminalNode NOT() { return getToken(KxiParser.NOT, 0); }
-		public TerminalNode PLUS() { return getToken(KxiParser.PLUS, 0); }
-		public TerminalNode SUBTRACT() { return getToken(KxiParser.SUBTRACT, 0); }
 		public TerminalNode NEW() { return getToken(KxiParser.NEW, 0); }
 		public TerminalNode IDENTIFIER() { return getToken(KxiParser.IDENTIFIER, 0); }
 		public ArgumentsContext arguments() {
@@ -1368,6 +1365,9 @@ public class KxiParser extends Parser {
 		public IndexContext index() {
 			return getRuleContext(IndexContext.class,0);
 		}
+		public TerminalNode NOT() { return getToken(KxiParser.NOT, 0); }
+		public TerminalNode PLUS() { return getToken(KxiParser.PLUS, 0); }
+		public TerminalNode SUBTRACT() { return getToken(KxiParser.SUBTRACT, 0); }
 		public TerminalNode INTLIT() { return getToken(KxiParser.INTLIT, 0); }
 		public TerminalNode CHARLIT() { return getToken(KxiParser.CHARLIT, 0); }
 		public TerminalNode STRINGLIT() { return getToken(KxiParser.STRINGLIT, 0); }
@@ -1375,11 +1375,11 @@ public class KxiParser extends Parser {
 		public TerminalNode FALSE() { return getToken(KxiParser.FALSE, 0); }
 		public TerminalNode NULL() { return getToken(KxiParser.NULL, 0); }
 		public TerminalNode THIS() { return getToken(KxiParser.THIS, 0); }
-		public TerminalNode DIVIDE() { return getToken(KxiParser.DIVIDE, 0); }
 		public TerminalNode MULT() { return getToken(KxiParser.MULT, 0); }
+		public TerminalNode DIVIDE() { return getToken(KxiParser.DIVIDE, 0); }
 		public TerminalNode LESSTHEN() { return getToken(KxiParser.LESSTHEN, 0); }
-		public TerminalNode LESSEQUALS() { return getToken(KxiParser.LESSEQUALS, 0); }
 		public TerminalNode GREATERTHEN() { return getToken(KxiParser.GREATERTHEN, 0); }
+		public TerminalNode LESSEQUALS() { return getToken(KxiParser.LESSEQUALS, 0); }
 		public TerminalNode GREATEREQUALS() { return getToken(KxiParser.GREATEREQUALS, 0); }
 		public TerminalNode EQUALSEQUALS() { return getToken(KxiParser.EQUALSEQUALS, 0); }
 		public TerminalNode NOTEQUALS() { return getToken(KxiParser.NOTEQUALS, 0); }
@@ -1433,45 +1433,45 @@ public class KxiParser extends Parser {
 			case 2:
 				{
 				setState(227);
-				match(NOT);
+				match(NEW);
 				setState(228);
-				expression(30);
+				match(IDENTIFIER);
+				setState(229);
+				arguments();
 				}
 				break;
 			case 3:
 				{
-				setState(229);
-				match(PLUS);
 				setState(230);
-				expression(29);
+				match(NEW);
+				setState(231);
+				type();
+				setState(232);
+				index();
 				}
 				break;
 			case 4:
 				{
-				setState(231);
-				match(SUBTRACT);
-				setState(232);
+				setState(234);
+				match(NOT);
+				setState(235);
 				expression(28);
 				}
 				break;
 			case 5:
 				{
-				setState(233);
-				match(NEW);
-				setState(234);
-				match(IDENTIFIER);
-				setState(235);
-				arguments();
+				setState(236);
+				match(PLUS);
+				setState(237);
+				expression(27);
 				}
 				break;
 			case 6:
 				{
-				setState(236);
-				match(NEW);
-				setState(237);
-				type();
 				setState(238);
-				index();
+				match(SUBTRACT);
+				setState(239);
+				expression(26);
 				}
 				break;
 			case 7:
@@ -1542,7 +1542,7 @@ public class KxiParser extends Parser {
 						setState(250);
 						if (!(precpred(_ctx, 25))) throw new FailedPredicateException(this, "precpred(_ctx, 25)");
 						setState(251);
-						match(DIVIDE);
+						match(MULT);
 						setState(252);
 						expression(26);
 						}
@@ -1554,7 +1554,7 @@ public class KxiParser extends Parser {
 						setState(253);
 						if (!(precpred(_ctx, 24))) throw new FailedPredicateException(this, "precpred(_ctx, 24)");
 						setState(254);
-						match(MULT);
+						match(DIVIDE);
 						setState(255);
 						expression(25);
 						}
@@ -1566,7 +1566,7 @@ public class KxiParser extends Parser {
 						setState(256);
 						if (!(precpred(_ctx, 23))) throw new FailedPredicateException(this, "precpred(_ctx, 23)");
 						setState(257);
-						match(SUBTRACT);
+						match(PLUS);
 						setState(258);
 						expression(24);
 						}
@@ -1578,7 +1578,7 @@ public class KxiParser extends Parser {
 						setState(259);
 						if (!(precpred(_ctx, 22))) throw new FailedPredicateException(this, "precpred(_ctx, 22)");
 						setState(260);
-						match(PLUS);
+						match(SUBTRACT);
 						setState(261);
 						expression(23);
 						}
@@ -1602,7 +1602,7 @@ public class KxiParser extends Parser {
 						setState(265);
 						if (!(precpred(_ctx, 20))) throw new FailedPredicateException(this, "precpred(_ctx, 20)");
 						setState(266);
-						match(LESSEQUALS);
+						match(GREATERTHEN);
 						setState(267);
 						expression(21);
 						}
@@ -1614,7 +1614,7 @@ public class KxiParser extends Parser {
 						setState(268);
 						if (!(precpred(_ctx, 19))) throw new FailedPredicateException(this, "precpred(_ctx, 19)");
 						setState(269);
-						match(GREATERTHEN);
+						match(LESSEQUALS);
 						setState(270);
 						expression(20);
 						}
@@ -2001,7 +2001,7 @@ public class KxiParser extends Parser {
 	}
 
 	public static final String _serializedATN =
-		"\u0004\u0001@\u014c\u0002\u0000\u0007\u0000\u0002\u0001\u0007\u0001\u0002"+
+		"\u0004\u0001?\u014c\u0002\u0000\u0007\u0000\u0002\u0001\u0007\u0001\u0002"+
 		"\u0002\u0007\u0002\u0002\u0003\u0007\u0003\u0002\u0004\u0007\u0004\u0002"+
 		"\u0005\u0007\u0005\u0002\u0006\u0007\u0006\u0002\u0007\u0007\u0007\u0002"+
 		"\b\u0007\b\u0002\t\u0007\t\u0002\n\u0007\n\u0002\u000b\u0007\u000b\u0002"+
@@ -2157,32 +2157,32 @@ public class KxiParser extends Parser {
 		"\u00db\u0001\u0000\u0000\u0000\u00de\u00df\u0006\u0012\uffff\uffff\u0000"+
 		"\u00df\u00e0\u0005\u001d\u0000\u0000\u00e0\u00e1\u0003$\u0012\u0000\u00e1"+
 		"\u00e2\u0005\u001e\u0000\u0000\u00e2\u00f9\u0001\u0000\u0000\u0000\u00e3"+
-		"\u00e4\u0005*\u0000\u0000\u00e4\u00f9\u0003$\u0012\u001e\u00e5\u00e6\u0005"+
-		"+\u0000\u0000\u00e6\u00f9\u0003$\u0012\u001d\u00e7\u00e8\u0005,\u0000"+
-		"\u0000\u00e8\u00f9\u0003$\u0012\u001c\u00e9\u00ea\u0005\u000e\u0000\u0000"+
-		"\u00ea\u00eb\u00058\u0000\u0000\u00eb\u00f9\u0003&\u0013\u0000\u00ec\u00ed"+
-		"\u0005\u000e\u0000\u0000\u00ed\u00ee\u0003\u0006\u0003\u0000\u00ee\u00ef"+
-		"\u0003*\u0015\u0000\u00ef\u00f9\u0001\u0000\u0000\u0000\u00f0\u00f9\u0005"+
-		";\u0000\u0000\u00f1\u00f9\u00059\u0000\u0000\u00f2\u00f9\u0005:\u0000"+
-		"\u0000\u00f3\u00f9\u0005\u0017\u0000\u0000\u00f4\u00f9\u0005\n\u0000\u0000"+
-		"\u00f5\u00f9\u0005\u000f\u0000\u0000\u00f6\u00f9\u0005\u0016\u0000\u0000"+
-		"\u00f7\u00f9\u00058\u0000\u0000\u00f8\u00de\u0001\u0000\u0000\u0000\u00f8"+
-		"\u00e3\u0001\u0000\u0000\u0000\u00f8\u00e5\u0001\u0000\u0000\u0000\u00f8"+
-		"\u00e7\u0001\u0000\u0000\u0000\u00f8\u00e9\u0001\u0000\u0000\u0000\u00f8"+
-		"\u00ec\u0001\u0000\u0000\u0000\u00f8\u00f0\u0001\u0000\u0000\u0000\u00f8"+
-		"\u00f1\u0001\u0000\u0000\u0000\u00f8\u00f2\u0001\u0000\u0000\u0000\u00f8"+
-		"\u00f3\u0001\u0000\u0000\u0000\u00f8\u00f4\u0001\u0000\u0000\u0000\u00f8"+
-		"\u00f5\u0001\u0000\u0000\u0000\u00f8\u00f6\u0001\u0000\u0000\u0000\u00f8"+
-		"\u00f7\u0001\u0000\u0000\u0000\u00f9\u0136\u0001\u0000\u0000\u0000\u00fa"+
-		"\u00fb\n\u0019\u0000\u0000\u00fb\u00fc\u0005.\u0000\u0000\u00fc\u0135"+
-		"\u0003$\u0012\u001a\u00fd\u00fe\n\u0018\u0000\u0000\u00fe\u00ff\u0005"+
-		"-\u0000\u0000\u00ff\u0135\u0003$\u0012\u0019\u0100\u0101\n\u0017\u0000"+
-		"\u0000\u0101\u0102\u0005,\u0000\u0000\u0102\u0135\u0003$\u0012\u0018\u0103"+
-		"\u0104\n\u0016\u0000\u0000\u0104\u0105\u0005+\u0000\u0000\u0105\u0135"+
-		"\u0003$\u0012\u0017\u0106\u0107\n\u0015\u0000\u0000\u0107\u0108\u0005"+
-		"&\u0000\u0000\u0108\u0135\u0003$\u0012\u0016\u0109\u010a\n\u0014\u0000"+
-		"\u0000\u010a\u010b\u0005%\u0000\u0000\u010b\u0135\u0003$\u0012\u0015\u010c"+
-		"\u010d\n\u0013\u0000\u0000\u010d\u010e\u0005\'\u0000\u0000\u010e\u0135"+
+		"\u00e4\u0005\u000e\u0000\u0000\u00e4\u00e5\u00058\u0000\u0000\u00e5\u00f9"+
+		"\u0003&\u0013\u0000\u00e6\u00e7\u0005\u000e\u0000\u0000\u00e7\u00e8\u0003"+
+		"\u0006\u0003\u0000\u00e8\u00e9\u0003*\u0015\u0000\u00e9\u00f9\u0001\u0000"+
+		"\u0000\u0000\u00ea\u00eb\u0005*\u0000\u0000\u00eb\u00f9\u0003$\u0012\u001c"+
+		"\u00ec\u00ed\u0005+\u0000\u0000\u00ed\u00f9\u0003$\u0012\u001b\u00ee\u00ef"+
+		"\u0005,\u0000\u0000\u00ef\u00f9\u0003$\u0012\u001a\u00f0\u00f9\u0005;"+
+		"\u0000\u0000\u00f1\u00f9\u00059\u0000\u0000\u00f2\u00f9\u0005:\u0000\u0000"+
+		"\u00f3\u00f9\u0005\u0017\u0000\u0000\u00f4\u00f9\u0005\n\u0000\u0000\u00f5"+
+		"\u00f9\u0005\u000f\u0000\u0000\u00f6\u00f9\u0005\u0016\u0000\u0000\u00f7"+
+		"\u00f9\u00058\u0000\u0000\u00f8\u00de\u0001\u0000\u0000\u0000\u00f8\u00e3"+
+		"\u0001\u0000\u0000\u0000\u00f8\u00e6\u0001\u0000\u0000\u0000\u00f8\u00ea"+
+		"\u0001\u0000\u0000\u0000\u00f8\u00ec\u0001\u0000\u0000\u0000\u00f8\u00ee"+
+		"\u0001\u0000\u0000\u0000\u00f8\u00f0\u0001\u0000\u0000\u0000\u00f8\u00f1"+
+		"\u0001\u0000\u0000\u0000\u00f8\u00f2\u0001\u0000\u0000\u0000\u00f8\u00f3"+
+		"\u0001\u0000\u0000\u0000\u00f8\u00f4\u0001\u0000\u0000\u0000\u00f8\u00f5"+
+		"\u0001\u0000\u0000\u0000\u00f8\u00f6\u0001\u0000\u0000\u0000\u00f8\u00f7"+
+		"\u0001\u0000\u0000\u0000\u00f9\u0136\u0001\u0000\u0000\u0000\u00fa\u00fb"+
+		"\n\u0019\u0000\u0000\u00fb\u00fc\u0005-\u0000\u0000\u00fc\u0135\u0003"+
+		"$\u0012\u001a\u00fd\u00fe\n\u0018\u0000\u0000\u00fe\u00ff\u0005.\u0000"+
+		"\u0000\u00ff\u0135\u0003$\u0012\u0019\u0100\u0101\n\u0017\u0000\u0000"+
+		"\u0101\u0102\u0005+\u0000\u0000\u0102\u0135\u0003$\u0012\u0018\u0103\u0104"+
+		"\n\u0016\u0000\u0000\u0104\u0105\u0005,\u0000\u0000\u0105\u0135\u0003"+
+		"$\u0012\u0017\u0106\u0107\n\u0015\u0000\u0000\u0107\u0108\u0005&\u0000"+
+		"\u0000\u0108\u0135\u0003$\u0012\u0016\u0109\u010a\n\u0014\u0000\u0000"+
+		"\u010a\u010b\u0005\'\u0000\u0000\u010b\u0135\u0003$\u0012\u0015\u010c"+
+		"\u010d\n\u0013\u0000\u0000\u010d\u010e\u0005%\u0000\u0000\u010e\u0135"+
 		"\u0003$\u0012\u0014\u010f\u0110\n\u0012\u0000\u0000\u0110\u0111\u0005"+
 		"$\u0000\u0000\u0111\u0135\u0003$\u0012\u0013\u0112\u0113\n\u0011\u0000"+
 		"\u0000\u0113\u0114\u0005\"\u0000\u0000\u0114\u0135\u0003$\u0012\u0012"+

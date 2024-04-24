@@ -26,6 +26,36 @@ public class M3Tests {
     }
 
     @Test
+    void breakStatements() {
+        test("void main() {\n" +
+                "    break;\n" +
+                "}\n", true);
+
+        test("void main() {\n" +
+                "    char c;\n" +
+                "    int i;\n" +
+                "    if(true)\n" +
+                "    break;\n" +
+                "    while(true) break;\n" +
+                "    for(; false;) break;\n" +
+                "    switch(c) {default: break;}\n" +
+                "    switch(i) {default: break;}\n" +
+                "}\n", false);
+
+        test("void main() {\n" +
+                "    char c;\n" +
+                "    int i;\n" +
+                "    if(true)\n" +
+                "    break;\n" +
+                "    while(true) break;\n" +
+                "    for(; false;) break;\n" +
+                "    switch(c) {default: break;}\n" +
+                "    switch(i) {default: break;}\n" +
+                "    break;\n" +
+                "}\n", true);
+    }
+
+    @Test
     void arrayMemberAccess() {
         test("class Thing {\n" +
                 "        public int x = 4;\n" +

@@ -20,7 +20,7 @@ public class KxiForStatement extends AbstractKxiConditionalStatement {
     private KxiPostForExpression postExpression;
     private KxiPreForExpression preExpression;
 
-    public KxiForStatement(KxiBlock statement, KxiPostForExpression postExpression, AbstractKxiExpression conditionalExpression, KxiPreForExpression preExpression) {
+    public KxiForStatement(AbstractKxiStatement statement, KxiPostForExpression postExpression, AbstractKxiExpression conditionalExpression, KxiPreForExpression preExpression) {
         super(statement, postExpression, new KxiFordSemi(), conditionalExpression, new KxiFordSemi(), preExpression);
         this.statement = statement;
         this.postExpression = postExpression;

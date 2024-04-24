@@ -14,7 +14,7 @@ public class KxiIfStatement extends AbstractKxiConditionalStatement {
     private KxiElseStatement elseStatement;
 
 
-    public KxiIfStatement(KxiElseStatement elseStatement, KxiBlock statement, AbstractKxiExpression conditionalExpression) {
+    public KxiIfStatement(KxiElseStatement elseStatement, AbstractKxiStatement statement, AbstractKxiExpression conditionalExpression) {
         super(conditionalExpression, statement, elseStatement);
         this.conditionalExpression = conditionalExpression;
         this.statement = statement;

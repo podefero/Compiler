@@ -1,13 +1,24 @@
 package compilers.visitor.kxi.invalid_break;
 
 import compilers.ast.kxi_nodes.statements.KxiBreakStatement;
+import compilers.ast.kxi_nodes.statements.KxiSwitchStatement;
+import compilers.ast.kxi_nodes.statements.conditional.KxiForStatement;
+import compilers.ast.kxi_nodes.statements.conditional.KxiIfStatement;
+import compilers.ast.kxi_nodes.statements.conditional.KxiWhileStatement;
 import compilers.exceptions.InvalidBreakException;
 import compilers.visitor.kxi.KxiVisitorBase;
-import compilers.visitor.kxi.symboltable.BlockScope;
-import compilers.visitor.kxi.symboltable.ScopeType;
-import compilers.visitor.kxi.symboltable.SymbolTable;
+
+import java.util.Stack;
 
 public class InvalidBreakVisitor extends KxiVisitorBase {
+
+    Stack<KxiBreakStatement> breakStack;
+    boolean withinContext;
+
+    public InvalidBreakVisitor() {
+        this.breakStack = new Stack<>();
+        withinContext = false;
+    }
 
     @Override
     public void dumpErrorStack() {
@@ -16,23 +27,48 @@ public class InvalidBreakVisitor extends KxiVisitorBase {
     }
 
     @Override
-    public void visit(KxiBreakStatement breakStatement) {
-        SymbolTable scope = currentScope;
-        boolean found = false;
-        while (scope != null) {
-            if (scope instanceof BlockScope) {
-                if (((BlockScope) scope).getScopeType() == ScopeType.Switch
-                        || ((BlockScope) scope).getScopeType() == ScopeType.While
-                        || ((BlockScope) scope).getScopeType() == ScopeType.For) {
-                    found = true;
-                    break;
-                }
-            }
-            scope = scope.getParent();
-        }
+    public void preVisit(KxiIfStatement node) {
+        withinContext = true;
+    }
 
-        if (!found)
-            exceptionStack.push(new InvalidBreakException(breakStatement.getLineInfo(),
-                    "break can only be used in Switch, While or For block"));
+    @Override
+    public void visit(KxiIfStatement node) {
+        withinContext = false;
+    }
+
+    @Override
+    public void preVisit(KxiSwitchStatement node) {
+        withinContext = true;
+    }
+
+    @Override
+    public void visit(KxiSwitchStatement node) {
+        withinContext = false;
+    }
+
+    @Override
+    public void preVisit(KxiWhileStatement node) {
+        withinContext = true;
+    }
+
+    @Override
+    public void visit(KxiWhileStatement node) {
+        withinContext = false;
+    }
+
+    @Override
+    public void preVisit(KxiForStatement node) {
+        withinContext = true;
+    }
+
+    @Override
+    public void visit(KxiForStatement node) {
+        withinContext = false;
+    }
+
+    @Override
+    public void visit(KxiBreakStatement breakStatement) {
+        if (!withinContext)
+            exceptionStack.push(new InvalidBreakException(breakStatement.getLineInfo(), "Invalid break statement"));
     }
 }

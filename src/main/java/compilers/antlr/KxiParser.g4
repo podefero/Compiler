@@ -36,21 +36,21 @@ expression :
             | expression index
             | expression arguments
             | expression DOT IDENTIFIER
+            | NEW IDENTIFIER arguments
+            | NEW type index
             //r to l
             | NOT expression
             | PLUS expression
             | SUBTRACT expression
             //r to l
-            | NEW IDENTIFIER arguments
-            | NEW type index
             //l to r
-            | expression DIVIDE expression
             | expression MULT expression
-            | expression SUBTRACT expression
+            | expression DIVIDE expression
             | expression PLUS expression
+            | expression SUBTRACT expression
             | expression LESSTHEN expression
-            | expression LESSEQUALS expression
             | expression GREATERTHEN expression
+            | expression LESSEQUALS expression
             | expression GREATEREQUALS expression
             | expression EQUALSEQUALS expression
             | expression NOTEQUALS expression

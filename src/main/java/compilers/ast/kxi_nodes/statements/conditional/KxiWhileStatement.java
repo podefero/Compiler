@@ -14,7 +14,7 @@ public class KxiWhileStatement extends AbstractKxiConditionalStatement {
     String loopLabel;
     String exitLoop;
 
-    public KxiWhileStatement(KxiBlock statement, AbstractKxiExpression conditionalExpression) {
+    public KxiWhileStatement(AbstractKxiStatement statement, AbstractKxiExpression conditionalExpression) {
         super(statement, conditionalExpression);
         this.statement = statement;
         this.conditionalExpression = conditionalExpression;

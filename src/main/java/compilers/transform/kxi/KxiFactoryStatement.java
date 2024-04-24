@@ -39,26 +39,26 @@ public class KxiFactoryStatement extends AbstractKxiFactory {
 
         } else if (statementContext.IF() != null) {
             KxiElseStatement kxiElseStatement;
-            KxiBlock block;
+            AbstractKxiStatement kxiStatement;
             AbstractKxiExpression expression;
             KxiIfStatement kxiIfStatement;
             if (statementContext.ELSE() != null) {
-                kxiElseStatement = new KxiElseStatement(getBlock(pop(stack)));
-                block = getBlock(pop(stack));
+                kxiElseStatement = new KxiElseStatement(pop(stack));
+                kxiStatement = pop(stack);
                 expression = pop(stack);
-                kxiIfStatement = new KxiIfStatement(kxiElseStatement, block, expression);
+                kxiIfStatement = new KxiIfStatement(kxiElseStatement, kxiStatement, expression);
                 kxiElseStatement.setParent(kxiIfStatement);
             } else {
-                block = getBlock(pop(stack));
+                kxiStatement = pop(stack);
                 expression = pop(stack);
-                kxiIfStatement = new KxiIfStatement(null, block, expression);
+                kxiIfStatement = new KxiIfStatement(null, kxiStatement, expression);
             }
-            block.setParent(kxiIfStatement);
+            kxiStatement.setParent(kxiIfStatement);
             expression.setParent(kxiIfStatement);
             return kxiIfStatement;
 
         } else if (statementContext.WHILE() != null) {
-            return new KxiWhileStatement(getBlock(pop(stack)), pop(stack));
+            return new KxiWhileStatement(pop(stack), pop(stack));
 
         } else if (statementContext.FOR() != null) {
 
@@ -90,7 +90,7 @@ public class KxiFactoryStatement extends AbstractKxiFactory {
                     }
                 }
             }
-            return new KxiForStatement(getBlock(statement), postExpression, conditionalExpression, preExpression);
+            return new KxiForStatement(statement, postExpression, conditionalExpression, preExpression);
 
 
         } else if (statementContext.RETURN() != null) {
