@@ -1,5 +1,6 @@
 package compilers.ast.kxi_nodes.expressions.binary;
 
+import compilers.ast.intermediate.expression.operation.InterOperation;
 import compilers.ast.intermediate.statements.InterVariable;
 import compilers.ast.kxi_nodes.expressions.AbstractKxiExpression;
 import compilers.visitor.kxi.KxiVisitorBase;
@@ -11,6 +12,7 @@ public abstract class AbstractKxiBinaryOperation extends AbstractKxiExpression {
     protected AbstractKxiExpression expressionR;
     protected AbstractKxiExpression expressionL;
     protected InterVariable interVariable;
+    protected InterOperation interOperation;
 
     public AbstractKxiBinaryOperation(AbstractKxiExpression expressionR, AbstractKxiExpression expressionL) {
         super(expressionR, expressionL);

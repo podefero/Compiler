@@ -22,6 +22,11 @@ public class InterId extends InterValue {
         this.id =  "temp$" + HashString.updateStringHash();
     }
 
+    public InterPtr convertToPtr() {
+        return new InterPtr(id, scalarType);
+    }
+
+
     @Override
     public GenericNode copy() {
         return new InterId(id, scalarType);

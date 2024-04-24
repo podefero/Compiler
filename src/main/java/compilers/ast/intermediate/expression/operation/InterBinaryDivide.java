@@ -6,7 +6,7 @@ import compilers.visitor.kxi.KxiVisitorBase;
 public class InterBinaryDivide extends InterOperation{
 
 
-    public InterBinaryDivide(InterOperand leftOperand, InterOperand rightOperand) {
+    public InterBinaryDivide(InterOperand rightOperand, InterOperand leftOperand) {
         super(rightOperand, leftOperand);
     }
 

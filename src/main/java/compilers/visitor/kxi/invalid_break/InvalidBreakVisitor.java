@@ -27,16 +27,6 @@ public class InvalidBreakVisitor extends KxiVisitorBase {
     }
 
     @Override
-    public void preVisit(KxiIfStatement node) {
-        withinContext = true;
-    }
-
-    @Override
-    public void visit(KxiIfStatement node) {
-        withinContext = false;
-    }
-
-    @Override
     public void preVisit(KxiSwitchStatement node) {
         withinContext = true;
     }

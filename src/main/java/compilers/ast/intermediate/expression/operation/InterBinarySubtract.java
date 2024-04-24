@@ -6,7 +6,7 @@ import compilers.visitor.kxi.KxiVisitorBase;
 public class InterBinarySubtract extends InterOperation{
 
 
-    public InterBinarySubtract(InterOperand leftOperand, InterOperand rightOperand) {
+    public InterBinarySubtract(InterOperand rightOperand, InterOperand leftOperand) {
         super(rightOperand, leftOperand);
     }
 

@@ -10,10 +10,7 @@ import compilers.visitor.antlr.AntlrToKxiVisitor;
 import compilers.visitor.assembly.AssemblyAssembleVisitor;
 import compilers.visitor.assembly.InterToAssemblyVisitor;
 import compilers.visitor.generic.GraphVizVisitor;
-import compilers.visitor.intermediate.DanglingElseVisitor;
-import compilers.visitor.intermediate.InterSymbolTableVisitor;
-import compilers.visitor.intermediate.BreakAndReturnsVisitor;
-import compilers.visitor.intermediate.KxiToIntermediateVisitor;
+import compilers.visitor.intermediate.*;
 import compilers.visitor.kxi.invalid_break.InvalidBreakVisitor;
 import compilers.visitor.kxi.invalid_write.InvalidWriteVisitor;
 import compilers.visitor.kxi.symboltable.SymbolTableVisitor;
@@ -88,6 +85,27 @@ public class M4 {
                 "    cout << j; //should print int value of k 107\n" +
                 "}", false);
     }
+
+    @Test
+    void simpleAddition() {
+        test("//UnaryPLUS\n" +
+                "void main() {\n" +
+                "    int i = 1;\n" +
+                "    i = i + 1; //convert to int\n" +
+                "    cout << i; \n" +
+                "}", false);
+    }
+
+    @Test
+    void simpleArithmic() {
+        test("void main() {\n" +
+                "   int i;\n" +
+                "   int j;\n" +
+                "   i *= j += 1;\n" +
+                "   i = i - j;\n" +
+                "}\n", false);
+    }
+
 
     @Test
     void validUnaryMinusExpressionTestM4() {
@@ -1037,7 +1055,8 @@ public class M4 {
         BreakAndReturnsVisitor breakAndReturnsVisitor = new BreakAndReturnsVisitor();
         rootNode.accept(breakAndReturnsVisitor);
 
-        // rootNode.accept(new DanglingElseVisitor());
+        rootNode.accept(new FullyLoadedIdVisitor(symbolTableVisitor.getScopeHandler()));
+        rootNode.accept(new ExpressionToTempVisitor());
 
         KxiToIntermediateVisitor kxiToIntermediateVisitor = new KxiToIntermediateVisitor(symbolTableVisitor.getScopeHandler());
         rootNode.accept(kxiToIntermediateVisitor);

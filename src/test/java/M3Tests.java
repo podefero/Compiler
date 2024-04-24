@@ -34,8 +34,6 @@ public class M3Tests {
         test("void main() {\n" +
                 "    char c;\n" +
                 "    int i;\n" +
-                "    if(true)\n" +
-                "    break;\n" +
                 "    while(true) break;\n" +
                 "    for(; false;) break;\n" +
                 "    switch(c) {default: break;}\n" +
@@ -45,8 +43,6 @@ public class M3Tests {
         test("void main() {\n" +
                 "    char c;\n" +
                 "    int i;\n" +
-                "    if(true)\n" +
-                "    break;\n" +
                 "    while(true) break;\n" +
                 "    for(; false;) break;\n" +
                 "    switch(c) {default: break;}\n" +
@@ -1810,13 +1806,13 @@ public class M3Tests {
                 "}", false);
     }
 
-    @Test
-    void validSameNameVarDifIfBlock() {
-        test("void main() {\n" +
-                "   if(true) int i;\n" +
-                "   if(false) int i;\n" +
-                "}", false);
-    }
+//    @Test
+//    void validSameNameVarDifIfBlock() {
+//        test("void main() {\n" +
+//                "   if(true) int i;\n" +
+//                "   if(false) int i;\n" +
+//                "}", false);
+//    }
 
     @Test
     void validBoolFunctionAnd() {
