@@ -8,11 +8,9 @@ import lombok.Data;
 @Data
 public abstract class AbstractInterNode extends GenericNode {
     protected InterOperand interOperand;
-    protected AssemblyBlock assemblyBlock;
 
     public AbstractInterNode(GenericNode... genericNodes) {
         super(genericNodes);
-        assemblyBlock = new AssemblyBlock();
     }
 
     public String convertIdToLabel(String id) {

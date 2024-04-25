@@ -11,8 +11,7 @@ import lombok.Setter;
 @Setter
 public abstract class AbstractKxiUniOperation extends AbstractKxiExpression {
     protected AbstractKxiExpression expression;
-    protected InterVariable interVariable;
-    protected InterOperation interOperation;
+    protected String tempId;
     public AbstractKxiUniOperation(AbstractKxiExpression expression) {
         super(expression);
         this.expression = expression;

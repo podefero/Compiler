@@ -13,9 +13,6 @@ import java.util.List;
 @Setter
 @Getter
 public abstract class AbstractKxiStatement extends AbstractKxiNode {
-    protected List<InterExpression> interExpressions;
-    protected InterOperand interOperand;
-
 
     public AbstractKxiStatement(GenericNode... genericNodes) {
         super(genericNodes);

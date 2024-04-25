@@ -1,21 +1,26 @@
 package compilers.visitor.intermediate;
 
 import compilers.ast.intermediate.InterFunctionNode;
+import compilers.ast.intermediate.InterId;
 import compilers.ast.intermediate.StackType;
 import compilers.ast.intermediate.statements.InterGlobalVariable;
 import compilers.ast.intermediate.expression.InterVariable;
 import compilers.ast.intermediate.symboltable.*;
+import compilers.ast.kxi_nodes.KxiMain;
+import compilers.ast.kxi_nodes.expressions.literals.ExpressionIdLit;
 import compilers.visitor.kxi.KxiVisitorBase;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.util.HashMap;
+import java.util.List;
 
 @AllArgsConstructor
 @Getter
 public class InterSymbolTableVisitor extends KxiVisitorBase {
     private InterSymbolTable interSymbolTable;
     private FunctionData currentFunctionData;
+    private List<ExpressionIdLit> tempVars;
 
     private String convertIdToLabel(String id) {
         String label = id.replace('$', '_');
@@ -23,27 +28,23 @@ public class InterSymbolTableVisitor extends KxiVisitorBase {
     }
 
     @Override
-    public void preVisit(InterFunctionNode node) {
-        String id = node.getInterId().getId();
+    public void preVisit(KxiMain node) {
+        String id = node.getId();
         String label = convertIdToLabel(id);
         FunctionData functionData = new FunctionData(id, label, 0, new ActivationRecord(new HashMap<>()));
         ActivationRecord activationRecord = functionData.getActivationRecord();
         //have two items on stack, return address and pfp
-        activationRecord.pushStackItem(node.getReturnId(), StackType.PARAM);
-        activationRecord.pushStackItem(node.getPfpId(), StackType.PARAM);
-        for(String param : node.getParams()) {
-            activationRecord.pushStackItem(param, StackType.PARAM);
-        }
+        activationRecord.pushStackItem(id + "return", StackType.PARAM);
+        activationRecord.pushStackItem(id + "pfp", StackType.PARAM);
         currentFunctionData = functionData;
         interSymbolTable.getFunctionDataMap().put(id, functionData);
+
+        for(ExpressionIdLit expressionIdLit : tempVars) {
+            currentFunctionData.getActivationRecord().pushStackItem(expressionIdLit.getId(), StackType.LOCAL);
+        }
+
     }
 
-
-    @Override
-    public void visit(InterVariable node) {
-        String id = node.getInterId().getId();
-        currentFunctionData.getActivationRecord().pushStackItem(id, StackType.LOCAL);
-    }
 
     @Override
     public void visit(InterGlobalVariable node) {

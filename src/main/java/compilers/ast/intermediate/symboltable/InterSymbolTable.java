@@ -16,8 +16,8 @@ public class InterSymbolTable {
         return functionDataMap.get(id.getId()).getLabel();
     }
 
-    public int getOffset(InterId id, FunctionData functionData) {
-        StackData stackData = functionData.getActivationRecord().getStackDataMap().get(id.getId());
+    public int getOffset(String id, FunctionData functionData) {
+        StackData stackData = functionData.getActivationRecord().getStackDataMap().get(id);
         return stackData.offset;
     }
 }

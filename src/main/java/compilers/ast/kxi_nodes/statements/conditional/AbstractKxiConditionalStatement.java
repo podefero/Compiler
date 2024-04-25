@@ -6,8 +6,10 @@ import compilers.ast.kxi_nodes.scope.KxiBlock;
 import compilers.ast.kxi_nodes.statements.AbstractKxiStatement;
 import compilers.ast.kxi_nodes.statements.KxiBlockStatement;
 import lombok.Getter;
+import lombok.Setter;
 
 @Getter
+@Setter
 public abstract class AbstractKxiConditionalStatement extends AbstractKxiStatement {
     protected AbstractKxiStatement statement;
     protected AbstractKxiExpression conditionalExpression;

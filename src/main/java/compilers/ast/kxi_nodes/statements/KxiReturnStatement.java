@@ -3,8 +3,10 @@ package compilers.ast.kxi_nodes.statements;
 import compilers.ast.kxi_nodes.expressions.AbstractKxiExpression;
 import compilers.visitor.kxi.KxiVisitorBase;
 import lombok.Getter;
+import lombok.Setter;
 
 @Getter
+@Setter
 public class KxiReturnStatement extends AbstractKxiStatement {
     private AbstractKxiExpression expression;
 

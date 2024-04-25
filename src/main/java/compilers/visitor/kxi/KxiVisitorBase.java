@@ -762,6 +762,7 @@ public class KxiVisitorBase implements VisitKxi {
     public void visit(InterAssignment interAssignment) {
     }
 
+
     public void visit(OperandLabelWrapper operandLabelWrapper) {
     }
 

@@ -2,18 +2,36 @@ package compilers.visitor.assembly;
 
 import compilers.ast.GenericListNode;
 import compilers.ast.assembly.*;
-import compilers.ast.intermediate.*;
+import compilers.ast.intermediate.InterId;
+import compilers.ast.intermediate.InterLit;
 import compilers.ast.intermediate.InterOperand.*;
+import compilers.ast.intermediate.InterValue;
+import compilers.ast.intermediate.StackType;
 import compilers.ast.intermediate.expression.InterExpression;
-import compilers.ast.intermediate.expression.InterVariable;
-import compilers.ast.intermediate.expression.operation.*;
-import compilers.ast.intermediate.statements.*;
+import compilers.ast.intermediate.expression.operation.InterOperation;
+import compilers.ast.intermediate.expression.operation.InterPtrAssignment;
 import compilers.ast.intermediate.symboltable.ActivationRecord;
 import compilers.ast.intermediate.symboltable.FunctionData;
 import compilers.ast.intermediate.symboltable.InterSymbolTable;
 import compilers.ast.intermediate.symboltable.StackData;
-import compilers.ast.kxi_nodes.KxiMain;
-import compilers.ast.kxi_nodes.ScalarType;
+import compilers.ast.kxi_nodes.*;
+import compilers.ast.kxi_nodes.expressions.AbstractKxiExpression;
+import compilers.ast.kxi_nodes.expressions.binary.arithmic.KxiDiv;
+import compilers.ast.kxi_nodes.expressions.binary.arithmic.KxiMult;
+import compilers.ast.kxi_nodes.expressions.binary.arithmic.KxiPlus;
+import compilers.ast.kxi_nodes.expressions.binary.arithmic.KxiSubtract;
+import compilers.ast.kxi_nodes.expressions.binary.assignment.KxiEquals;
+import compilers.ast.kxi_nodes.expressions.binary.conditional.*;
+import compilers.ast.kxi_nodes.expressions.literals.*;
+import compilers.ast.kxi_nodes.expressions.uni.KxiNot;
+import compilers.ast.kxi_nodes.expressions.uni.KxiUniSubtract;
+import compilers.ast.kxi_nodes.statements.*;
+import compilers.ast.kxi_nodes.statements.conditional.KxiElseStatement;
+import compilers.ast.kxi_nodes.statements.conditional.KxiIfStatement;
+import compilers.ast.kxi_nodes.statements.conditional.KxiWhileStatement;
+import compilers.ast.kxi_nodes.token_literals.IdentifierToken;
+import compilers.ast.kxi_nodes.token_literals.IntLitToken;
+import compilers.ast.kxi_nodes.token_literals.TokenLiteral;
 import compilers.util.DataSizes;
 import compilers.util.HashString;
 import compilers.visitor.kxi.KxiVisitorBase;
@@ -24,9 +42,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import static compilers.ast.assembly.Registers.*;
-import static compilers.ast.assembly.Directive.*;
+import static compilers.ast.assembly.Directive.BYT;
+import static compilers.ast.assembly.Directive.INT;
 import static compilers.ast.assembly.OpCodes.*;
+import static compilers.ast.assembly.Registers.*;
 
 
 @AllArgsConstructor
@@ -35,6 +54,7 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
     private final List<AbstractAssembly> assemblyList;
     private InterSymbolTable interSymbolTable;
     private FunctionData currentFunctionData;
+    private AssemblyMain rootNode;
 
     //COMMONLY Used
     private void getFP() {
@@ -58,65 +78,6 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
         return currentFunctionData.getLabel() + "_" + hash;
     }
 
-    private void tryDerefInterOperand(InterOperand interOperand) {
-        if (interOperand == null) return;
-        if (interSymbolTable.getFunctionDataMap().containsKey(interOperand.getInterValue().getTerminalValue())) {
-            return;
-        }
-
-        if (interOperand instanceof LeftVariableStack) {
-            comment("Deref " + ((LeftVariableStack) interOperand).getInterId().getId());
-            twoReg(LDRI, R1, R1);
-        } else if (interOperand instanceof RightVariableStack) {
-            comment("Deref " + ((RightVariableStack) interOperand).getInterId().getId());
-            twoReg(LDRI, R2, R2);
-
-        } else if (interOperand instanceof RightPtr) {
-            //cant deref string or id
-            if (((RightPtr) interOperand).getInterPtr().getScalarType() != ScalarType.STRING) {
-                comment("Deref ptr" + interOperand.getTerminalValue());
-                twoReg(LDRI, R2, R2);
-            }
-        } else if (interOperand instanceof LeftPtr) {
-            //cant deref string or id
-            if (((LeftPtr) interOperand).getInterPtr().getScalarType() != ScalarType.STRING) {
-                comment("Deref ptr" + interOperand.getTerminalValue());
-                twoReg(LDRI, R1, R1);
-            }
-        }  else if (interOperand instanceof LeftOperandLit) {
-            LeftOperandLit leftOperandLit = (LeftOperandLit) interOperand;
-            if(leftOperandLit.getInterValue().getScalarType() == ScalarType.INT)
-                regImmInt(MOVI, R1, (Integer) leftOperandLit.getInterLit().getValue());
-            else
-                regImmChar(MOVI, R1, (Character) leftOperandLit.getInterLit().getValue());
-        }  else if (interOperand instanceof RightOperandLit) {
-            RightOperandLit rightOperandLit = (RightOperandLit) interOperand;
-            if(rightOperandLit.getInterValue().getScalarType() == ScalarType.INT)
-                regImmInt(MOVI, R2, (Integer) rightOperandLit.getInterLit().getValue());
-            else
-                regImmChar(MOVI, R2, (Character) rightOperandLit.getInterLit().getValue());
-        }
-
-
-    }
-
-    List<AbstractAssembly> dumpCode() {
-        List<AbstractAssembly> newList = new ArrayList<>(assemblyList);
-        assemblyList.clear();
-        return newList;
-    }
-
-    InterValue getInterVal(List<InterExpression> expressions) {
-        if (!exceptionStack.empty()) {
-            InterOperation interOperation;
-            if (expressions.get(0) instanceof InterOperation) {
-                interOperation = (InterOperation) expressions.get(0);
-                return interOperation.getRightOperand().getInterValue();
-            }
-
-        }
-        return null;
-    }
 
     //DIR
     private <T> void directive(Directive directive, String label, T value) {
@@ -188,7 +149,7 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
 
 
     @Override
-    public void preVisit(InterGlobal node) {
+    public void preVisit(KxiMain node) {
         String label = "main_main";
         newLine();
         comment("Calling function " + "main_main");
@@ -207,10 +168,6 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
         getFP();
         comment("Get Address, and calculate offset");
         setPC();
-        //add delim;
-//        AssemblyReturnAddressDelim assemblyReturnAddressDelim = new AssemblyReturnAddressDelim(true);
-//        assemblyReturnAddressDelim.setLabel(label);
-//        assemblyList.add(assemblyReturnAddressDelim);
         regImmInt(ADI, R15, 60);
         comment("push return address");
         leftOp(PUSH, R15);
@@ -221,45 +178,11 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
         twoReg(MOV, FP, R13);
         regLabel(JMP, label);
         regLabel(JMP, "END");
-        setPre(node);
-    }
 
-    @Override
-    public void visit(InterGlobal node) {
+        currentFunctionData = interSymbolTable.getFunctionDataMap().get(node.getId());
+        label(label);
         newLine();
-        label("END");
-        trap(0);
-        setPost(node);
-        appendMultiBody(node, node.getInterFunctionNode());
-    }
-
-//    @Override
-//    public void visit(InterGlobalVariable node) {
-//        newLine();
-//        comment("Write variable " + node.getInterId().getId() + " to Data Segment");
-//        if (node.getInterLit() != null)
-//            directive(node.getDirective(), node.convertIdToLabel(node.getInterId().getId()), node.getInterLit().getValue());
-//        else
-//            directive(node.getDirective(), node.convertIdToLabel(node.getInterId().getId()), null);
-//    }
-
-
-    //    @Override
-//    public void visit(LeftVariableDir node) {
-//        newLine();
-//        comment("Store address of DIR in R1");
-//
-//
-//    }
-
-
-    @Override
-    public void preVisit(InterFunctionNode node) {
-        //when first enter push activation record
-        currentFunctionData = interSymbolTable.getFunctionDataMap().get(node.getInterId().getId());
-        label(interSymbolTable.getFunctionLabel(node.getInterId()));
-        newLine();
-        comment("push " + node.getInterId().getId() + " activation record");
+        comment("push " + node.getId() + " activation record");
         regImmInt(MOVI, R0, 0);
         ActivationRecord activationRecord = currentFunctionData.getActivationRecord();
         Collection<StackData> stackDataCollection = activationRecord.getStackDataMap().values();
@@ -270,137 +193,100 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
                 leftOp(PUSH, R0);
             }
         }
-
-        setPre(node);
     }
 
     @Override
-    public void visit(InterFunctionNode node) {
-        appendMultiBody(node, node.getBlock());
+    public void visit(KxiMain node) {
+        newLine();
+        label("END");
+        trap(0);
+        rootNode = new AssemblyMain(new GenericListNode(getAssemblyList()));
     }
 
-    //    @Override
-//    public void visit(InterActivationRecord node) {
-//        newLine();
-//        comment("push " + node.getFunctionId().getId() + " activation record");
-//        regImmInt(MOVI, R0, 0);
-//        ActivationRecord activationRecord = currentFunctionData.getActivationRecord();
-//        Collection<StackData> stackDataCollection = activationRecord.getStackDataMap().values();
-//        for (StackData stackData : stackDataCollection) {
-//            if (stackData.getStackType() == StackType.LOCAL) {
-//                comment("push " + stackData.getId());
-//                comment("offset: " + stackData.getOffset());
-//                leftOp(PUSH, R0);
-//            }
-//        }
-//    }
-
-    @Override
-    public void visit(InterDerefStatement node) {
-        tryDerefInterOperand(node.getInterOperand());
-        setPost(node);
-    }
-
-    void setPre(AbstractInterNode node) {
-        node.getAssemblyBlock().setPreBlock(dumpCode());
-    }
-
-    void appendBody(AbstractInterNode node, AbstractInterNode otherNode) {
-        node.getAssemblyBlock().getBodyBlock().addAll(otherNode.getAssemblyBlock().combineBlocks());
-    }
-
-    void appendMultiBody(AbstractInterNode node, List<? extends AbstractInterNode> otherNode) {
-        List<AbstractAssembly> ultimateBlock = new ArrayList<>();
-        for (AbstractInterNode n : otherNode) {
-            ultimateBlock.addAll(n.getAssemblyBlock().combineBlocks());
+    void deref(AbstractKxiExpression expression) {
+        ExpressionIdLit expressionIdLit;
+        if (expression instanceof ExpressionIdLit) {
+            expressionIdLit = (ExpressionIdLit) expression;
+            ScalarType scalarType = expressionIdLit.getScalarType();
+            if (scalarType != ScalarType.STRING) {
+                comment("Deref stack var");
+                if (expressionIdLit.isLeft()) twoReg(LDRI, R1, R1);
+                else twoReg(LDRI, R2, R2);
+            }
         }
-        node.getAssemblyBlock().getBodyBlock().addAll(ultimateBlock);
     }
 
+    void evaluateExpression(AbstractKxiExpression expression) {
 
-    void setPost(AbstractInterNode node) {
-        node.getAssemblyBlock().setPostBlock(dumpCode());
     }
+
 
     @Override
-    public void preVisit(InterIfStatement node) {
+    public void preVisit(KxiIfStatement node) {
         newLine();
         comment("Set up for if statement");
-        tryDerefInterOperand(node.getInterOperand());
-        if (node.getInterElseStatement() != null)
+        deref(node.getConditionalExpression());
+        if (node.getElseStatement() != null)
             regAndLabel(BLT, R2, node.getIfNot());
         else
             regAndLabel(BLT, R2, node.getDone());
         comment("Use this for else");
         twoReg(MOV, R4, R2);
-
-        setPre(node);
     }
 
 
     @Override
-    public void visit(InterIfStatement node) {
-        appendBody(node, node.getIfMet());
-        if (node.getInterElseStatement() != null) {
-            appendBody(node, node.getInterElseStatement());
-        }
+    public void visit(KxiIfStatement node) {
         label(node.getDone());
-        setPost(node);
+        rootNode = new AssemblyMain(new GenericListNode(getAssemblyList()));
 
     }
 
-
     @Override
-    public void visit(InterBreak interBreak) {
-        newLine();
-        comment("Break out of loop");
-        regLabel(JMP, interBreak.getExitLoop());
-        setPost(interBreak);
-    }
-
-
-    @Override
-    public void preVisit(InterWhileStatement node) {
-        newLine();
-        comment("Start of loop");
-        label(node.getLoop());
-        comment("Set up for while loop");
-        tryDerefInterOperand(node.getInterOperand());
-        regAndLabel(BLT, R2, node.getExitLoop());
-        setPre(node);
-    }
-
-
-    @Override
-    public void visit(InterWhileStatement node) {
-        appendMultiBody(node, node.getPreExpressions());
-        appendBody(node, node.getIfMet());
-        newLine();
-        comment("End of while loop");
-        regLabel(JMP, node.getLoop());
-        label(node.getExitLoop());
-        setPost(node);
-        appendMultiBody(node, node.getPostExpressions());
-    }
-
-    @Override
-    public void preVisit(InterElseStatement node) {
+    public void preVisit(KxiElseStatement node) {
         newLine();
         regLabel(JMP, node.getDone());
         comment("else statement");
         label(node.getIfNot());
-        setPre(node);
     }
 
     @Override
-    public void visit(InterElseStatement node) {
+    public void visit(KxiElseStatement node) {
         newLine();
         regLabel(JMP, node.getDone());
-        setPost(node);
     }
 
+
     @Override
-    public void visit(InterReturn node) {
+    public void visit(KxiBreakStatement interBreak) {
+        newLine();
+        comment("Break out of loop");
+        regLabel(JMP, interBreak.getExitLoop());
+    }
+
+
+    @Override
+    public void preVisit(KxiWhileStatement node) {
+        newLine();
+        comment("Start of loop");
+        label(node.getLoopLabel());
+        comment("Set up for while loop");
+        deref(node.getConditionalExpression());
+        regAndLabel(BLT, R2, node.getExitLoop());
+    }
+
+
+    @Override
+    public void visit(KxiWhileStatement node) {
+        newLine();
+        comment("End of while loop");
+        regLabel(JMP, node.getLoopLabel());
+        label(node.getExitLoop());
+    }
+
+
+    @Override
+    public void visit(KxiReturnStatement node) {
         newLine();
         comment("Return " + currentFunctionData.getLabel());
         comment("Get ptr to Return Address in R15");
@@ -416,11 +302,10 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
         comment("FP = PFP ");
         twoReg(MOV, FP, R14);
         comment("push result on stack");
-        tryDerefInterOperand(node.getInterOperand());
+        deref(node.getExpression());
         leftOp(PUSH, R2);
         comment("jump to return address");
         leftOp(JMR, R15);
-        setPost(node);
 
     }
 
@@ -471,39 +356,38 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
 //    }
 
     @Override
-    public void visit(InterVariable node) {
+    public void visit(KxiVariableDeclaration node) {
         //assign R1 to result of R2
-        if (node.getInterOperation() != null && !(node.getInterOperation() instanceof InterAssignment)) {
-            newLine();
-            comment("Initializing Variable " + node.getInterId().getId());
-            comment("Get ptr to var");
-            getFP();
-            decFP(interSymbolTable.getOffset(node.getInterId(), currentFunctionData));
-            comment("store R2 into ptr R14");
-            twoReg(STRI, R2, R14);
-        }
-        setPost(node);
+        newLine();
+        comment("Initializing Variable " + node.getId());
+        comment("Get ptr to var");
+        getFP();
+        decFP(interSymbolTable.getOffset(node.getId(), currentFunctionData));
+        comment("store R2 into ptr R14");
+        twoReg(STRI, R2, R14);
+
     }
 
+
     @Override
-    public void visit(InterCoutStatement node) {
-        appendMultiBody(node, node.getInterExpressionList());
+    public void visit(KxiCoutStatement node) {
         int trpVal;
-        ScalarType scalarType = node.getInterOperand().getInterValue().getScalarType();
+        ScalarType scalarType = node.getScalarType();
         if (scalarType != ScalarType.CHAR && scalarType != ScalarType.STRING) trpVal = 1;
         else if (scalarType == ScalarType.STRING) trpVal = 5;
         else trpVal = 3;
-        tryDerefInterOperand(node.getInterOperand());
+
+        deref(node.getExpression());
+
         newLine();
         comment("COUT  result");
         twoReg(MOV, R3, R2);
         trap(trpVal);
-        setPost(node);
     }
 
     @Override
-    public void preVisit(InterCinStatement node) {
-        ScalarType scalarType = node.getInterOperand().getInterValue().getScalarType();
+    public void preVisit(KxiCinStatement node) {
+        ScalarType scalarType = node.getScalarType();
         if (scalarType != ScalarType.CHAR) {
             newLine();
             comment("CIN input Integer");
@@ -515,58 +399,51 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
             trap(4);
             twoReg(MOV, R2, R3);
         }
-        setPre(node);
     }
 
     @Override
-    public void visit(InterBinaryPlus node) {
+    public void visit(KxiPlus node) {
         newLine();
         comment("Add R1 and R2, result in R2");
-        tryDerefInterOperand(node.getLeftOperand());
-        tryDerefInterOperand(node.getRightOperand());
+        deref(node.getExpressionL());
+        deref(node.getExpressionR());
         twoReg(ADD, R1, R2);
         twoReg(MOV, R2, R1);
-        setPost(node);
     }
 
     @Override
-    public void visit(InterBinarySubtract node) {
+    public void visit(KxiSubtract node) {
         newLine();
         comment("Subtract R1 and R2, result in R2");
-        tryDerefInterOperand(node.getLeftOperand());
-        tryDerefInterOperand(node.getRightOperand());
+        deref(node.getExpressionL());
+        deref(node.getExpressionR());
         twoReg(SUB, R1, R2);
         twoReg(MOV, R2, R1);
-        setPost(node);
 
     }
 
     @Override
-    public void visit(InterBinaryDivide node) {
+    public void visit(KxiDiv node) {
         newLine();
         comment("Divide R1 and R2, result in R2");
-        tryDerefInterOperand(node.getLeftOperand());
-        tryDerefInterOperand(node.getRightOperand());
+        deref(node.getExpressionL());
+        deref(node.getExpressionR());
         twoReg(DIV, R1, R2);
         twoReg(MOV, R2, R1);
-        setPost(node);
-
     }
 
     @Override
-    public void visit(InterBinaryMult node) {
+    public void visit(KxiMult node) {
         newLine();
         comment("Mult R1 and R2, result in R2");
-        tryDerefInterOperand(node.getLeftOperand());
-        tryDerefInterOperand(node.getRightOperand());
+        deref(node.getExpressionL());
+        deref(node.getExpressionR());
         twoReg(MUL, R1, R2);
         twoReg(MOV, R2, R1);
-        setPost(node);
-
     }
 
     @Override
-    public void visit(InterLogicalLessThen node) {
+    public void visit(KxiLessThen node) {
         String hash = HashString.updateStringHash();
         String ifTrue = uniqueLabel(hash) + "_iftrue";
         String ifNot = uniqueLabel(hash) + "_ifnot";
@@ -574,8 +451,8 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
 
         newLine();
         comment("R1 < R2, result in R2");
-        tryDerefInterOperand(node.getLeftOperand());
-        tryDerefInterOperand(node.getRightOperand());
+        deref(node.getExpressionL());
+        deref(node.getExpressionR());
         twoReg(CMP, R1, R2);
         regAndLabel(BLT, R1, ifTrue);
         regLabel(JMP, ifNot);
@@ -586,12 +463,10 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
         regImmInt(MOVI, R1, -1);
         label(done);
         twoReg(MOV, R2, R1);
-        setPost(node);
-
     }
 
     @Override
-    public void visit(InterLogicalGreaterThen node) {
+    public void visit(KxiGreaterThen node) {
         String hash = HashString.updateStringHash();
         String ifTrue = uniqueLabel(hash) + "_iftrue";
         String ifNot = uniqueLabel(hash) + "_ifnot";
@@ -599,8 +474,8 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
 
         newLine();
         comment("R1 > R2, result in R2");
-        tryDerefInterOperand(node.getLeftOperand());
-        tryDerefInterOperand(node.getRightOperand());
+        deref(node.getExpressionL());
+        deref(node.getExpressionR());
         twoReg(CMP, R1, R2);
         regAndLabel(BGT, R1, ifTrue);
         regLabel(JMP, ifNot);
@@ -611,20 +486,19 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
         regImmInt(MOVI, R1, -1);
         label(done);
         twoReg(MOV, R2, R1);
-        setPost(node);
-
     }
 
     @Override
-    public void visit(InterLogicalEqualsEquals node) {
+    public void visit(KxiEqualsEquals node) {
+
         String hash = HashString.updateStringHash();
         String ifTrue = uniqueLabel(hash) + "_iftrue";
         String ifNot = uniqueLabel(hash) + "_ifnot";
         String done = uniqueLabel(hash) + "_done";
         newLine();
         comment("R1 == R2, result in R2");
-        tryDerefInterOperand(node.getLeftOperand());
-        tryDerefInterOperand(node.getRightOperand());
+        deref(node.getExpressionL());
+        deref(node.getExpressionR());
         twoReg(CMP, R1, R2);
         comment("If zero set true");
         regAndLabel(BRZ, R1, ifTrue);
@@ -639,12 +513,11 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
         regImmInt(MOVI, R1, -1);
         label(done);
         twoReg(MOV, R2, R1);
-        setPost(node);
-
     }
 
     @Override
-    public void visit(InterLogicalGreaterEqualThen node) {
+    public void visit(KxiGreaterEqualsThen node) {
+
         String hash = HashString.updateStringHash();
         String ifTrue = uniqueLabel(hash) + "_iftrue";
         String ifNot = uniqueLabel(hash) + "_ifnot";
@@ -652,8 +525,8 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
 
         newLine();
         comment("R1 >= R2, result in R2");
-        tryDerefInterOperand(node.getLeftOperand());
-        tryDerefInterOperand(node.getRightOperand());
+        deref(node.getExpressionL());
+        deref(node.getExpressionR());
         twoReg(CMP, R1, R2);
         comment("If zero set true");
         regAndLabel(BRZ, R1, ifTrue);
@@ -666,12 +539,11 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
         regImmInt(MOVI, R1, -1);
         label(done);
         twoReg(MOV, R2, R1);
-        setPost(node);
-
     }
 
     @Override
-    public void visit(InterLogicalLessEqualThen node) {
+    public void visit(KxiLessEqualsThen node) {
+
         String hash = HashString.updateStringHash();
         String ifTrue = uniqueLabel(hash) + "_iftrue";
         String ifNot = uniqueLabel(hash) + "_ifnot";
@@ -679,8 +551,8 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
 
         newLine();
         comment("R1 <= R2, result in R2");
-        tryDerefInterOperand(node.getLeftOperand());
-        tryDerefInterOperand(node.getRightOperand());
+        deref(node.getExpressionL());
+        deref(node.getExpressionR());
         twoReg(CMP, R1, R2);
         comment("If zero set true");
         regAndLabel(BRZ, R1, ifTrue);
@@ -693,56 +565,50 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
         regImmInt(MOVI, R1, -1);
         label(done);
         twoReg(MOV, R2, R1);
-        setPost(node);
-
     }
 
     @Override
-    public void visit(InterLogicalAnd node) {
+    public void visit(KxiAnd node) {
+
         newLine();
         comment("R1 AND R2, result in R2");
-        tryDerefInterOperand(node.getLeftOperand());
-        tryDerefInterOperand(node.getRightOperand());
+        deref(node.getExpressionL());
+        deref(node.getExpressionR());
         twoReg(AND, R1, R2);
         twoReg(MOV, R2, R1);
-        setPost(node);
-
     }
 
     @Override
-    public void visit(InterLogicalOr node) {
+    public void visit(KxiOr node) {
+
         newLine();
         comment("R1 OR R2, result in R2");
-        tryDerefInterOperand(node.getLeftOperand());
-        tryDerefInterOperand(node.getRightOperand());
+        deref(node.getExpressionL());
+        deref(node.getExpressionR());
         twoReg(OR, R1, R2);
         twoReg(MOV, R2, R1);
-        setPost(node);
-
     }
 
     @Override
-    public void visit(InterLogicalNot node) {
+    public void visit(KxiNot node) {
         newLine();
         comment("R1 NOT R2, result in R2");
-        tryDerefInterOperand(node.getLeftOperand());
-        tryDerefInterOperand(node.getRightOperand());
+        regImmInt(MOVI, R1, -1);
+        deref(node.getExpression());
         twoReg(NOT, R1, R2);
         twoReg(MOV, R2, R1);
-        setPost(node);
-
     }
 
     @Override
-    public void visit(InterLogicalNotEquals node) {
+    public void visit(KxiNotEquals node) {
         String hash = HashString.updateStringHash();
         String ifZero = uniqueLabel(hash) + "_ifzero";
         String ifNot = uniqueLabel(hash) + "_ifnot";
         String done = uniqueLabel(hash) + "_done";
         newLine();
         comment("R1 != R2, result in R2");
-        tryDerefInterOperand(node.getLeftOperand());
-        tryDerefInterOperand(node.getRightOperand());
+        deref(node.getExpressionL());
+        deref(node.getExpressionR());
         twoReg(CMP, R1, R2);
         regAndLabel(BRZ, R1, ifZero);
         regLabel(JMP, ifNot);
@@ -753,8 +619,6 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
         regImmInt(MOVI, R1, 1);
         label(done);
         twoReg(MOV, R2, R1);
-        setPost(node);
-
     }
 
     @Override
@@ -765,169 +629,194 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
         comment("Store R2 into R1");
         //tryDerefInterOperand(node.getRightOperand());
         twoReg(MOV, R1, R2);
-        setPost(node);
-
     }
 
     @Override
-    public void visit(InterUnarySubOperator node) {
+    public void visit(KxiUniSubtract node) {
         newLine();
-        comment("get ptr to " + node.getInterId().getId() + " into R1 from Stack");
-        getFP();
-        decFP(interSymbolTable.getOffset(node.getInterId(), currentFunctionData));
         twoReg(MOV, R1, R14);
         comment("Negate R2");
-        tryDerefInterOperand(node.getRightOperand());
+        deref(node.getExpression());
         regImmInt(MOVI, R0, -1);
         twoReg(MUL, R2, R0);
         twoReg(STRI, R2, R1);
-        setPost(node);
-
     }
 
     @Override
-    public void visit(InterAssignment node) {
+    public void visit(KxiEquals node) {
         //assign R1 to result of R2
         newLine();
         comment("Assignment");
         comment("str R2 into R1");
-        tryDerefInterOperand(node.getRightOperand());
+        deref(node.getExpressionR());
         twoReg(STRI, R2, R1);
-        setPost(node);
-
     }
 
     @Override
-    public void preVisit(InterSwitch node) {
+    public void preVisit(KxiSwitchStatement node) {
         newLine();
         comment("Set R5 to hold the switch value for cases");
-        tryDerefInterOperand(node.getInterOperand());
+        deref(node.getExpression());
         twoReg(MOV, R5, R2);
-        setPre(node);
     }
 
     @Override
-    public void visit(InterSwitch node) {
-        appendMultiBody(node, node.getInterCaseList());
-        appendMultiBody(node, node.getDefaultStatements());
+    public void visit(KxiSwitchStatement node) {
         newLine();
         comment("Exit for switch");
-        label(node.getExit());
-        setPost(node);
+        label(node.getExitLoop());
     }
 
-    @Override
-    public void visit(InterPushArg node) {
-        newLine();
-        comment("Pushing " + node.getRightOperand().getInterValue().getTerminalValue());
-        tryDerefInterOperand(node.getRightOperand());
-        leftOp(PUSH, R2);
-        setPost(node);
-
-    }
+//    @Override
+//    public void visit(InterPushArg node) {
+//        newLine();
+//        comment("Pushing " + node.getRightOperand().getInterValue().getTerminalValue());
+//        tryDerefInterOperand(node.getRightOperand());
+//        leftOp(PUSH, R2);
+//    }
 
     @Override
-    public void preVisit(InterCase node) {
+    public void preVisit(KxiCaseInt node) {
         newLine();
-        comment("Evaluate case " + node.getInterLit().getTerminalValue());
-        if (node.getInterLit().getScalarType() == ScalarType.INT)
-            regImmInt(MOVI, R2, (Integer) node.getInterLit().getValue());
-        else
-            regImmChar(MOVI, R2, (Character) node.getInterLit().getValue());
+        comment("Evaluate case " + node.getCaseValue().getValue());
+
+        regImmInt(MOVI, R2, node.getCaseValue().getValue());
         twoReg(CMP, R2, R5);
         regAndLabel(BGT, R2, node.getExit());
         regAndLabel(BLT, R2, node.getExit());
-        setPre(node);
     }
 
     @Override
-    public void visit(InterCase node) {
+    public void visit(KxiCaseInt node) {
         newLine();
         comment("Case block");
         label(node.getExit());
-        setPost(node);
-
     }
 
     @Override
-    public void visit(RightPtr node) {
+    public void preVisit(KxiCaseChar node) {
         newLine();
-        comment("get ptr to " + node.getInterPtr().getId() + " into R2 from DIR");
-        regAndLabel(LDA, R2, node.convertIdToLabel(node.getInterPtr().getId()));
-        setPost(node);
+        comment("Evaluate case " + node.getCaseValue().getValue());
 
+        regImmInt(MOVI, R2, node.getCaseValue().getValue());
+        twoReg(CMP, R2, R5);
+        regAndLabel(BGT, R2, node.getExit());
+        regAndLabel(BLT, R2, node.getExit());
     }
 
     @Override
-    public void visit(LeftPtr node) {
+    public void visit(KxiCaseChar node) {
         newLine();
-        comment("get ptr to " + node.getInterPtr().getId() + " into R1 from DIR");
-        regAndLabel(LDA, R1, node.convertIdToLabel(node.getInterPtr().getId()));
-        setPost(node);
+        comment("Case block");
+        label(node.getExit());
+    }
 
+    @Override
+    public void visit(ExpressionBoolLit node) {
+        ExpressionIntLit expressionIntLit;
+        if (node.getTokenLiteral().getValue() == true)
+            expressionIntLit = new ExpressionIntLit(new IntLitToken("1"));
+        else
+            expressionIntLit = new ExpressionIntLit(new IntLitToken("-1"));
+
+        if (node.isLeft()) leftLit(expressionIntLit);
+        else rightLit(expressionIntLit);
+    }
+
+    @Override
+    public void visit(ExpressionCharLit node) {
+        if (node.isLeft()) leftLit(node);
+        else rightLit(node);
+    }
+
+    @Override
+    public void visit(ExpressionIdLit node) {
+        if (node.getScalarType() == ScalarType.STRING) {
+            if (node.isLeft()) leftPtrVar(node);
+            else rightPtrVar(node);
+        } else {
+            if (node.isLeft()) lefStackVar(node);
+            else rightStackVar(node);
+        }
+    }
+
+    @Override
+    public void visit(ExpressionIntLit node) {
+        if (node.isLeft()) leftLit(node);
+        else rightLit(node);
+    }
+
+    @Override
+    public void visit(ExpressionNullLit node) {
+        ExpressionIntLit expressionIntLit;
+
+        expressionIntLit = new ExpressionIntLit(new IntLitToken("0"));
+
+        if (node.isLeft()) leftLit(expressionIntLit);
+        else rightLit(expressionIntLit);
     }
 
 
-    @Override
-    public void visit(RightVariableStack node) {
+    public void rightPtrVar(ExpressionIdLit node) {
+        newLine();
+        comment("get ptr to " + node.getId() + " into R2 from DIR");
+        regAndLabel(LDA, R2, node.getId());
+    }
+
+    public void leftPtrVar(ExpressionIdLit node) {
+        newLine();
+        comment("get ptr to " + node.getId() + " into R1 from DIR");
+        regAndLabel(LDA, R1, node.getId());
+    }
+
+
+    public void rightStackVar(ExpressionIdLit node) {
         //instruction to load variable in R2 from stack
         newLine();
-        String id = node.getInterId().getId();
+        String id = node.getId();
         if (interSymbolTable.getFunctionDataMap().containsKey(id)) {
             comment("Pop stack");
             leftOp(POP, R2);
         } else {
-            comment("get ptr to " + node.getInterId().getId() + " into R2 from Stack");
+            comment("get ptr to " + node.getId() + " into R2 from Stack");
             getFP();
-            decFP(interSymbolTable.getOffset(node.getInterId(), currentFunctionData));
+            decFP(interSymbolTable.getOffset(node.getId(), currentFunctionData));
             twoReg(MOV, R2, R14);
         }
-        setPost(node);
-
     }
 
-    @Override
-    public void visit(RightOperandLit node) {
-        InterLit interLit = node.getInterLit();
+    public void rightLit(ExpressionLiteral node) {
+        TokenLiteral interLit = node.getTokenLiteral();
         newLine();
         comment("setting R2 to " + interLit.getTerminalValue());
         if (interLit.getScalarType() == ScalarType.INT)
             regImmInt(MOVI, R2, (Integer) interLit.getValue());
         else if (interLit.getScalarType() == ScalarType.CHAR)
             regImmInt(MOVI, R2, (Character) interLit.getValue());
-        setPost(node);
-
     }
 
-    @Override
-    public void visit(LeftVariableStack node) {
+    public void lefStackVar(ExpressionIdLit node) {
         newLine();
-        String id = node.getInterId().getId();
+        String id = node.getId();
         if (interSymbolTable.getFunctionDataMap().containsKey(id)) {
             comment("Pop stack");
             leftOp(POP, R1);
         } else {
-            comment("get ptr to " + node.getInterId().getId() + " into R1 from Stack");
+            comment("get ptr to " + node.getId() + " into R1 from Stack");
             getFP();
-            decFP(interSymbolTable.getOffset(node.getInterId(), currentFunctionData));
+            decFP(interSymbolTable.getOffset(node.getId(), currentFunctionData));
             twoReg(MOV, R1, R14);
         }
-        setPost(node);
-
-
     }
 
-    @Override
-    public void visit(LeftOperandLit node) {
-        InterLit interLit = node.getInterLit();
+    public void leftLit(ExpressionLiteral node) {
+        TokenLiteral interLit = node.getTokenLiteral();
         newLine();
         comment("setting R1 to " + interLit.getTerminalValue());
         if (interLit.getScalarType() == ScalarType.INT)
             regImmInt(MOVI, R1, (Integer) interLit.getValue());
         else if (interLit.getScalarType() == ScalarType.CHAR)
             regImmInt(MOVI, R1, (Character) interLit.getValue());
-        setPost(node);
-
     }
 
     @Override
@@ -939,7 +828,5 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
                 leftOp(POP, R1);
             else leftOp(POP, R2);
         }
-        setPost(node);
-
     }
 }

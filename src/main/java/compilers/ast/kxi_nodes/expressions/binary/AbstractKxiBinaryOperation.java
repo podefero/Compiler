@@ -10,8 +10,7 @@ import lombok.Data;
 public abstract class AbstractKxiBinaryOperation extends AbstractKxiExpression {
     protected AbstractKxiExpression expressionR;
     protected AbstractKxiExpression expressionL;
-    protected InterVariable interVariable;
-    protected InterOperation interOperation;
+    protected String tempId;
 
     public AbstractKxiBinaryOperation(AbstractKxiExpression expressionR, AbstractKxiExpression expressionL) {
         super(expressionR, expressionL);

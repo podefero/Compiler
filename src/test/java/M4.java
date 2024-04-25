@@ -1,5 +1,6 @@
 import compilers.antlr.KxiLexer;
 import compilers.antlr.KxiParser;
+import compilers.ast.GenericNode;
 import compilers.ast.assembly.AssemblyMain;
 import compilers.ast.intermediate.InterGlobal;
 import compilers.ast.intermediate.symboltable.InterSymbolTable;
@@ -1069,6 +1070,7 @@ public class M4 {
                 "  if(false) cout << 99;\n" +
                 "}\n", false);
     }
+
     @Test
     void simpleITestThree() {
         test("void main() {\n" +
@@ -1079,6 +1081,72 @@ public class M4 {
                 "}", false);
     }
 
+    @Test
+    void simpleIfTestFour() {
+        test("void main() {\n" +
+                "    if(true)\n" +
+                "        cout << 99;\n" +
+                "    else\n" +
+                "        cout << 33;\n" +
+                "}", false);
+    }
+
+    @Test
+    void simpleIfTestBlock() {
+        test("void main() {\n" +
+                "  if(true) {\n" +
+                "    cout << 99;\n" +
+                "  } else {\n" +
+                "    cout << 33;\n" +
+                "  }\n" +
+                "}", false);
+    }
+
+    @Test
+    void simpleIfTestBlockTwo() {
+        test("void main() {\n" +
+                "  if(false) {\n" +
+                "    cout << 99;\n" +
+                "  } else {\n" +
+                "    cout << 33;\n" +
+                "  }\n" +
+                "}", false);
+    }
+
+    @Test
+    void simpleIfTestBlockThree() {
+        test("void main() {\n" +
+                "  if(false) {\n" +
+                "    cout << 55 + 44;\n" +
+                "  } else {\n" +
+                "    cout << 11 + 22;\n" +
+                "  }\n" +
+                "}", false);
+    }
+
+    @Test
+    void simpleIfTestBlockFour() {
+        test("void main() {\n" +
+                "  if(true) {\n" +
+                "    cout << 55 + 44;\n" +
+                "  } else {\n" +
+                "    cout << 11 + 22;\n" +
+                "  }\n" +
+                "}", false);
+    }
+
+    @Test
+    void simpleIfTestBlockVar() {
+        test("void main() {\n" +
+                "\n" +
+                "  bool b = false;\n" +
+                "  if(b) {\n" +
+                "    cout << 99;\n" +
+                "  } else {\n" +
+                "    cout << 33;\n" +
+                "  }\n" +
+                "}", false);
+    }
 
 
     //    @Test
@@ -1115,40 +1183,36 @@ public class M4 {
         rootNode.accept(breakAndReturnsVisitor);
 
         rootNode.accept(new FullyLoadedIdVisitor(symbolTableVisitor.getScopeHandler()));
-        rootNode.accept(new ExpressionToTempVisitor());
-        rootNode.accept(new InterStatementsSetupVisitor());
-        rootNode.accept(new StatementToInterVisitor());
+        drawGraph(rootNode);
+        ExpressionToTempVisitor expressionToTempVisitor = new ExpressionToTempVisitor();
+        rootNode.accept(expressionToTempVisitor);
+        //rootNode.accept(new InterStatementsSetupVisitor());
+//        rootNode.accept(new StatementToInterVisitor());
 
-        KxiToIntermediateVisitor kxiToIntermediateVisitor = new KxiToIntermediateVisitor(symbolTableVisitor.getScopeHandler());
-        rootNode.accept(kxiToIntermediateVisitor);
-
-        IntermediateFinalizeVisitor intermediateFinalizeVisitor = new IntermediateFinalizeVisitor(kxiToIntermediateVisitor.getGlobalVariables(), kxiToIntermediateVisitor.getGlobalInit(), kxiToIntermediateVisitor.getFunctions());
-        rootNode.accept(intermediateFinalizeVisitor);
-
+//        KxiToIntermediateVisitor kxiToIntermediateVisitor = new KxiToIntermediateVisitor(symbolTableVisitor.getScopeHandler());
+//        rootNode.accept(kxiToIntermediateVisitor);
+//
+//        IntermediateFinalizeVisitor intermediateFinalizeVisitor = new IntermediateFinalizeVisitor(kxiToIntermediateVisitor.getGlobalVariables(), kxiToIntermediateVisitor.getGlobalInit(), kxiToIntermediateVisitor.getFunctions());
+//        rootNode.accept(intermediateFinalizeVisitor);
+//
 
         InterSymbolTableVisitor interSymbolTableVisitor =
-                new InterSymbolTableVisitor(new InterSymbolTable(new HashMap<>(), new HashMap<>()), null);
+                new InterSymbolTableVisitor(new InterSymbolTable(new HashMap<>(), new HashMap<>()), null, expressionToTempVisitor.tempVars);
 
-        InterGlobal interGlobal = intermediateFinalizeVisitor.getInterGlobal();
-        interGlobal.accept(interSymbolTableVisitor);
+//        InterGlobal interGlobal = intermediateFinalizeVisitor.getInterGlobal();
+        rootNode.accept(interSymbolTableVisitor);
 
-        drawGraph(interGlobal);
 
         InterToAssemblyVisitor interToAssemblyVisitor = new InterToAssemblyVisitor(new ArrayList<>()
                 , interSymbolTableVisitor.getInterSymbolTable()
-                , interSymbolTableVisitor.getInterSymbolTable().getFunctionDataMap().get("main$main"));
+                , interSymbolTableVisitor.getInterSymbolTable().getFunctionDataMap().get("main$main")
+                , null);
 
-        interGlobal.accept(interToAssemblyVisitor);
+        rootNode.accept(interToAssemblyVisitor);
 
-        FinalizeAssemblyVisitor finalizeAssemblyVisitor = new FinalizeAssemblyVisitor(new ArrayList<>()
-                , null
-                , interSymbolTableVisitor.getInterSymbolTable()
-                , interSymbolTableVisitor.getInterSymbolTable().getFunctionDataMap().get("main$main"));
-
-        interGlobal.accept(finalizeAssemblyVisitor);
 
         AssemblyAssembleVisitor assemblyAssembleVisitor = new AssemblyAssembleVisitor();
-        AssemblyMain assemblyMain = finalizeAssemblyVisitor.getRootNode();
+        AssemblyMain assemblyMain = interToAssemblyVisitor.getRootNode();
 
         assemblyMain.accept(assemblyAssembleVisitor);
 
@@ -1188,7 +1252,7 @@ public class M4 {
         }
     }
 
-    void drawGraph(InterGlobal interGlobal) {
+    void drawGraph(GenericNode interGlobal) {
         GraphVizVisitor graphVizVisitor = new GraphVizVisitor(interGlobal);
 
         OutputHandler outputHandler = new OutputHandler("[inter.dot]");

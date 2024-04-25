@@ -105,7 +105,8 @@ public class KxiFactoryStatement extends AbstractKxiFactory {
         } else if (statementContext.CIN() != null) {
             return new KxiCinStatement(pop(stack));
 
-        } else if (statementContext.block() != null) {
+        }
+        else if (statementContext.block() != null) {
             return new KxiBlockStatement(pop(stack));
 
         }

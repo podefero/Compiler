@@ -1,6 +1,7 @@
 package compilers.ast.kxi_nodes.statements;
 
 import compilers.ast.intermediate.InterOperand.InterOperand;
+import compilers.ast.kxi_nodes.ScalarType;
 import compilers.ast.kxi_nodes.expressions.AbstractKxiExpression;
 import compilers.visitor.kxi.KxiVisitorBase;
 import lombok.Getter;
@@ -10,6 +11,7 @@ import lombok.Setter;
 @Setter
 public class KxiCinStatement extends AbstractKxiStatement {
     private AbstractKxiExpression expression;
+    ScalarType scalarType;
 
     public KxiCinStatement(AbstractKxiExpression expression) {
         super(expression);

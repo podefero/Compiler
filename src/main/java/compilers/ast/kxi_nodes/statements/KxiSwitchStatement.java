@@ -5,8 +5,10 @@ import compilers.ast.kxi_nodes.scope.KxiCaseBlock;
 import compilers.util.HashString;
 import compilers.visitor.kxi.KxiVisitorBase;
 import lombok.Getter;
+import lombok.Setter;
 
 @Getter
+@Setter
 public class KxiSwitchStatement extends AbstractKxiStatement {
     private KxiCaseBlock caseBlock;
     private AbstractKxiExpression expression;

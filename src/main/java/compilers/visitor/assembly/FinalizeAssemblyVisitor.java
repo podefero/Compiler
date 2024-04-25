@@ -164,7 +164,6 @@ public class FinalizeAssemblyVisitor extends KxiVisitorBase {
 
     @Override
     public void visit(InterGlobal node) {
-        assemblyList.addAll(node.getAssemblyBlock().combineBlocks());
         rootNode = new AssemblyMain(new GenericListNode(getAssemblyList()));
     }
 }

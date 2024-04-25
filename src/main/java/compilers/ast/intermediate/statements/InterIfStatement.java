@@ -24,9 +24,16 @@ public class InterIfStatement extends InterStatement {
         this.interOperand = interOperand;
         this.interElseStatement = interElseStatement;
         this.interExpressionList = getNodeList(expression);
+
         this.label = label;
         ifNot = convertIdToLabel(label) + "ifNot";
         done = convertIdToLabel(label) + "ifDone";
+
+        if (interElseStatement != null) {
+            interElseStatement.setDone(this.done);
+            interElseStatement.setIfNot(this.ifNot);
+        }
+
     }
 
     @Override

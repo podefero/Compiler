@@ -691,6 +691,7 @@ EXPRESSIONS DOT
         ResultType result = resultTypeStack.pop();
         //check if int, char, or string
         ScalarType resultType = result.getScalarType();
+        statement.setScalarType(resultType);
         if (resultType != ScalarType.CHAR && resultType != ScalarType.INT)
             exceptionStack.push(new TypeCheckException(statement.getLineInfo(), "CIN does not support type: " + resultType));
 
