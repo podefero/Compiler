@@ -8,6 +8,7 @@ import compilers.util.InputHandler;
 import compilers.util.OutputHandler;
 import compilers.visitor.antlr.AntlrToKxiVisitor;
 import compilers.visitor.assembly.AssemblyAssembleVisitor;
+import compilers.visitor.assembly.FinalizeAssemblyVisitor;
 import compilers.visitor.assembly.InterToAssemblyVisitor;
 import compilers.visitor.generic.GraphVizVisitor;
 import compilers.visitor.intermediate.*;
@@ -1057,9 +1058,28 @@ public class M4 {
     void simpIfTest() {
         test("void main() {\n" +
                 "  bool b = false;\n" +
+                "  if(true) cout << 99;\n" +
+                "}\n", false);
+    }
+
+    @Test
+    void simpIfTestTwo() {
+        test("void main() {\n" +
+                "  bool b = false;\n" +
                 "  if(false) cout << 99;\n" +
                 "}\n", false);
     }
+    @Test
+    void simpleITestThree() {
+        test("void main() {\n" +
+                "    if(false)\n" +
+                "        cout << 99;\n" +
+                "    else\n" +
+                "        cout << 33;\n" +
+                "}", false);
+    }
+
+
 
     //    @Test
 //    void imSpacedOut() {
@@ -1108,20 +1128,27 @@ public class M4 {
 
         InterSymbolTableVisitor interSymbolTableVisitor =
                 new InterSymbolTableVisitor(new InterSymbolTable(new HashMap<>(), new HashMap<>()), null);
+
         InterGlobal interGlobal = intermediateFinalizeVisitor.getInterGlobal();
         interGlobal.accept(interSymbolTableVisitor);
 
+        drawGraph(interGlobal);
+
         InterToAssemblyVisitor interToAssemblyVisitor = new InterToAssemblyVisitor(new ArrayList<>()
-                , null
                 , interSymbolTableVisitor.getInterSymbolTable()
                 , interSymbolTableVisitor.getInterSymbolTable().getFunctionDataMap().get("main$main"));
 
         interGlobal.accept(interToAssemblyVisitor);
 
-        drawGraph(intermediateFinalizeVisitor);
+        FinalizeAssemblyVisitor finalizeAssemblyVisitor = new FinalizeAssemblyVisitor(new ArrayList<>()
+                , null
+                , interSymbolTableVisitor.getInterSymbolTable()
+                , interSymbolTableVisitor.getInterSymbolTable().getFunctionDataMap().get("main$main"));
+
+        interGlobal.accept(finalizeAssemblyVisitor);
 
         AssemblyAssembleVisitor assemblyAssembleVisitor = new AssemblyAssembleVisitor();
-        AssemblyMain assemblyMain = interToAssemblyVisitor.getRootNode();
+        AssemblyMain assemblyMain = finalizeAssemblyVisitor.getRootNode();
 
         assemblyMain.accept(assemblyAssembleVisitor);
 
@@ -1161,8 +1188,8 @@ public class M4 {
         }
     }
 
-    void drawGraph(IntermediateFinalizeVisitor intermediateFinalizeVisitor) {
-        GraphVizVisitor graphVizVisitor = new GraphVizVisitor(intermediateFinalizeVisitor.getInterGlobal());
+    void drawGraph(InterGlobal interGlobal) {
+        GraphVizVisitor graphVizVisitor = new GraphVizVisitor(interGlobal);
 
         OutputHandler outputHandler = new OutputHandler("[inter.dot]");
         try {

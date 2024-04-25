@@ -81,7 +81,7 @@ public class StatementToInterVisitor extends KxiVisitorBase {
         InterStatement interStatement = pop(node.getLineInfo());
         InterElseStatement interElseStatement = null;
         if (node.getElseStatement() != null)
-            interElseStatement = (InterElseStatement) pop(node.getElseStatement().getLineInfo());
+            interElseStatement = new InterElseStatement(pop(node.getLineInfo()));
         GenericListNode expression = new GenericListNode(node.getInterExpressions());
         InterIfStatement interIfStatement =
                 new InterIfStatement(expression, interStatement, interElseStatement, "if_" + HashString.updateStringHash(), node.getInterOperand());
@@ -189,7 +189,7 @@ public class StatementToInterVisitor extends KxiVisitorBase {
             for (InterExpression exp : node.getInterStatements()) {
                 expressions.add(exp);
             }
-            interOperation = new InterAssignment(new LeftVariableStack(interValue), node.getInterInit()); //may need to set to expression op
+            interOperation = new InterAssignment(node.getInterInit(), new LeftVariableStack(interValue)); //may need to set to expression op
         }
         InterVariable interVariable = new InterVariable(new InterId(node.getId(), node.getType().getScalarType()), interOperation);
         node.setInterVariable(interVariable);

@@ -19,7 +19,7 @@ public class InterIfStatement extends InterStatement {
     InterElseStatement interElseStatement;
 
     public InterIfStatement(GenericListNode expression, InterStatement ifMet, InterElseStatement interElseStatement, String label, InterOperand interOperand) {
-        super(interElseStatement, ifMet, expression, interOperand);
+        super(interElseStatement, ifMet, expression);
         this.ifMet = ifMet;
         this.interOperand = interOperand;
         this.interElseStatement = interElseStatement;

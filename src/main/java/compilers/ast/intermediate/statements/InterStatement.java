@@ -1,6 +1,7 @@
 package compilers.ast.intermediate.statements;
 
 import compilers.ast.GenericNode;
+import compilers.ast.assembly.AssemblyBlock;
 import compilers.ast.intermediate.AbstractInterNode;
 import compilers.ast.intermediate.InterOperand.InterOperand;
 import compilers.ast.intermediate.expression.InterExpression;
