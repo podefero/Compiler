@@ -80,28 +80,4 @@ public class BreakAndReturnsVisitor extends KxiVisitorBase {
         node.setExitLoop(breakLoopStack.peek());
     }
 
-    @Override
-    public void visit(KxiBlock node) {
-//        //add return statements to methods and main (if they don't have one)
-//        BlockScope blockScope = (BlockScope) node.getScope();
-//        if ((blockScope.getScopeType() == ScopeType.Method || blockScope.getScopeType() == ScopeType.Main)
-//                && !hasNode(KxiReturnStatement.class, node.getStatements())) {
-//        }
-
-        BlockScope blockScope = (BlockScope) node.getScope();
-        if ((blockScope.getScopeType() == ScopeType.Method || blockScope.getScopeType() == ScopeType.Main))
-            node.getChildren().add(new KxiReturnStatement(null));
-    }
-
-//    @Override
-//    public void visit(KxiVariableDeclaration node) {
-//        String id = node.getId().getValue();
-//        node.getId().setValue(currentScope.getUniqueName() + id);
-//    }
-//
-//    @Override
-//    public void visit(ExpressionIdLit node) {
-//        String id = node.getTokenLiteral().getValue();
-//        node.getTokenLiteral().setValue(currentScope.getUniqueName() + id);
-//    }
 }

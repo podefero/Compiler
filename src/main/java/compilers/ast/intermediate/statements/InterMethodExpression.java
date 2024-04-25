@@ -1,18 +1,20 @@
 package compilers.ast.intermediate.statements;
 
 import compilers.ast.GenericListNode;
+import compilers.ast.intermediate.InterReturnOperand;
 import compilers.visitor.kxi.KxiVisitorBase;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 
 @Getter
-public class InterBlock extends InterStatement {
-    List<InterStatement> interStatementList;
+@Setter
+public class InterMethodExpression extends InterStatement {
+    List<InterPushArg> interPushArgList;
 
-    public InterBlock(GenericListNode statements) {
-        super(statements);
-        this.interStatementList = getNodeList(statements);
+    public InterMethodExpression(GenericListNode args) {
+        this.interPushArgList = getNodeList(args);
     }
 
     @Override

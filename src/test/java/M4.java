@@ -841,7 +841,7 @@ public class M4 {
                 "}", false);
     }
 
-        @Test
+    @Test
     void cMinusTestProg() {
         test("void main() {\n" +
                 "    // Test for loop\n" +
@@ -919,7 +919,8 @@ public class M4 {
                 "    }\n" +
                 "}\n", false);
     }
-        @Test
+
+    @Test
     void forLoopTest() {
         test("void main() {\n" +
                 "    // Test for loop\n" +
@@ -932,7 +933,7 @@ public class M4 {
                 "    }\n", false);
     }
 
-        @Test
+    @Test
     void logicalExp() {
         test("void main() {\n" +
                 "     // Test if statement with logical expressions\n" +
@@ -949,7 +950,7 @@ public class M4 {
                 "}\n", false);
     }
 
-        @Test
+    @Test
     void testSwitchStatement() {
         test("void main() {\n" +
                 "    // Test switch statement\n" +
@@ -969,7 +970,8 @@ public class M4 {
                 "    }\n" +
                 "}\n", false);
     }
-        @Test
+
+    @Test
     void dataTypes() {
         test("void main() {\n" +
                 "    // Test data types\n" +
@@ -988,7 +990,8 @@ public class M4 {
                 "    cout << '\\n';\n" +
                 "}\n", false);
     }
-        @Test
+
+    @Test
     void nestedLoops() {
         test("void main() {\n" +
                 "   // Test nested loops and blocks\n" +
@@ -1006,7 +1009,8 @@ public class M4 {
                 "    }\n" +
                 "}\n", false);
     }
-        @Test
+
+    @Test
     void forLoopExpression() {
         test("void main() {\n" +
                 "  // Test nested for loops\n" +
@@ -1016,12 +1020,51 @@ public class M4 {
                 "    }\n" +
                 "}\n", false);
     }
-        @Test
+
+    @Test
     void helloWorld() {
         test("void main() {\n" +
                 "    cout << \"hello world\";\n" +
                 "}", false);
     }
+
+
+    @Test
+    void simpVariable() {
+        test("void main() {\n" +
+                "   int i;\n" +
+                "}\n", false);
+    }
+
+    @Test
+    void simpVariableTwo() {
+        test("void main() {\n" +
+                "   int i = 1;\n" +
+                "   i += 1; cout << i;\n" +
+                "}\n", false);
+    }
+
+    @Test
+    void simpVariableThree() {
+        test("void main() {\n" +
+                "   int i = 1;\n" +
+                "   cout << i += 1;\n" +
+                "}\n", false);
+    }
+
+
+    @Test
+    void simpIfTest() {
+        test("void main() {\n" +
+                "  bool b = false;\n" +
+                "  if(false) cout << 99;\n" +
+                "}\n", false);
+    }
+
+    //    @Test
+//    void imSpacedOut() {
+//        test("", false);
+//    }
     //    @Test
 //    void imSpacedOut() {
 //        test("", false);
@@ -1038,19 +1081,15 @@ public class M4 {
 
         SymbolTableVisitor symbolTableVisitor = new SymbolTableVisitor();
         rootNode.accept(symbolTableVisitor);
-        symbolTableVisitor.dumpErrorStack();
 
         TypeCheckerVisitor typeCheckerVisitor = new TypeCheckerVisitor(symbolTableVisitor.getScopeHandler(), new Stack<>());
         rootNode.accept(typeCheckerVisitor);
-        typeCheckerVisitor.dumpErrorStack();
 
         InvalidWriteVisitor invalidWriteVisitor = new InvalidWriteVisitor(new Stack<>(), symbolTableVisitor.getScopeHandler());
         rootNode.accept(invalidWriteVisitor);
-        invalidWriteVisitor.dumpErrorStack();
 
         InvalidBreakVisitor invalidBreakVisitor = new InvalidBreakVisitor();
         rootNode.accept(invalidBreakVisitor);
-        invalidBreakVisitor.dumpErrorStack();
 
         BreakAndReturnsVisitor breakAndReturnsVisitor = new BreakAndReturnsVisitor();
         rootNode.accept(breakAndReturnsVisitor);
@@ -1058,16 +1097,18 @@ public class M4 {
         rootNode.accept(new FullyLoadedIdVisitor(symbolTableVisitor.getScopeHandler()));
         rootNode.accept(new ExpressionToTempVisitor());
         rootNode.accept(new InterStatementsSetupVisitor());
+        rootNode.accept(new StatementToInterVisitor());
 
         KxiToIntermediateVisitor kxiToIntermediateVisitor = new KxiToIntermediateVisitor(symbolTableVisitor.getScopeHandler());
         rootNode.accept(kxiToIntermediateVisitor);
 
-        drawGraph(kxiToIntermediateVisitor);
+        IntermediateFinalizeVisitor intermediateFinalizeVisitor = new IntermediateFinalizeVisitor(kxiToIntermediateVisitor.getGlobalVariables(), kxiToIntermediateVisitor.getGlobalInit(), kxiToIntermediateVisitor.getFunctions());
+        rootNode.accept(intermediateFinalizeVisitor);
 
 
         InterSymbolTableVisitor interSymbolTableVisitor =
                 new InterSymbolTableVisitor(new InterSymbolTable(new HashMap<>(), new HashMap<>()), null);
-        InterGlobal interGlobal = kxiToIntermediateVisitor.getRootNode();
+        InterGlobal interGlobal = intermediateFinalizeVisitor.getInterGlobal();
         interGlobal.accept(interSymbolTableVisitor);
 
         InterToAssemblyVisitor interToAssemblyVisitor = new InterToAssemblyVisitor(new ArrayList<>()
@@ -1077,6 +1118,7 @@ public class M4 {
 
         interGlobal.accept(interToAssemblyVisitor);
 
+        drawGraph(intermediateFinalizeVisitor);
 
         AssemblyAssembleVisitor assemblyAssembleVisitor = new AssemblyAssembleVisitor();
         AssemblyMain assemblyMain = interToAssemblyVisitor.getRootNode();
@@ -1119,8 +1161,8 @@ public class M4 {
         }
     }
 
-    void drawGraph(KxiToIntermediateVisitor kxiToIntermediateVisitor) {
-        GraphVizVisitor graphVizVisitor = new GraphVizVisitor(kxiToIntermediateVisitor.getRootNode());
+    void drawGraph(IntermediateFinalizeVisitor intermediateFinalizeVisitor) {
+        GraphVizVisitor graphVizVisitor = new GraphVizVisitor(intermediateFinalizeVisitor.getInterGlobal());
 
         OutputHandler outputHandler = new OutputHandler("[inter.dot]");
         try {

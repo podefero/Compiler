@@ -44,24 +44,16 @@ expression :
             | SUBTRACT expression
             //r to l
             //l to r
-            | expression MULT expression
-            | expression DIVIDE expression
-            | expression PLUS expression
-            | expression SUBTRACT expression
-            | expression LESSTHEN expression
-            | expression GREATERTHEN expression
-            | expression LESSEQUALS expression
-            | expression GREATEREQUALS expression
-            | expression EQUALSEQUALS expression
+
+            | expression (MULT | DIVIDE) expression
+            | expression (PLUS | SUBTRACT) expression
+            | expression (LESSTHEN | GREATERTHEN | LESSEQUALS | GREATEREQUALS)  expression
+            | expression (EQUALSEQUALS | NOTEQUALS) expression
             | expression NOTEQUALS expression
             | expression AND expression
             | expression OR expression
             // r to l
-            | expression EQUALS expression
-            | expression PLUSEQUALS expression
-            | expression SUBEQUALS expression
-            | expression MULTEQUALS expression
-            | expression DIVEQUALS expression
+            |  <assoc=right> expression (EQUALS | PLUSEQUALS | SUBEQUALS | MULTEQUALS | DIVEQUALS) expression
             | INTLIT
             | CHARLIT
             | STRINGLIT

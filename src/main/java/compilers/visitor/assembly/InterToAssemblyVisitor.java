@@ -4,6 +4,7 @@ import compilers.ast.GenericListNode;
 import compilers.ast.assembly.*;
 import compilers.ast.intermediate.*;
 import compilers.ast.intermediate.InterOperand.*;
+import compilers.ast.intermediate.expression.InterExpression;
 import compilers.ast.intermediate.expression.InterVariable;
 import compilers.ast.intermediate.expression.operation.*;
 import compilers.ast.intermediate.statements.*;
@@ -83,6 +84,18 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
                 twoReg(LDRI, R1, R1);
             }
         }
+    }
+
+    InterValue getInterVal(List<InterExpression> expressions) {
+        if (!exceptionStack.empty()) {
+            InterOperation interOperation;
+            if (expressions.get(0) instanceof InterOperation) {
+                interOperation = (InterOperation) expressions.get(0);
+                return interOperation.getRightOperand().getInterValue();
+            }
+
+        }
+        return null;
     }
 
     //DIR
@@ -224,6 +237,7 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
     public void preVisit(InterIfStatement node) {
         newLine();
         comment("Set up for if statement");
+        tryDerefInterOperand(node.getInterOperand());
         if (node.getInterElseStatement() != null)
             regAndLabel(BLT, R2, node.getIfNot());
         else
@@ -300,7 +314,7 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
         comment("FP = PFP ");
         twoReg(MOV, FP, R14);
         comment("push result on stack");
-        tryDerefInterOperand(node.getRightOperand());
+        tryDerefInterOperand(node.getInterOperand());
         leftOp(PUSH, R2);
         comment("jump to return address");
         leftOp(JMR, R15);
@@ -370,10 +384,11 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
     @Override
     public void visit(InterCoutStatement node) {
         int trpVal;
-        if (node.getScalarType() != ScalarType.CHAR && node.getScalarType() != ScalarType.STRING) trpVal = 1;
-        else if (node.getScalarType() == ScalarType.STRING) trpVal = 5;
+        ScalarType scalarType = node.getInterOperand().getInterValue().getScalarType();
+        if (scalarType != ScalarType.CHAR && scalarType != ScalarType.STRING) trpVal = 1;
+        else if (scalarType == ScalarType.STRING) trpVal = 5;
         else trpVal = 3;
-        tryDerefInterOperand(node.getRightOperand());
+        tryDerefInterOperand(node.getInterOperand());
         newLine();
         comment("COUT  result");
         twoReg(MOV, R3, R2);
@@ -383,7 +398,8 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
 
     @Override
     public void preVisit(InterCinStatement node) {
-        if (node.getScalarType() != ScalarType.CHAR) {
+        ScalarType scalarType = node.getInterOperand().getInterValue().getScalarType();
+        if (scalarType != ScalarType.CHAR) {
             newLine();
             comment("CIN input Integer");
             trap(2);
@@ -662,8 +678,8 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
     @Override
     public void visit(InterPushArg node) {
         newLine();
-        comment("Pushing " + node.getInterOperand().getInterValue().getTerminalValue());
-        tryDerefInterOperand(node.getInterOperand());
+        comment("Pushing " + node.getRightOperand().getInterValue().getTerminalValue());
+        tryDerefInterOperand(node.getRightOperand());
         leftOp(PUSH, R2);
     }
 

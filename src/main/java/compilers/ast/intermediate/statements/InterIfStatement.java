@@ -1,6 +1,7 @@
 package compilers.ast.intermediate.statements;
 
 import compilers.ast.GenericListNode;
+import compilers.ast.intermediate.InterOperand.InterOperand;
 import compilers.ast.intermediate.InterValue;
 import compilers.ast.intermediate.expression.InterExpression;
 import compilers.ast.intermediate.expression.operation.InterOperation;
@@ -17,9 +18,10 @@ public class InterIfStatement extends InterStatement {
     InterStatement ifMet;
     InterElseStatement interElseStatement;
 
-    public InterIfStatement(GenericListNode expression, InterStatement ifMet, InterElseStatement interElseStatement, String label) {
-        super(interElseStatement, ifMet, expression);
+    public InterIfStatement(GenericListNode expression, InterStatement ifMet, InterElseStatement interElseStatement, String label, InterOperand interOperand) {
+        super(interElseStatement, ifMet, expression, interOperand);
         this.ifMet = ifMet;
+        this.interOperand = interOperand;
         this.interElseStatement = interElseStatement;
         this.interExpressionList = getNodeList(expression);
         this.label = label;

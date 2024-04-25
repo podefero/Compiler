@@ -1,10 +1,13 @@
 package compilers.ast.kxi_nodes.statements;
 
+import compilers.ast.intermediate.InterOperand.InterOperand;
 import compilers.ast.kxi_nodes.expressions.AbstractKxiExpression;
 import compilers.visitor.kxi.KxiVisitorBase;
 import lombok.Getter;
+import lombok.Setter;
 
 @Getter
+@Setter
 public class KxiCinStatement extends AbstractKxiStatement {
     private AbstractKxiExpression expression;
 

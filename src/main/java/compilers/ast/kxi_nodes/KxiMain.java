@@ -6,20 +6,24 @@ import compilers.ast.kxi_nodes.scope.KxiClass;
 import compilers.ast.kxi_nodes.token_literals.IdentifierToken;
 import compilers.visitor.kxi.KxiVisitorBase;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 
+@Setter
 @Getter
 public class KxiMain extends AbstractKxiNode {
     private KxiBlock block;
-    private IdentifierToken id;
+    private IdentifierToken identifierToken;
+    String id;
     private List<KxiClass> classList;
 
-    public KxiMain(KxiBlock block, IdentifierToken id, GenericListNode classList) {
+    public KxiMain(KxiBlock block, IdentifierToken identifierToken, GenericListNode classList) {
         super(block, classList);
         this.block = block;
-        this.id = id;
+        this.identifierToken = identifierToken;
         this.classList = getNodeList(classList);
+        id = identifierToken.getValue();
     }
 
     @Override

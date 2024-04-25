@@ -942,4 +942,28 @@ public class KxiVisitorBase implements VisitKxi {
 
     public void visit(InterArgs interArgs) {
     }
+
+    public void visit(InterVariableDec interVariableDec) {
+    }
+
+    public void visit(InterBlock interBlock) {
+    }
+
+    public void preVisit(InterBlock interBlock) {
+    }
+
+    public void preVisit(InterMethodExpression interMethodExpression) {
+    }
+
+    public void visit(InterMethodExpression interMethodExpression) {
+    }
+
+    public void visit(InterMethodOperation interMethodOperation) {
+    }
+
+    public void preVisit(InterMainStart interMainStart) {
+    }
+
+    public void visit(InterMainStart interMainStart) {
+    }
 }

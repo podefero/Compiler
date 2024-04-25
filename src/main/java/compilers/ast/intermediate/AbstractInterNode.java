@@ -1,8 +1,10 @@
 package compilers.ast.intermediate;
 
 import compilers.ast.GenericNode;
+import compilers.ast.intermediate.InterOperand.InterOperand;
 
 public abstract class AbstractInterNode extends GenericNode {
+    protected InterOperand interOperand;
     public AbstractInterNode(GenericNode... genericNodes) {
         super(genericNodes);
     }

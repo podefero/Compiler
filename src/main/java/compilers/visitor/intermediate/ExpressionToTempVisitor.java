@@ -3,11 +3,14 @@ package compilers.visitor.intermediate;
 import compilers.ast.assembly.Directive;
 import compilers.ast.intermediate.*;
 import compilers.ast.intermediate.InterOperand.*;
+import compilers.ast.intermediate.expression.InterExpression;
 import compilers.ast.intermediate.expression.operation.*;
+import compilers.ast.intermediate.statements.InterCoutStatement;
 import compilers.ast.intermediate.statements.InterFunctionalCall;
 import compilers.ast.intermediate.expression.InterVariable;
 import compilers.ast.intermediate.statements.InterGlobalVariable;
 import compilers.ast.kxi_nodes.KxiMain;
+import compilers.ast.kxi_nodes.KxiVariableDeclaration;
 import compilers.ast.kxi_nodes.ScalarType;
 import compilers.ast.kxi_nodes.expressions.KxiDotExpression;
 import compilers.ast.kxi_nodes.expressions.KxiMethodExpression;
@@ -20,6 +23,10 @@ import compilers.ast.kxi_nodes.expressions.uni.AbstractKxiUniOperation;
 import compilers.ast.kxi_nodes.expressions.uni.KxiNot;
 import compilers.ast.kxi_nodes.expressions.uni.KxiUniPlus;
 import compilers.ast.kxi_nodes.expressions.uni.KxiUniSubtract;
+import compilers.ast.kxi_nodes.statements.*;
+import compilers.ast.kxi_nodes.statements.conditional.KxiForStatement;
+import compilers.ast.kxi_nodes.statements.conditional.KxiIfStatement;
+import compilers.ast.kxi_nodes.statements.conditional.KxiWhileStatement;
 import compilers.visitor.kxi.KxiVisitorBase;
 
 import java.lang.reflect.InvocationTargetException;
@@ -111,7 +118,7 @@ public class ExpressionToTempVisitor extends KxiVisitorBase {
     private void setBinaryAssign(AbstractBinaryAssignmentExpression binaryAssign) {
         InterOperand variable = binaryAssign.getInterOperation().getLeftOperand();
         InterOperand tempVariable = getOperand(false, binaryAssign.getInterVariable().getInterId());
-        InterAssignment interAssignment = new InterAssignment(tempVariable, variable);
+        InterAssignment interAssignment = new InterAssignment(tempVariable, (InterOperand) variable.copy());
         binaryAssign.setInterAssignment(interAssignment);
         valueStack.push(variable.getInterValue());
     }
@@ -186,14 +193,15 @@ public class ExpressionToTempVisitor extends KxiVisitorBase {
     @Override
     public void visit(KxiMethodExpression node) {
         int size = node.getArguments().getArguments().size();
-        List<InterArgs> interArgsList = new ArrayList<>();
+        List<InterExpression> expressions = new ArrayList<>();
 
         for (int i = 0; i < size; i++) {
             InterArgs interArgs = new InterArgs(getOperand(false, node.getLineInfo()));
-            interArgsList.add(interArgs);
+            expressions.add(interArgs);
         }
 
-        node.setInterArgsList(interArgsList);
+        expressions.add(new InterMethodOperation(null));
+        node.setInterExpressions(expressions);
         InterId interid = (InterId) valueStack.pop();
         InterFunctionalCall interFunctionalCall = new InterFunctionalCall(interid, interid.getScalarType());
         valueStack.push(interFunctionalCall);
@@ -323,10 +331,57 @@ public class ExpressionToTempVisitor extends KxiVisitorBase {
     }
 
     @Override
+    public void visit(KxiVariableDeclaration node) {
+        if (node.getInitializer() != null) {
+            node.setInterInit(getOperand(false, node.getLineInfo()));
+        }
+    }
+
+    @Override
     public void visit(KxiEquals node) {
         if (valueStack.size() >= 2) {
             InterOperation interOperation = getBinaryOperation(node.getLineInfo(), InterAssignment.class);
             node.setInterAssignment((InterAssignment) interOperation);
         }
     }
+
+    @Override
+    public void visit(KxiCoutStatement node) {
+        node.setInterOperand(getOperand(false, node.getLineInfo()));
+    }
+
+    @Override
+    public void visit(KxiCinStatement node) {
+        node.setInterOperand(getOperand(false, node.getLineInfo()));
+    }
+
+    @Override
+    public void visit(KxiIfStatement node) {
+        node.setInterOperand(getOperand(false, node.getLineInfo()));
+    }
+
+    @Override
+    public void visit(KxiWhileStatement node) {
+        node.setInterOperand(getOperand(false, node.getLineInfo()));
+    }
+
+    @Override
+    public void visit(KxiForStatement node) {
+        if (node.getPostExpression() != null) valueStack.pop();
+        node.setInterOperand(getOperand(false, node.getLineInfo()));
+        if (node.getPreExpression() != null) valueStack.pop();
+    }
+
+    @Override
+    public void visit(KxiReturnStatement node) {
+        if (node.getExpression() != null)
+            node.setInterOperand(getOperand(false, node.getLineInfo()));
+    }
+
+    @Override
+    public void visit(KxiSwitchStatement node) {
+        node.setInterOperand(getOperand(false, node.getLineInfo()));
+    }
+
+
 }

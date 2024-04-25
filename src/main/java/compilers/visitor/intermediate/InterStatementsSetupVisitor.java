@@ -103,8 +103,8 @@ public class InterStatementsSetupVisitor extends KxiVisitorBase {
 
     @Override
     public void visit(KxiMethodExpression node) {
-        for(InterArgs arg : node.getInterArgsList()) {
-            pushExpression(arg);
+        for(InterExpression expression : node.getInterExpressions()) {
+            pushExpression(expression);
         }
     }
 

@@ -4,36 +4,12 @@ import compilers.ast.GenericListNode;
 import compilers.ast.GenericNode;
 import compilers.ast.assembly.Directive;
 import compilers.ast.intermediate.*;
-import compilers.ast.intermediate.InterOperand.*;
-import compilers.ast.intermediate.expression.InterVariable;
 import compilers.ast.intermediate.expression.operation.*;
 import compilers.ast.intermediate.statements.*;
 import compilers.ast.kxi_nodes.*;
-import compilers.ast.kxi_nodes.class_members.KxiConstructor;
 import compilers.ast.kxi_nodes.class_members.KxiDataMember;
 import compilers.ast.kxi_nodes.class_members.KxiMethod;
-import compilers.ast.kxi_nodes.expressions.AbstractKxiExpression;
-import compilers.ast.kxi_nodes.expressions.KxiDotExpression;
-import compilers.ast.kxi_nodes.expressions.KxiMethodExpression;
-import compilers.ast.kxi_nodes.expressions.KxiPostForExpression;
-import compilers.ast.kxi_nodes.expressions.binary.arithmic.KxiDiv;
-import compilers.ast.kxi_nodes.expressions.binary.arithmic.KxiMult;
-import compilers.ast.kxi_nodes.expressions.binary.arithmic.KxiPlus;
-import compilers.ast.kxi_nodes.expressions.binary.arithmic.KxiSubtract;
-import compilers.ast.kxi_nodes.expressions.binary.assignment.*;
-import compilers.ast.kxi_nodes.expressions.binary.conditional.*;
 import compilers.ast.kxi_nodes.expressions.literals.*;
-import compilers.ast.kxi_nodes.expressions.uni.KxiNot;
-import compilers.ast.kxi_nodes.expressions.uni.KxiUniPlus;
-import compilers.ast.kxi_nodes.expressions.uni.KxiUniSubtract;
-import compilers.ast.kxi_nodes.scope.KxiBlock;
-import compilers.ast.kxi_nodes.scope.KxiCaseBlock;
-import compilers.ast.kxi_nodes.statements.*;
-import compilers.ast.kxi_nodes.statements.conditional.KxiElseStatement;
-import compilers.ast.kxi_nodes.statements.conditional.KxiForStatement;
-import compilers.ast.kxi_nodes.statements.conditional.KxiIfStatement;
-import compilers.ast.kxi_nodes.statements.conditional.KxiWhileStatement;
-import compilers.util.HashString;
 import compilers.visitor.kxi.KxiVisitorBase;
 import compilers.visitor.kxi.symboltable.*;
 import lombok.Getter;
@@ -46,10 +22,9 @@ import java.util.Stack;
 @Getter
 public class KxiToIntermediateVisitor extends KxiVisitorBase {
     private final Stack<AbstractInterNode> nodeStack;
-    private InterGlobal rootNode;
     private List<InterGlobalVariable> globalVariables;
     private List<InterOperation> globalInit;
-    private List<InterFunctionNode> globalFunctions;
+    private List<InterFunctionNode> functions;
     private ScopeHandler scopeHandler;
 
 
@@ -57,7 +32,7 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
         nodeStack = new Stack<>();
         this.scopeHandler = scopeHandler;
         this.globalVariables = new ArrayList<>();
-        this.globalFunctions = new ArrayList<>();
+        this.functions = new ArrayList<>();
         this.globalInit = new ArrayList<>();
     }
 
@@ -78,23 +53,11 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
     }
 
     @Override
-    public void preVisit(KxiMain node) {
-
-    }
-
-    @Override
     public void visit(KxiMain node) {
-        GenericListNode functions = new GenericListNode(globalFunctions);
-        GenericListNode globalDir = new GenericListNode(globalVariables); //after symbol table
-        GenericListNode globalInit = new GenericListNode(this.globalInit);
-        InterId interId = new InterId(getFullyQualifiedName(node.getId().getValue()), ScalarType.VOID);
-        InterFunctionNode interFunctionNode = new InterFunctionNode(interId, node.getBlock().getInterBlock(), new ArrayList<>());
-
-        InterGlobal interGlobal =
-                new InterGlobal(globalDir, globalInit, functions, new InterFunctionalCall(interId, ScalarType.VOID));
-        rootNode = interGlobal;
-
-        rootNode.getInterFunctionNode().add(0, interFunctionNode);
+        InterFunctionNode interFunctionNode = new InterFunctionNode(new InterId(node.getId(), ScalarType.VOID)
+                , new GenericListNode(node.getBlock().getInterBlock().getInterStatementList())
+                , new ArrayList<>());
+        functions.add(interFunctionNode);
     }
 
     @Override
@@ -106,7 +69,7 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
         if (classScope != null)
             methodScope = classScope.getMethodScopeMap().get(node.getIdToken().getValue());
 
-        InterId interId = new InterId(getFullyQualifiedName(node.getIdToken().getValue()), node.getReturnType().getScalarType());
+        InterId interId = new InterId(node.getId(), node.getReturnType().getScalarType());
         List<String> params = new ArrayList<>();
 
         for (int i = 0; i < paramSize; i++) {
@@ -114,8 +77,8 @@ public class KxiToIntermediateVisitor extends KxiVisitorBase {
                 params.add(methodScope.getBlockScope().getUniqueName() + node.getParameters().get(i).getIdToken().getValue());
         }
 
-        InterFunctionNode interFunctionNode = new InterFunctionNode(interId, node.getBlock().getInterBlock(), params);
-        globalFunctions.add(interFunctionNode);
+        InterFunctionNode interFunctionNode = new InterFunctionNode(interId, new GenericListNode(node.getBlock().getInterBlock().getInterStatementList()), params);
+        functions.add(interFunctionNode);
     }
 
     private String getFullyQualifiedName(String id) {

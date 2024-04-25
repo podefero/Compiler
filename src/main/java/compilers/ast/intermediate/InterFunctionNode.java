@@ -6,21 +6,24 @@ import compilers.ast.intermediate.statements.InterBlock;
 import compilers.ast.intermediate.statements.InterStatement;
 import compilers.visitor.kxi.KxiVisitorBase;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 
 @Getter
+@Setter
 public class InterFunctionNode extends AbstractInterNode {
     private InterId interId;
-    private InterBlock block;
+    private List<InterStatement> block;
     private List<String> params;
     private String returnId;
     private String pfpId;
+    private boolean main;
 
-    public InterFunctionNode(InterId interId, InterBlock block, List<String> params) {
-        super(block, new InterActivationRecord((InterId) interId.copy()));
+    public InterFunctionNode(InterId interId, GenericListNode block, List<String> params) {
+        super(block);
         this.interId = interId;
-        this.block = block;
+        this.block = getNodeList(block);
         this.params = params;
         this.returnId = "return" + this.hashCode();
         this.pfpId = "pfp" + this.hashCode();

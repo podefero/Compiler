@@ -1,5 +1,6 @@
 package compilers.ast.kxi_nodes.statements;
 
+import compilers.ast.intermediate.InterOperand.InterOperand;
 import compilers.ast.kxi_nodes.ScalarType;
 import compilers.ast.kxi_nodes.expressions.AbstractKxiExpression;
 import compilers.visitor.kxi.KxiVisitorBase;

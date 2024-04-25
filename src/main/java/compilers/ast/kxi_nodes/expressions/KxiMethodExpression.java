@@ -1,6 +1,7 @@
 package compilers.ast.kxi_nodes.expressions;
 
 import compilers.ast.intermediate.InterArgs;
+import compilers.ast.intermediate.expression.InterExpression;
 import compilers.ast.kxi_nodes.KxiArguments;
 import compilers.visitor.kxi.KxiVisitorBase;
 import lombok.Getter;
@@ -13,7 +14,7 @@ import java.util.List;
 public class KxiMethodExpression extends AbstractKxiExpression{
     private KxiArguments arguments;
     private AbstractKxiExpression methodExpression;
-    private List<InterArgs> interArgsList;
+    List<InterExpression> interExpressions;
 
     public KxiMethodExpression(KxiArguments arguments, AbstractKxiExpression methodExpression) {
         super(arguments, methodExpression);

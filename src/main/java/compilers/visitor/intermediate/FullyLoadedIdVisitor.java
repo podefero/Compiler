@@ -1,12 +1,12 @@
 package compilers.visitor.intermediate;
 
+import compilers.ast.kxi_nodes.KxiMain;
 import compilers.ast.kxi_nodes.KxiParameter;
 import compilers.ast.kxi_nodes.KxiVariableDeclaration;
 import compilers.ast.kxi_nodes.ScalarType;
 import compilers.ast.kxi_nodes.class_members.KxiMethod;
 import compilers.ast.kxi_nodes.expressions.KxiDotExpression;
 import compilers.ast.kxi_nodes.expressions.literals.ExpressionIdLit;
-import compilers.util.HashString;
 import compilers.visitor.kxi.KxiVisitorBase;
 import compilers.visitor.kxi.symboltable.ClassScope;
 import compilers.visitor.kxi.symboltable.ScopeHandler;
@@ -75,6 +75,12 @@ public class FullyLoadedIdVisitor extends KxiVisitorBase {
     public void visit(KxiMethod node) {
         node.setId(getFullyQualifiedName(node.getId()));
         node.getIdToken().setValue(node.getId());
+    }
+
+    @Override
+    public void visit(KxiMain node) {
+        node.setId(getFullyQualifiedName(node.getId()));
+        node.getIdentifierToken().setValue(node.getId());
     }
 
     @Override

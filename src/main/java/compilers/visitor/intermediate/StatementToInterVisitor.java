@@ -34,6 +34,7 @@ import compilers.util.HashString;
 import compilers.visitor.kxi.KxiVisitorBase;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Stack;
 
@@ -52,7 +53,9 @@ public class StatementToInterVisitor extends KxiVisitorBase {
         List<InterStatement> interStatements = new ArrayList<>();
         while (size > 0) {
             interStatements.add(interStatementStack.pop());
+            size--;
         }
+        Collections.reverse(interStatements);
         return interStatements;
     }
 
@@ -80,7 +83,8 @@ public class StatementToInterVisitor extends KxiVisitorBase {
         if (node.getElseStatement() != null)
             interElseStatement = (InterElseStatement) pop(node.getElseStatement().getLineInfo());
         GenericListNode expression = new GenericListNode(node.getInterExpressions());
-        InterIfStatement interIfStatement = new InterIfStatement(expression, interStatement, interElseStatement, "if_" + HashString.updateStringHash());
+        InterIfStatement interIfStatement =
+                new InterIfStatement(expression, interStatement, interElseStatement, "if_" + HashString.updateStringHash(), node.getInterOperand());
         interStatementStack.push(interIfStatement);
     }
 
@@ -89,6 +93,7 @@ public class StatementToInterVisitor extends KxiVisitorBase {
         GenericListNode empty = new GenericListNode(new ArrayList<>());
         GenericListNode expression = new GenericListNode(node.getInterExpressions());
         InterWhileStatement interWhileStatement = new InterWhileStatement(empty, expression, pop(node.getLineInfo()), empty, node.getLoopLabel(), node.getExitLoop());
+        interWhileStatement.setInterOperand(node.getInterOperand());
         interStatementStack.push(interWhileStatement);
     }
 
@@ -111,6 +116,7 @@ public class StatementToInterVisitor extends KxiVisitorBase {
         GenericListNode expression = new GenericListNode(node.getInterExpressions());
 
         InterWhileStatement interWhileStatement = new InterWhileStatement(preExpression, expression, pop(node.getLineInfo()), postExpression, node.getLoopLabel(), node.getExitLoop());
+        interWhileStatement.setInterOperand(node.getInterOperand());
         interStatementStack.push(interWhileStatement);
     }
 
@@ -122,13 +128,14 @@ public class StatementToInterVisitor extends KxiVisitorBase {
         } else
             expression = new GenericListNode(new ArrayList<>());
         InterReturn interReturn = new InterReturn(expression);
+        interReturn.setInterOperand(node.getInterOperand());
         interStatementStack.push(interReturn);
     }
 
     @Override
     public void visit(KxiCoutStatement node) {
         GenericListNode expression = new GenericListNode(node.getInterExpressions());
-        InterCoutStatement interCoutStatement = new InterCoutStatement(expression);
+        InterCoutStatement interCoutStatement = new InterCoutStatement(expression, node.getInterOperand());
         interStatementStack.push(interCoutStatement);
     }
 
@@ -136,6 +143,7 @@ public class StatementToInterVisitor extends KxiVisitorBase {
     public void visit(KxiCinStatement node) {
         GenericListNode expression = new GenericListNode(node.getInterExpressions());
         InterCinStatement interCinStatement = new InterCinStatement(expression);
+        interCinStatement.setInterOperand(node.getInterOperand());
         interStatementStack.push(interCinStatement);
     }
 
@@ -147,6 +155,7 @@ public class StatementToInterVisitor extends KxiVisitorBase {
         GenericListNode defaultStatements = new GenericListNode(getStatements(defSize));
         GenericListNode cases = new GenericListNode(getStatements(caseSize));
         InterSwitch interSwitch = new InterSwitch(expression, cases, defaultStatements, node.getExitLoop());
+        interSwitch.setInterOperand(node.getInterOperand());
         interStatementStack.push(interSwitch);
     }
 
@@ -155,6 +164,11 @@ public class StatementToInterVisitor extends KxiVisitorBase {
         GenericListNode expression = new GenericListNode(node.getInterExpressions());
         InterExpressionStatement interExpressionStatement = new InterExpressionStatement(expression);
         interStatementStack.push(interExpressionStatement);
+    }
+
+    @Override
+    public void visit(KxiMain node) {
+        node.getBlock().getInterBlock().getInterStatementList().add(new InterReturn(new GenericListNode(new ArrayList<>())));
     }
 
     @Override
@@ -175,12 +189,12 @@ public class StatementToInterVisitor extends KxiVisitorBase {
             for (InterExpression exp : node.getInterStatements()) {
                 expressions.add(exp);
             }
-            interOperation = new InterAssignment(new LeftVariableStack(interValue), null); //may need to set to expression op
+            interOperation = new InterAssignment(new LeftVariableStack(interValue), node.getInterInit()); //may need to set to expression op
         }
         InterVariable interVariable = new InterVariable(new InterId(node.getId(), node.getType().getScalarType()), interOperation);
         node.setInterVariable(interVariable);
         expressions.add(interVariable);
-        InterExpressionStatement interExpressionStatement = new InterExpressionStatement(new GenericListNode(expressions));
-        interStatementStack.push(interExpressionStatement);
+        InterVariableDec interVariableDec = new InterVariableDec(interVariable);
+        interStatementStack.push(interVariableDec);
     }
 }

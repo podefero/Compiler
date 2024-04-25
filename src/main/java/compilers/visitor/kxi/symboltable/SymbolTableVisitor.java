@@ -148,12 +148,12 @@ public class SymbolTableVisitor extends KxiVisitorBase {
     @Override
     public void visit(KxiMain kxiMain) {
         //check if id is 'main'
-        if (!kxiMain.getId().getValue().equals("main")) {
+        if (!kxiMain.getIdentifierToken().getValue().equals("main")) {
             exceptionStack.push(new SymbolTableException(kxiMain.getLineInfo(), "main must be named 'main'"));
         }
         setBlockScopeType(ScopeType.Main);
         MethodScope methodScope =
-                new MethodScope(new SymbolData(false, null, new KxiType(ScalarType.VOID, kxiMain.getId()))
+                new MethodScope(new SymbolData(false, null, new KxiType(ScalarType.VOID, kxiMain.getIdentifierToken()))
                         , new ArrayList<>(), (BlockScope) currentSymbolTable);
 
         globalScope.setMainScope(methodScope);
