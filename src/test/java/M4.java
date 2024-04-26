@@ -2,15 +2,13 @@ import compilers.antlr.KxiLexer;
 import compilers.antlr.KxiParser;
 import compilers.ast.GenericNode;
 import compilers.ast.assembly.AssemblyMain;
-import compilers.ast.intermediate.InterGlobal;
 import compilers.ast.intermediate.symboltable.InterSymbolTable;
 import compilers.ast.kxi_nodes.AbstractKxiNode;
 import compilers.util.InputHandler;
 import compilers.util.OutputHandler;
 import compilers.visitor.antlr.AntlrToKxiVisitor;
 import compilers.visitor.assembly.AssemblyAssembleVisitor;
-import compilers.visitor.assembly.FinalizeAssemblyVisitor;
-import compilers.visitor.assembly.InterToAssemblyVisitor;
+import compilers.visitor.assembly.ExpressionToAssemblyVisitor;
 import compilers.visitor.generic.GraphVizVisitor;
 import compilers.visitor.intermediate.*;
 import compilers.visitor.kxi.invalid_break.InvalidBreakVisitor;
@@ -1034,7 +1032,7 @@ public class M4 {
     @Test
     void simpVariable() {
         test("void main() {\n" +
-                "   int i;\n" +
+                "   int i = 1 + 1 + 3;\n" +
                 "}\n", false);
     }
 
@@ -1203,7 +1201,7 @@ public class M4 {
         rootNode.accept(interSymbolTableVisitor);
 
 
-        InterToAssemblyVisitor interToAssemblyVisitor = new InterToAssemblyVisitor(new ArrayList<>()
+        ExpressionToAssemblyVisitor interToAssemblyVisitor = new ExpressionToAssemblyVisitor(new ArrayList<>()
                 , interSymbolTableVisitor.getInterSymbolTable()
                 , interSymbolTableVisitor.getInterSymbolTable().getFunctionDataMap().get("main$main")
                 , null);

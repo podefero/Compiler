@@ -18,9 +18,7 @@ public class KxiVariableDeclaration extends AbstractKxiNode {
     private IdentifierToken idToken;
     private KxiAbstractType type;
     private boolean partOfDataMember;
-    private List<InterExpression> interStatements;
-    private InterVariable interVariable;
-    private InterOperand interInit;
+
     String id;
 
     public KxiVariableDeclaration(AbstractKxiExpression initializer, IdentifierToken idToken, KxiAbstractType type) {

@@ -4,6 +4,7 @@ import compilers.ast.intermediate.expression.operation.InterAssignment;
 import compilers.ast.kxi_nodes.expressions.AbstractKxiExpression;
 import compilers.ast.kxi_nodes.expressions.binary.AbstractKxiBinaryOperation;
 import compilers.ast.kxi_nodes.expressions.literals.ExpressionIdLit;
+import compilers.ast.kxi_nodes.expressions.literals.ExpressionLiteral;
 import compilers.visitor.kxi.KxiVisitorBase;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,7 +14,6 @@ import lombok.Setter;
 public abstract class AbstractBinaryAssignmentExpression extends AbstractKxiBinaryOperation {
 
     protected ExpressionIdLit id;
-
     public AbstractBinaryAssignmentExpression(AbstractKxiExpression expressionR, AbstractKxiExpression expressionL) {
         super(expressionR, expressionL);
     }

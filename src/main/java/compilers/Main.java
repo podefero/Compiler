@@ -2,20 +2,13 @@ package compilers;
 
 import compilers.antlr.KxiLexer;
 import compilers.antlr.KxiParser;
-import compilers.ast.assembly.AssemblyMain;
-import compilers.ast.intermediate.InterGlobal;
-import compilers.ast.intermediate.symboltable.InterSymbolTable;
 import compilers.ast.kxi_nodes.AbstractKxiNode;
 import compilers.ast.kxi_nodes.KxiMain;
 import compilers.commandargs.ArgumentFlags;
 import compilers.util.InputHandler;
 import compilers.util.OutputHandler;
 import compilers.visitor.antlr.AntlrToKxiVisitor;
-import compilers.visitor.assembly.AssemblyAssembleVisitor;
 import compilers.visitor.generic.GraphVizVisitor;
-import compilers.visitor.intermediate.BreakAndReturnsVisitor;
-import compilers.visitor.intermediate.InterSymbolTableVisitor;
-import compilers.visitor.intermediate.KxiToIntermediateVisitor;
 import compilers.visitor.kxi.invalid_break.InvalidBreakVisitor;
 import compilers.visitor.kxi.invalid_write.InvalidWriteVisitor;
 import compilers.visitor.kxi.symboltable.ScopeHandler;
@@ -24,8 +17,6 @@ import compilers.visitor.kxi.typecheck.TypeCheckerVisitor;
 import org.antlr.v4.runtime.CommonTokenStream;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Stack;
 
 public class Main {

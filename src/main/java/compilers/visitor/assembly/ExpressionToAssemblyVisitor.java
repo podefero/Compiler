@@ -1,20 +1,14 @@
 package compilers.visitor.assembly;
 
-import compilers.ast.GenericListNode;
 import compilers.ast.assembly.*;
-import compilers.ast.intermediate.InterId;
-import compilers.ast.intermediate.InterLit;
-import compilers.ast.intermediate.InterOperand.*;
-import compilers.ast.intermediate.InterValue;
-import compilers.ast.intermediate.StackType;
-import compilers.ast.intermediate.expression.InterExpression;
-import compilers.ast.intermediate.expression.operation.InterOperation;
+import compilers.ast.intermediate.InterOperand.OperandReturn;
 import compilers.ast.intermediate.expression.operation.InterPtrAssignment;
-import compilers.ast.intermediate.symboltable.ActivationRecord;
 import compilers.ast.intermediate.symboltable.FunctionData;
 import compilers.ast.intermediate.symboltable.InterSymbolTable;
-import compilers.ast.intermediate.symboltable.StackData;
-import compilers.ast.kxi_nodes.*;
+import compilers.ast.kxi_nodes.AbstractKxiNode;
+import compilers.ast.kxi_nodes.KxiCaseChar;
+import compilers.ast.kxi_nodes.KxiCaseInt;
+import compilers.ast.kxi_nodes.ScalarType;
 import compilers.ast.kxi_nodes.expressions.AbstractKxiExpression;
 import compilers.ast.kxi_nodes.expressions.binary.arithmic.KxiDiv;
 import compilers.ast.kxi_nodes.expressions.binary.arithmic.KxiMult;
@@ -25,21 +19,15 @@ import compilers.ast.kxi_nodes.expressions.binary.conditional.*;
 import compilers.ast.kxi_nodes.expressions.literals.*;
 import compilers.ast.kxi_nodes.expressions.uni.KxiNot;
 import compilers.ast.kxi_nodes.expressions.uni.KxiUniSubtract;
-import compilers.ast.kxi_nodes.statements.*;
-import compilers.ast.kxi_nodes.statements.conditional.KxiElseStatement;
-import compilers.ast.kxi_nodes.statements.conditional.KxiIfStatement;
-import compilers.ast.kxi_nodes.statements.conditional.KxiWhileStatement;
-import compilers.ast.kxi_nodes.token_literals.IdentifierToken;
+import compilers.ast.kxi_nodes.statements.KxiSwitchStatement;
 import compilers.ast.kxi_nodes.token_literals.IntLitToken;
 import compilers.ast.kxi_nodes.token_literals.TokenLiteral;
-import compilers.util.DataSizes;
 import compilers.util.HashString;
 import compilers.visitor.kxi.KxiVisitorBase;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import static compilers.ast.assembly.Directive.BYT;
@@ -50,11 +38,10 @@ import static compilers.ast.assembly.Registers.*;
 
 @AllArgsConstructor
 @Getter
-public class InterToAssemblyVisitor extends KxiVisitorBase {
+public class ExpressionToAssemblyVisitor extends KxiVisitorBase {
     private final List<AbstractAssembly> assemblyList;
     private InterSymbolTable interSymbolTable;
     private FunctionData currentFunctionData;
-    private AssemblyMain rootNode;
 
     //COMMONLY Used
     private void getFP() {
@@ -147,61 +134,29 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
         assemblyList.add(new OperandLabelWrapper(comment));
     }
 
+    void getPre(AbstractKxiNode node) {
+        List<AbstractAssembly> temp = new ArrayList<>(assemblyList);
+        assemblyList.clear();
+        node.getAssemblyBlock().setPreBlock(temp);
+    }
 
-    @Override
-    public void preVisit(KxiMain node) {
-        String label = "main_main";
-        newLine();
-        comment("Calling function " + "main_main");
-        comment("Zero out Record");
-        twoReg(MOV, R14, SP);
-        regImmInt(MOVI, R0, 0);
-        int size = currentFunctionData.getSize();
-        for (int i = 0; i < size + 1; i++) { //i = 1 for return value
-            decFP(i * DataSizes.INT_SIZE);
-            twoReg(STRI, R0, R14); //store 0 in stack ptr
-        }
-        //now zeroed out push return address
-        comment("Pre Activation Record");
-        comment("PFP");
-        twoReg(MOV, R13, SP);
-        getFP();
-        comment("Get Address, and calculate offset");
-        setPC();
-        regImmInt(ADI, R15, 60);
-        comment("push return address");
-        leftOp(PUSH, R15);
-        comment("push pfp");
-        leftOp(PUSH, R14);
-        //instruction for DIR
-        //instruction for INIT
-        twoReg(MOV, FP, R13);
-        regLabel(JMP, label);
-        regLabel(JMP, "END");
+    void appendBody(AbstractKxiNode node, AbstractKxiNode otherNode) {
+        node.getAssemblyBlock().getBodyBlock().addAll(otherNode.getAssemblyBlock().combineBlocks());
+    }
 
-        currentFunctionData = interSymbolTable.getFunctionDataMap().get(node.getId());
-        label(label);
-        newLine();
-        comment("push " + node.getId() + " activation record");
-        regImmInt(MOVI, R0, 0);
-        ActivationRecord activationRecord = currentFunctionData.getActivationRecord();
-        Collection<StackData> stackDataCollection = activationRecord.getStackDataMap().values();
-        for (StackData stackData : stackDataCollection) {
-            if (stackData.getStackType() == StackType.LOCAL) {
-                comment("push " + stackData.getId());
-                comment("offset: " + stackData.getOffset());
-                leftOp(PUSH, R0);
-            }
+    void appendMultiBody(AbstractKxiNode node, List<? extends AbstractKxiNode> otherNode) {
+        for (AbstractKxiNode n : otherNode) {
+            node.getAssemblyBlock().getBodyBlock().addAll(n.getAssemblyBlock().combineBlocks());
         }
     }
 
-    @Override
-    public void visit(KxiMain node) {
-        newLine();
-        label("END");
-        trap(0);
-        rootNode = new AssemblyMain(new GenericListNode(getAssemblyList()));
+    void getPost(AbstractKxiNode node) {
+        List<AbstractAssembly> temp = new ArrayList<>(assemblyList);
+        assemblyList.clear();
+        node.getAssemblyBlock().setPostBlock(temp);
     }
+
+
 
     void deref(AbstractKxiExpression expression) {
         ExpressionIdLit expressionIdLit;
@@ -209,6 +164,7 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
             expressionIdLit = (ExpressionIdLit) expression;
             ScalarType scalarType = expressionIdLit.getScalarType();
             if (scalarType != ScalarType.STRING) {
+
                 comment("Deref stack var");
                 if (expressionIdLit.isLeft()) twoReg(LDRI, R1, R1);
                 else twoReg(LDRI, R2, R2);
@@ -216,230 +172,68 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
         }
     }
 
-    void evaluateExpression(AbstractKxiExpression expression) {
-
-    }
-
-
-    @Override
-    public void preVisit(KxiIfStatement node) {
-        newLine();
-        comment("Set up for if statement");
-        deref(node.getConditionalExpression());
-        if (node.getElseStatement() != null)
-            regAndLabel(BLT, R2, node.getIfNot());
-        else
-            regAndLabel(BLT, R2, node.getDone());
-        comment("Use this for else");
-        twoReg(MOV, R4, R2);
-    }
-
-
-    @Override
-    public void visit(KxiIfStatement node) {
-        label(node.getDone());
-        rootNode = new AssemblyMain(new GenericListNode(getAssemblyList()));
-
-    }
-
-    @Override
-    public void preVisit(KxiElseStatement node) {
-        newLine();
-        regLabel(JMP, node.getDone());
-        comment("else statement");
-        label(node.getIfNot());
-    }
-
-    @Override
-    public void visit(KxiElseStatement node) {
-        newLine();
-        regLabel(JMP, node.getDone());
-    }
-
-
-    @Override
-    public void visit(KxiBreakStatement interBreak) {
-        newLine();
-        comment("Break out of loop");
-        regLabel(JMP, interBreak.getExitLoop());
-    }
-
-
-    @Override
-    public void preVisit(KxiWhileStatement node) {
-        newLine();
-        comment("Start of loop");
-        label(node.getLoopLabel());
-        comment("Set up for while loop");
-        deref(node.getConditionalExpression());
-        regAndLabel(BLT, R2, node.getExitLoop());
-    }
-
-
-    @Override
-    public void visit(KxiWhileStatement node) {
-        newLine();
-        comment("End of while loop");
-        regLabel(JMP, node.getLoopLabel());
-        label(node.getExitLoop());
-    }
-
-
-    @Override
-    public void visit(KxiReturnStatement node) {
-        newLine();
-        comment("Return " + currentFunctionData.getLabel());
-        comment("Get ptr to Return Address in R15");
-        getFP();
-        comment("Deref the ptr so R15 now has the return address");
-        twoReg(LDR, R15, R14);
-        comment("Get PFP in R14");
-        getFP();
-        decFP(4);
-        twoReg(LDRI, R14, R14);
-        comment("SP = FP to pop activation record");
-        twoReg(MOV, SP, FP);
-        comment("FP = PFP ");
-        twoReg(MOV, FP, R14);
-        comment("push result on stack");
-        deref(node.getExpression());
-        leftOp(PUSH, R2);
-        comment("jump to return address");
-        leftOp(JMR, R15);
-
-    }
-
-//    @Override
-//    public void preVisit(InterFunctionalCall node) {
-//        newLine();
-//        comment("Calling function " + node.getLabel());
-//        comment("Zero out Record");
-//        twoReg(MOV, R14, SP);
-//        regImmInt(MOVI, R0, 0);
-//        int size = currentFunctionData.getSize();
-//        for (int i = 0; i < size + 1; i++) { //i = 1 for return value
-//            decFP(i * DataSizes.INT_SIZE);
-//            twoReg(STRI, R0, R14); //store 0 in stack ptr
-//        }
-//        //now zeroed out push return address
-//        comment("Pre Activation Record");
-//        comment("PFP");
-//        twoReg(MOV, R13, SP);
-//        getFP();
-//        comment("Get Address, and calculate offset");
-//        setPC();
-//        //add delim;
-//        AssemblyReturnAddressDelim assemblyReturnAddressDelim = new AssemblyReturnAddressDelim(true);
-//        assemblyReturnAddressDelim.setLabel(node.getLabel());
-//        assemblyList.add(assemblyReturnAddressDelim);
-//        comment("push return address");
-//        leftOp(PUSH, R15);
-//        comment("push pfp");
-//        leftOp(PUSH, R14);
-//    }
-
-//    @Override
-//    public void visit(InterFunctionalCall node) {
-//        twoReg(MOV, FP, R13);
-//        regLabel(JMP, node.getLabel());
-//    }
-
-//    @Override
-//    public void visit(EndFunctionCall node) {
-//        comment("End of Function Call");
-//        assemblyList.add(new AssemblyReturnAddressDelim(false));
-//    }
-
-//    @Override
-//    public void visit(EndPog node) {
-//        regLabel(JMP, "END");
-//    }
-
-    @Override
-    public void visit(KxiVariableDeclaration node) {
-        //assign R1 to result of R2
-        newLine();
-        comment("Initializing Variable " + node.getId());
+    void initTempVar(ExpressionIdLit id) {
+        comment("Initializing Variable " + id.getId());
         comment("Get ptr to var");
         getFP();
-        decFP(interSymbolTable.getOffset(node.getId(), currentFunctionData));
+        decFP(interSymbolTable.getOffset(id.getId(), currentFunctionData));
         comment("store R2 into ptr R14");
         twoReg(STRI, R2, R14);
-
     }
 
-
-    @Override
-    public void visit(KxiCoutStatement node) {
-        int trpVal;
-        ScalarType scalarType = node.getScalarType();
-        if (scalarType != ScalarType.CHAR && scalarType != ScalarType.STRING) trpVal = 1;
-        else if (scalarType == ScalarType.STRING) trpVal = 5;
-        else trpVal = 3;
-
-        deref(node.getExpression());
-
-        newLine();
-        comment("COUT  result");
-        twoReg(MOV, R3, R2);
-        trap(trpVal);
-    }
-
-    @Override
-    public void preVisit(KxiCinStatement node) {
-        ScalarType scalarType = node.getScalarType();
-        if (scalarType != ScalarType.CHAR) {
-            newLine();
-            comment("CIN input Integer");
-            trap(2);
-            twoReg(MOV, R2, R3);
-        } else {
-            newLine();
-            comment("CIN input char");
-            trap(4);
-            twoReg(MOV, R2, R3);
+    void evaluateTempVar(AbstractKxiExpression expressionLiteral) {
+        if (expressionLiteral instanceof ExpressionIdLit) {
+            ExpressionIdLit node = (ExpressionIdLit) expressionLiteral;
+            if (node.getScalarType() == ScalarType.STRING) {
+                if (node.isLeft()) leftPtrVar(node);
+                else rightPtrVar(node);
+            } else {
+                if (node.isLeft()) lefStackVar(node);
+                else rightStackVar(node);
+            }
         }
+    }
+
+    void assembleBinaryOp(OpCodes opCodes, AbstractKxiExpression expressionL, AbstractKxiExpression expressionR, ExpressionIdLit idLit) {
+        evaluateTempVar(expressionL);
+        evaluateTempVar(expressionR);
+        deref(expressionL);
+        deref(expressionR);
+        twoReg(opCodes, R1, R2);
+        twoReg(MOV, R2, R1);
+        initTempVar(idLit);
     }
 
     @Override
     public void visit(KxiPlus node) {
         newLine();
         comment("Add R1 and R2, result in R2");
-        deref(node.getExpressionL());
-        deref(node.getExpressionR());
-        twoReg(ADD, R1, R2);
-        twoReg(MOV, R2, R1);
+        assembleBinaryOp(ADD, node.getExpressionL(), node.getExpressionR(), node.getTempId());
+        getPost(node);
     }
 
     @Override
     public void visit(KxiSubtract node) {
         newLine();
         comment("Subtract R1 and R2, result in R2");
-        deref(node.getExpressionL());
-        deref(node.getExpressionR());
-        twoReg(SUB, R1, R2);
-        twoReg(MOV, R2, R1);
-
+        assembleBinaryOp(SUB, node.getExpressionL(), node.getExpressionR(), node.getTempId());
+        getPost(node);
     }
 
     @Override
     public void visit(KxiDiv node) {
         newLine();
         comment("Divide R1 and R2, result in R2");
-        deref(node.getExpressionL());
-        deref(node.getExpressionR());
-        twoReg(DIV, R1, R2);
-        twoReg(MOV, R2, R1);
+        assembleBinaryOp(DIV, node.getExpressionL(), node.getExpressionR(), node.getTempId());
+        getPost(node);
     }
 
     @Override
     public void visit(KxiMult node) {
         newLine();
         comment("Mult R1 and R2, result in R2");
-        deref(node.getExpressionL());
-        deref(node.getExpressionR());
-        twoReg(MUL, R1, R2);
-        twoReg(MOV, R2, R1);
+        assembleBinaryOp(MUL, node.getExpressionL(), node.getExpressionR(), node.getTempId());
+        getPost(node);
     }
 
     @Override
@@ -451,6 +245,8 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
 
         newLine();
         comment("R1 < R2, result in R2");
+        evaluateTempVar(node.getExpressionL());
+        evaluateTempVar(node.getExpressionR());
         deref(node.getExpressionL());
         deref(node.getExpressionR());
         twoReg(CMP, R1, R2);
@@ -463,6 +259,8 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
         regImmInt(MOVI, R1, -1);
         label(done);
         twoReg(MOV, R2, R1);
+        initTempVar(node.getTempId());
+        getPost(node);
     }
 
     @Override
@@ -474,6 +272,8 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
 
         newLine();
         comment("R1 > R2, result in R2");
+        evaluateTempVar(node.getExpressionL());
+        evaluateTempVar(node.getExpressionR());
         deref(node.getExpressionL());
         deref(node.getExpressionR());
         twoReg(CMP, R1, R2);
@@ -486,6 +286,8 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
         regImmInt(MOVI, R1, -1);
         label(done);
         twoReg(MOV, R2, R1);
+        initTempVar(node.getTempId());
+        getPost(node);
     }
 
     @Override
@@ -497,6 +299,8 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
         String done = uniqueLabel(hash) + "_done";
         newLine();
         comment("R1 == R2, result in R2");
+        evaluateTempVar(node.getExpressionL());
+        evaluateTempVar(node.getExpressionR());
         deref(node.getExpressionL());
         deref(node.getExpressionR());
         twoReg(CMP, R1, R2);
@@ -513,6 +317,8 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
         regImmInt(MOVI, R1, -1);
         label(done);
         twoReg(MOV, R2, R1);
+        initTempVar(node.getTempId());
+        getPost(node);
     }
 
     @Override
@@ -525,6 +331,8 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
 
         newLine();
         comment("R1 >= R2, result in R2");
+        evaluateTempVar(node.getExpressionL());
+        evaluateTempVar(node.getExpressionR());
         deref(node.getExpressionL());
         deref(node.getExpressionR());
         twoReg(CMP, R1, R2);
@@ -539,6 +347,8 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
         regImmInt(MOVI, R1, -1);
         label(done);
         twoReg(MOV, R2, R1);
+        initTempVar(node.getTempId());
+        getPost(node);
     }
 
     @Override
@@ -551,6 +361,8 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
 
         newLine();
         comment("R1 <= R2, result in R2");
+        evaluateTempVar(node.getExpressionL());
+        evaluateTempVar(node.getExpressionR());
         deref(node.getExpressionL());
         deref(node.getExpressionR());
         twoReg(CMP, R1, R2);
@@ -565,6 +377,9 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
         regImmInt(MOVI, R1, -1);
         label(done);
         twoReg(MOV, R2, R1);
+        initTempVar(node.getTempId());
+        getPost(node);
+
     }
 
     @Override
@@ -572,10 +387,14 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
 
         newLine();
         comment("R1 AND R2, result in R2");
+        evaluateTempVar(node.getExpressionL());
+        evaluateTempVar(node.getExpressionR());
         deref(node.getExpressionL());
         deref(node.getExpressionR());
         twoReg(AND, R1, R2);
         twoReg(MOV, R2, R1);
+        initTempVar(node.getTempId());
+        getPost(node);
     }
 
     @Override
@@ -583,10 +402,15 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
 
         newLine();
         comment("R1 OR R2, result in R2");
+        evaluateTempVar(node.getExpressionL());
+        evaluateTempVar(node.getExpressionR());
         deref(node.getExpressionL());
         deref(node.getExpressionR());
         twoReg(OR, R1, R2);
         twoReg(MOV, R2, R1);
+        initTempVar(node.getTempId());
+        getPost(node);
+
     }
 
     @Override
@@ -594,9 +418,13 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
         newLine();
         comment("R1 NOT R2, result in R2");
         regImmInt(MOVI, R1, -1);
+        evaluateTempVar(node.getExpression());
         deref(node.getExpression());
         twoReg(NOT, R1, R2);
         twoReg(MOV, R2, R1);
+        initTempVar(node.getTempId());
+        getPost(node);
+
     }
 
     @Override
@@ -607,6 +435,8 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
         String done = uniqueLabel(hash) + "_done";
         newLine();
         comment("R1 != R2, result in R2");
+        evaluateTempVar(node.getExpressionL());
+        evaluateTempVar(node.getExpressionR());
         deref(node.getExpressionL());
         deref(node.getExpressionR());
         twoReg(CMP, R1, R2);
@@ -619,6 +449,9 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
         regImmInt(MOVI, R1, 1);
         label(done);
         twoReg(MOV, R2, R1);
+        initTempVar(node.getTempId());
+        getPost(node);
+
     }
 
     @Override
@@ -636,10 +469,15 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
         newLine();
         twoReg(MOV, R1, R14);
         comment("Negate R2");
+        evaluateTempVar(node.getExpression());
         deref(node.getExpression());
         regImmInt(MOVI, R0, -1);
         twoReg(MUL, R2, R0);
         twoReg(STRI, R2, R1);
+        initTempVar(node.getTempId());
+        getPost(node);
+
+
     }
 
     @Override
@@ -650,14 +488,18 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
         comment("str R2 into R1");
         deref(node.getExpressionR());
         twoReg(STRI, R2, R1);
+        getPost(node);
+
     }
 
     @Override
     public void preVisit(KxiSwitchStatement node) {
         newLine();
         comment("Set R5 to hold the switch value for cases");
+        evaluateTempVar(node.getExpression());
         deref(node.getExpression());
         twoReg(MOV, R5, R2);
+        getPre(node);
     }
 
     @Override
@@ -665,6 +507,8 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
         newLine();
         comment("Exit for switch");
         label(node.getExitLoop());
+        getPost(node);
+
     }
 
 //    @Override
@@ -684,6 +528,7 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
         twoReg(CMP, R2, R5);
         regAndLabel(BGT, R2, node.getExit());
         regAndLabel(BLT, R2, node.getExit());
+        getPre(node);
     }
 
     @Override
@@ -691,6 +536,8 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
         newLine();
         comment("Case block");
         label(node.getExit());
+        getPost(node);
+
     }
 
     @Override
@@ -702,6 +549,7 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
         twoReg(CMP, R2, R5);
         regAndLabel(BGT, R2, node.getExit());
         regAndLabel(BLT, R2, node.getExit());
+        getPre(node);
     }
 
     @Override
@@ -709,6 +557,8 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
         newLine();
         comment("Case block");
         label(node.getExit());
+        getPost(node);
+
     }
 
     @Override
@@ -721,12 +571,16 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
 
         if (node.isLeft()) leftLit(expressionIntLit);
         else rightLit(expressionIntLit);
+        getPost(node);
+
     }
 
     @Override
     public void visit(ExpressionCharLit node) {
         if (node.isLeft()) leftLit(node);
         else rightLit(node);
+        getPost(node);
+
     }
 
     @Override
@@ -738,12 +592,16 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
             if (node.isLeft()) lefStackVar(node);
             else rightStackVar(node);
         }
+        getPost(node);
+
     }
 
     @Override
     public void visit(ExpressionIntLit node) {
         if (node.isLeft()) leftLit(node);
         else rightLit(node);
+        getPost(node);
+
     }
 
     @Override
@@ -754,6 +612,8 @@ public class InterToAssemblyVisitor extends KxiVisitorBase {
 
         if (node.isLeft()) leftLit(expressionIntLit);
         else rightLit(expressionIntLit);
+        getPost(node);
+
     }
 
 

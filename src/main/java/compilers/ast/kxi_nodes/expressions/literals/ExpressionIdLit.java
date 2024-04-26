@@ -13,6 +13,7 @@ public class ExpressionIdLit extends ExpressionLiteral<IdentifierToken> {
     ScalarType scalarType;
     public ExpressionIdLit(IdentifierToken tokenLiteral) {
         super(tokenLiteral);
+        id = tokenLiteral.getValue();
     }
 
     @Override

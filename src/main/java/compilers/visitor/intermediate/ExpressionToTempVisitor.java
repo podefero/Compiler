@@ -58,7 +58,7 @@ public class ExpressionToTempVisitor extends KxiVisitorBase {
 
         //create temp var
         ExpressionIdLit tempVariable = new ExpressionIdLit(new IdentifierToken("temp$" + HashString.updateStringHash()));
-        binaryOp.setTempId(tempVariable.getId());
+        binaryOp.setTempId(tempVariable);
         tempVars.add(tempVariable);
 
         //assign LH and RH
@@ -73,7 +73,7 @@ public class ExpressionToTempVisitor extends KxiVisitorBase {
         right.setLeft(false);
 
         ExpressionIdLit tempVariable = new ExpressionIdLit(new IdentifierToken("temp$" + HashString.updateStringHash()));
-        uniOp.setTempId(tempVariable.getId());
+        uniOp.setTempId(tempVariable);
         tempVars.add(tempVariable);
 
         uniOp.setExpression(right);
@@ -238,6 +238,7 @@ public class ExpressionToTempVisitor extends KxiVisitorBase {
 
     @Override
     public void visit(KxiVariableDeclaration node) {
+        tempVars.add(new ExpressionIdLit(node.getIdToken()));
         if (node.getInitializer() != null) {
             node.setInitializer(valueStack.pop());
         }
