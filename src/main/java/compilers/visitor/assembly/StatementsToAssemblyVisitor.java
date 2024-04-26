@@ -359,6 +359,9 @@ public class StatementsToAssemblyVisitor extends KxiVisitorBase {
 
     @Override
     public void visit(KxiVariableDeclaration node) {
+        if(node.getType().getScalarType() == ScalarType.BOOL && node.getInitializer() == null) {
+            regImmInt(MOVI, R2, -1);
+        }
         //assign R1 to result of R2
         newLine();
         appendAssembly(node);

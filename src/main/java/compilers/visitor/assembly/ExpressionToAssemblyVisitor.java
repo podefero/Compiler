@@ -13,7 +13,7 @@ import compilers.ast.kxi_nodes.expressions.binary.arithmic.KxiDiv;
 import compilers.ast.kxi_nodes.expressions.binary.arithmic.KxiMult;
 import compilers.ast.kxi_nodes.expressions.binary.arithmic.KxiPlus;
 import compilers.ast.kxi_nodes.expressions.binary.arithmic.KxiSubtract;
-import compilers.ast.kxi_nodes.expressions.binary.assignment.KxiEquals;
+import compilers.ast.kxi_nodes.expressions.binary.assignment.*;
 import compilers.ast.kxi_nodes.expressions.binary.conditional.*;
 import compilers.ast.kxi_nodes.expressions.literals.*;
 import compilers.ast.kxi_nodes.expressions.uni.KxiNot;
@@ -177,7 +177,7 @@ public class ExpressionToAssemblyVisitor extends KxiVisitorBase {
     }
 
 
-    void deref(AbstractKxiExpression expression) {
+    void deref(AbstractKxiExpression expression, boolean left) {
         ExpressionIdLit expressionIdLit;
         if (expression instanceof ExpressionIdLit) {
             expressionIdLit = (ExpressionIdLit) expression;
@@ -185,7 +185,7 @@ public class ExpressionToAssemblyVisitor extends KxiVisitorBase {
             if (scalarType != ScalarType.STRING) {
 
                 comment("Deref stack var");
-                if (expressionIdLit.isLeft()) twoReg(LDRI, R1, R1);
+                if (left) twoReg(LDRI, R1, R1);
                 else twoReg(LDRI, R2, R2);
             }
         }
@@ -200,24 +200,24 @@ public class ExpressionToAssemblyVisitor extends KxiVisitorBase {
         twoReg(STRI, R2, R14);
     }
 
-    void evaluateTempVar(AbstractKxiExpression expressionLiteral) {
+    void evaluateTempVar(AbstractKxiExpression expressionLiteral, boolean left) {
         if (expressionLiteral instanceof ExpressionIdLit) {
             ExpressionIdLit node = (ExpressionIdLit) expressionLiteral;
             if (node.getScalarType() == ScalarType.STRING) {
-                if (node.isLeft()) leftPtrVar(node);
+                if (left) leftPtrVar(node);
                 else rightPtrVar(node);
             } else {
-                if (node.isLeft()) lefStackVar(node);
+                if (left) lefStackVar(node);
                 else rightStackVar(node);
             }
         }
     }
 
     void assembleBinaryOp(OpCodes opCodes, AbstractKxiExpression expressionL, AbstractKxiExpression expressionR, ExpressionIdLit idLit) {
-        evaluateTempVar(expressionL);
-        evaluateTempVar(expressionR);
-        deref(expressionL);
-        deref(expressionR);
+        evaluateTempVar(expressionL, true);
+        evaluateTempVar(expressionR, false);
+        deref(expressionL, true);
+        deref(expressionR, false);
         twoReg(opCodes, R1, R2);
         twoReg(MOV, R2, R1);
         initTempVar(idLit);
@@ -285,12 +285,53 @@ public class ExpressionToAssemblyVisitor extends KxiVisitorBase {
         setCurrentScope(node);
     }
 
+    void binaryAssign(AbstractKxiExpression left, AbstractKxiExpression right) {
+        newLine();
+        comment("Binary assign");
+        evaluateTempVar(left, true);
+        evaluateTempVar(right, false);
+        deref(right, false);
+        twoReg(STRI, R2, R1);
+    }
+
 
     @Override
     public void visit(KxiPlus node) {
         newLine();
         comment("Add R1 and R2, result in R2");
         assembleBinaryOp(ADD, node.getExpressionL(), node.getExpressionR(), node.getTempId());
+    }
+
+    @Override
+    public void visit(KxiPlusEquals node) {
+        newLine();
+        comment("+= R1 and R2, result in R2");
+        assembleBinaryOp(ADD, node.getExpressionL(), node.getExpressionR(), node.getTempId());
+        binaryAssign(node.getExpressionL(), node.getTempId());
+    }
+
+    @Override
+    public void visit(KxiSubtractEquals node) {
+        newLine();
+        comment("-= R1 and R2, result in R2");
+        assembleBinaryOp(SUB, node.getExpressionL(), node.getExpressionR(), node.getTempId());
+        binaryAssign(node.getExpressionL(), node.getTempId());
+    }
+
+    @Override
+    public void visit(KxiDivEquals node) {
+        newLine();
+        comment("/= R1 and R2, result in R2");
+        assembleBinaryOp(DIV, node.getExpressionL(), node.getExpressionR(), node.getTempId());
+        binaryAssign(node.getExpressionL(), node.getTempId());
+    }
+
+    @Override
+    public void visit(KxiMultEquals node) {
+        newLine();
+        comment("*= R1 and R2, result in R2");
+        assembleBinaryOp(MUL, node.getExpressionL(), node.getExpressionR(), node.getTempId());
+        binaryAssign(node.getExpressionL(), node.getTempId());
     }
 
     @Override
@@ -323,10 +364,10 @@ public class ExpressionToAssemblyVisitor extends KxiVisitorBase {
 
         newLine();
         comment("R1 < R2, result in R2");
-        evaluateTempVar(node.getExpressionL());
-        evaluateTempVar(node.getExpressionR());
-        deref(node.getExpressionL());
-        deref(node.getExpressionR());
+        evaluateTempVar(node.getExpressionL(), true);
+        evaluateTempVar(node.getExpressionR(), false);
+        deref(node.getExpressionL(), true);
+        deref(node.getExpressionR(), false);
         twoReg(CMP, R1, R2);
         regAndLabel(BLT, R1, ifTrue);
         regLabel(JMP, ifNot);
@@ -349,10 +390,10 @@ public class ExpressionToAssemblyVisitor extends KxiVisitorBase {
 
         newLine();
         comment("R1 > R2, result in R2");
-        evaluateTempVar(node.getExpressionL());
-        evaluateTempVar(node.getExpressionR());
-        deref(node.getExpressionL());
-        deref(node.getExpressionR());
+        evaluateTempVar(node.getExpressionL(), true);
+        evaluateTempVar(node.getExpressionR(), false);
+        deref(node.getExpressionL(), true);
+        deref(node.getExpressionR(), false);
         twoReg(CMP, R1, R2);
         regAndLabel(BGT, R1, ifTrue);
         regLabel(JMP, ifNot);
@@ -375,10 +416,10 @@ public class ExpressionToAssemblyVisitor extends KxiVisitorBase {
         String done = uniqueLabel(hash) + "_done";
         newLine();
         comment("R1 == R2, result in R2");
-        evaluateTempVar(node.getExpressionL());
-        evaluateTempVar(node.getExpressionR());
-        deref(node.getExpressionL());
-        deref(node.getExpressionR());
+        evaluateTempVar(node.getExpressionL(), true);
+        evaluateTempVar(node.getExpressionR(), false);
+        deref(node.getExpressionL(), true);
+        deref(node.getExpressionR(), false);
         twoReg(CMP, R1, R2);
         comment("If zero set true");
         regAndLabel(BRZ, R1, ifTrue);
@@ -406,10 +447,10 @@ public class ExpressionToAssemblyVisitor extends KxiVisitorBase {
 
         newLine();
         comment("R1 >= R2, result in R2");
-        evaluateTempVar(node.getExpressionL());
-        evaluateTempVar(node.getExpressionR());
-        deref(node.getExpressionL());
-        deref(node.getExpressionR());
+        evaluateTempVar(node.getExpressionL(), true);
+        evaluateTempVar(node.getExpressionR(), false);
+        deref(node.getExpressionL(), true);
+        deref(node.getExpressionR(), false);
         twoReg(CMP, R1, R2);
         comment("If zero set true");
         regAndLabel(BRZ, R1, ifTrue);
@@ -435,10 +476,10 @@ public class ExpressionToAssemblyVisitor extends KxiVisitorBase {
 
         newLine();
         comment("R1 <= R2, result in R2");
-        evaluateTempVar(node.getExpressionL());
-        evaluateTempVar(node.getExpressionR());
-        deref(node.getExpressionL());
-        deref(node.getExpressionR());
+        evaluateTempVar(node.getExpressionL(), true);
+        evaluateTempVar(node.getExpressionR(), false);
+        deref(node.getExpressionL(), true);
+        deref(node.getExpressionR(), false);
         twoReg(CMP, R1, R2);
         comment("If zero set true");
         regAndLabel(BRZ, R1, ifTrue);
@@ -460,10 +501,10 @@ public class ExpressionToAssemblyVisitor extends KxiVisitorBase {
 
         newLine();
         comment("R1 AND R2, result in R2");
-        evaluateTempVar(node.getExpressionL());
-        evaluateTempVar(node.getExpressionR());
-        deref(node.getExpressionL());
-        deref(node.getExpressionR());
+        evaluateTempVar(node.getExpressionL(), true);
+        evaluateTempVar(node.getExpressionR(), false);
+        deref(node.getExpressionL(), true);
+        deref(node.getExpressionR(), false);
         twoReg(AND, R1, R2);
         twoReg(MOV, R2, R1);
         initTempVar(node.getTempId());
@@ -474,10 +515,10 @@ public class ExpressionToAssemblyVisitor extends KxiVisitorBase {
 
         newLine();
         comment("R1 OR R2, result in R2");
-        evaluateTempVar(node.getExpressionL());
-        evaluateTempVar(node.getExpressionR());
-        deref(node.getExpressionL());
-        deref(node.getExpressionR());
+        evaluateTempVar(node.getExpressionL(), true);
+        evaluateTempVar(node.getExpressionR(), false);
+        deref(node.getExpressionL(), true);
+        deref(node.getExpressionR(), false);
         twoReg(OR, R1, R2);
         twoReg(MOV, R2, R1);
         initTempVar(node.getTempId());
@@ -489,8 +530,8 @@ public class ExpressionToAssemblyVisitor extends KxiVisitorBase {
         newLine();
         comment("R1 NOT R2, result in R2");
         regImmInt(MOVI, R1, -1);
-        evaluateTempVar(node.getExpression());
-        deref(node.getExpression());
+        evaluateTempVar(node.getExpression(), false);
+        deref(node.getExpression(), false);
         twoReg(NOT, R1, R2);
         twoReg(MOV, R2, R1);
         initTempVar(node.getTempId());
@@ -505,10 +546,10 @@ public class ExpressionToAssemblyVisitor extends KxiVisitorBase {
         String done = uniqueLabel(hash) + "_done";
         newLine();
         comment("R1 != R2, result in R2");
-        evaluateTempVar(node.getExpressionL());
-        evaluateTempVar(node.getExpressionR());
-        deref(node.getExpressionL());
-        deref(node.getExpressionR());
+        evaluateTempVar(node.getExpressionL(), true);
+        evaluateTempVar(node.getExpressionR(), false);
+        deref(node.getExpressionL(), true);
+        deref(node.getExpressionR(), false);
         twoReg(CMP, R1, R2);
         regAndLabel(BRZ, R1, ifZero);
         regLabel(JMP, ifNot);
@@ -538,14 +579,12 @@ public class ExpressionToAssemblyVisitor extends KxiVisitorBase {
         newLine();
         twoReg(MOV, R1, R14);
         comment("Negate R2");
-        evaluateTempVar(node.getExpression());
-        deref(node.getExpression());
+        evaluateTempVar(node.getExpression(), false);
+        deref(node.getExpression(), false);
         regImmInt(MOVI, R0, -1);
         twoReg(MUL, R2, R0);
         twoReg(STRI, R2, R1);
         initTempVar(node.getTempId());
-
-
     }
 
     @Override
@@ -554,9 +593,9 @@ public class ExpressionToAssemblyVisitor extends KxiVisitorBase {
         newLine();
         comment("Assignment");
         comment("str R2 into R1");
-        evaluateTempVar(node.getExpressionL());
-        evaluateTempVar(node.getExpressionR());
-        deref(node.getExpressionR());
+        evaluateTempVar(node.getExpressionL(), true);
+        evaluateTempVar(node.getExpressionR(), false);
+        deref(node.getExpressionR(), false);
         twoReg(STRI, R2, R1);
 
     }
@@ -569,7 +608,6 @@ public class ExpressionToAssemblyVisitor extends KxiVisitorBase {
 //        tryDerefInterOperand(node.getRightOperand());
 //        leftOp(PUSH, R2);
 //    }
-
 
 
     @Override
@@ -592,11 +630,11 @@ public class ExpressionToAssemblyVisitor extends KxiVisitorBase {
 
     }
 
-    @Override
-    public void visit(ExpressionIdLit node) {
-        if (node.isLeft()) lefStackVar(node);
-        else rightStackVar(node);
-    }
+//    @Override
+//    public void visit(ExpressionIdLit node) {
+//        if (node.isLeft()) lefStackVar(node);
+//        else rightStackVar(node);
+//    }
 
     @Override
     public void visit(ExpressionIntLit node) {
@@ -652,7 +690,7 @@ public class ExpressionToAssemblyVisitor extends KxiVisitorBase {
         if (interLit.getScalarType() == ScalarType.INT)
             regImmInt(MOVI, R2, (Integer) interLit.getValue());
         else if (interLit.getScalarType() == ScalarType.CHAR)
-            regImmInt(MOVI, R2, (Character) interLit.getValue());
+            regImmChar(MOVI, R2, (Character) interLit.getValue());
     }
 
     public void lefStackVar(ExpressionIdLit node) {
@@ -676,7 +714,7 @@ public class ExpressionToAssemblyVisitor extends KxiVisitorBase {
         if (interLit.getScalarType() == ScalarType.INT)
             regImmInt(MOVI, R1, (Integer) interLit.getValue());
         else if (interLit.getScalarType() == ScalarType.CHAR)
-            regImmInt(MOVI, R1, (Character) interLit.getValue());
+            regImmChar(MOVI, R1, (Character) interLit.getValue());
     }
 
     @Override

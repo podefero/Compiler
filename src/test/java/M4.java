@@ -88,6 +88,15 @@ public class M4 {
     }
 
     @Test
+    void validUnarySimp4() {
+        test("//UnaryPLUS\n" +
+                "void main() {\n" +
+                "    char i = 'k';\n" +
+                "    cout << i; //should print int value of k 107\n" +
+                "}", false);
+    }
+
+    @Test
     void simpleAddition() {
         test("//UnaryPLUS\n" +
                 "void main() {\n" +
@@ -96,6 +105,7 @@ public class M4 {
                 "    cout << i; \n" +
                 "}", false);
     }
+
 
     @Test
     void simpleArithmic() {
@@ -1159,6 +1169,31 @@ public class M4 {
                 "  } else {\n" +
                 "    cout << 33;\n" +
                 "  }\n" +
+                "}", false);
+    }
+
+    @Test
+    void simplePlusEqual() {
+        test("void main() {\n" +
+                "   int x = 0;\n" +
+                "   x += 1;\n" +
+                "   cout << x;\n" +
+                "}", false);
+    }
+    @Test
+    void simplePlusEqualTwo() {
+        test("void main() {\n" +
+                "   int x = 2;\n" +
+                "   x += x;\n" +
+                "   cout << x;\n" +
+                "}", false);
+    }
+    @Test
+    void simplePlusEqualThree() {
+        test("void main() {\n" +
+                "   int x = 2;\n" +
+                "   x += x += x;\n" +
+                "   cout << x;\n" +
                 "}", false);
     }
 

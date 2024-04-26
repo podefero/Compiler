@@ -69,14 +69,14 @@ public class ExpressionToTempVisitor extends KxiVisitorBase {
     }
 
     private void setUnaryOp(AbstractKxiUniOperation uniOp) {
-        ExpressionLiteral right = valueStack.pop();
-        right.setLeft(false);
+        //ExpressionLiteral right = valueStack.pop();
 
         ExpressionIdLit tempVariable = new ExpressionIdLit(new IdentifierToken("temp$" + HashString.updateStringHash()));
+        tempVariable.setScalarType(ScalarType.INT);
         uniOp.setTempId(tempVariable);
         tempVars.add(tempVariable);
 
-        uniOp.setExpression(right);
+        //uniOp.setExpression(right);
         valueStack.push(tempVariable);
     }
 

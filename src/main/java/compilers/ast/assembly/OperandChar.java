@@ -8,5 +8,6 @@ public class OperandChar extends Operand {
 
     public OperandChar(char character) {
         this.character = character;
+        this.value = "\'" + character +"\'";
     }
 }
