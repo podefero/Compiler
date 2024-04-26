@@ -8,6 +8,19 @@ public class OperandChar extends Operand {
 
     public OperandChar(char character) {
         this.character = character;
-        this.value = "\'" + character +"\'";
+        switch(character) {
+            case '\n':
+                this.value = "'\\n'";
+                break;
+            case '\r':
+                this.value = "'\\r'";
+                break;
+            case '\t':
+                this.value = "'\\t'";
+                break;
+            default:
+                this.value = "'" + character + "'";
+                break;
+        }
     }
 }

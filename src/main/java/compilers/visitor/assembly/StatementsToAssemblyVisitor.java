@@ -314,7 +314,7 @@ public class StatementsToAssemblyVisitor extends KxiVisitorBase {
         newLine();
         comment("Start of loop");
         label(node.getLoopLabel());
-        appendAssembly(node.getPreExpression());
+        if(node.getPreExpression() != null)appendAssembly(node.getPreExpression());
         appendAssembly(node);
         newLine();
         comment("Set up for while loop");
@@ -326,7 +326,7 @@ public class StatementsToAssemblyVisitor extends KxiVisitorBase {
     @Override
     public void visit(KxiForStatement node) {
         newLine();
-        appendAssembly(node.getPostExpression());
+        if(node.getPostExpression()!=null)appendAssembly(node.getPostExpression());
         comment("End of while loop");
         regLabel(JMP, node.getLoopLabel());
         label(node.getExitLoop());
@@ -398,13 +398,13 @@ public class StatementsToAssemblyVisitor extends KxiVisitorBase {
             newLine();
             comment("CIN input Integer");
             trap(2);
-            twoReg(MOV, R2, R3);
         } else {
             newLine();
             comment("CIN input char");
             trap(4);
-            twoReg(MOV, R2, R3);
         }
+        evaluateTempVar(node.getExpression());
+        twoReg(STRI, R3, R2);
     }
 
     @Override

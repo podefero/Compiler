@@ -577,7 +577,6 @@ public class ExpressionToAssemblyVisitor extends KxiVisitorBase {
     @Override
     public void visit(KxiUniSubtract node) {
         newLine();
-        twoReg(MOV, R1, R14);
         comment("Negate R2");
         evaluateTempVar(node.getExpression(), false);
         deref(node.getExpression(), false);

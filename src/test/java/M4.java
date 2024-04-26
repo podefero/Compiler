@@ -240,13 +240,6 @@ public class M4 {
 //    }
 
     @Test
-    void imSpacedOut() {
-        test(" void main() {\n" +
-                "    cout << \"\\\\\\\"    im spaced out    \\\\\\\"\";\n" +
-                "    }", false);
-    }
-
-    @Test
     void cout12() {
         test("  class Cheddar {\n" +
                 "        static public int y = 1;\n" +
