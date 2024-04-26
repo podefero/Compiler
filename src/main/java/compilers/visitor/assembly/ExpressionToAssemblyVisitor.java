@@ -571,45 +571,6 @@ public class ExpressionToAssemblyVisitor extends KxiVisitorBase {
 //    }
 
 
-    @Override
-    public void preVisit(KxiCaseInt node) {
-        newLine();
-        comment("Evaluate case " + node.getCaseValue().getValue());
-
-        regImmInt(MOVI, R2, node.getCaseValue().getValue());
-        twoReg(CMP, R2, R5);
-        regAndLabel(BGT, R2, node.getExit());
-        regAndLabel(BLT, R2, node.getExit());
-        getPre(node);
-    }
-
-    @Override
-    public void visit(KxiCaseInt node) {
-        newLine();
-        comment("Case block");
-        label(node.getExit());
-
-    }
-
-    @Override
-    public void preVisit(KxiCaseChar node) {
-        newLine();
-        comment("Evaluate case " + node.getCaseValue().getValue());
-
-        regImmInt(MOVI, R2, node.getCaseValue().getValue());
-        twoReg(CMP, R2, R5);
-        regAndLabel(BGT, R2, node.getExit());
-        regAndLabel(BLT, R2, node.getExit());
-        getPre(node);
-    }
-
-    @Override
-    public void visit(KxiCaseChar node) {
-        newLine();
-        comment("Case block");
-        label(node.getExit());
-
-    }
 
     @Override
     public void visit(ExpressionBoolLit node) {

@@ -6,6 +6,7 @@ import compilers.ast.kxi_nodes.scope.KxiBlock;
 import compilers.ast.kxi_nodes.scope.KxiCaseBlock;
 import compilers.ast.kxi_nodes.statements.KxiBreakStatement;
 import compilers.ast.kxi_nodes.statements.KxiReturnStatement;
+import compilers.ast.kxi_nodes.statements.KxiSwitchStatement;
 import compilers.ast.kxi_nodes.statements.conditional.KxiForStatement;
 import compilers.ast.kxi_nodes.statements.conditional.KxiWhileStatement;
 import compilers.visitor.kxi.KxiVisitorBase;
@@ -45,7 +46,7 @@ public class BreakAndReturnsVisitor extends KxiVisitorBase {
     }
 
     @Override
-    public void preVisit(KxiCaseBlock node) {
+    public void preVisit(KxiSwitchStatement node) {
         breakLoopStack.push(node.getExitLoop());
     }
 
@@ -60,7 +61,7 @@ public class BreakAndReturnsVisitor extends KxiVisitorBase {
     }
 
     @Override
-    public void visit(KxiCaseBlock node) {
+    public void visit(KxiSwitchStatement node) {
         breakLoopStack.pop();
     }
 

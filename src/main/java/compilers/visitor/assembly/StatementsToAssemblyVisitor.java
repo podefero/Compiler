@@ -23,6 +23,7 @@ import compilers.ast.kxi_nodes.expressions.uni.KxiUniSubtract;
 import compilers.ast.kxi_nodes.scope.KxiBlock;
 import compilers.ast.kxi_nodes.statements.*;
 import compilers.ast.kxi_nodes.statements.conditional.KxiElseStatement;
+import compilers.ast.kxi_nodes.statements.conditional.KxiForStatement;
 import compilers.ast.kxi_nodes.statements.conditional.KxiIfStatement;
 import compilers.ast.kxi_nodes.statements.conditional.KxiWhileStatement;
 import compilers.ast.kxi_nodes.token_literals.IdentifierToken;
@@ -144,28 +145,10 @@ public class StatementsToAssemblyVisitor extends KxiVisitorBase {
         assemblyList.add(new OperandLabelWrapper(comment));
     }
 
-    void getPre(AbstractKxiNode node) {
-        List<AbstractAssembly> temp = new ArrayList<>(assemblyList);
-        assemblyList.clear();
-        node.getAssemblyBlock().setPreBlock(temp);
-    }
 
     void appendAssembly(AbstractKxiNode node) {
         assemblyList.addAll(node.getAssemblyBlock().combineBlocks());
     }
-
-    void appendMultiBody(AbstractKxiNode node, List<? extends AbstractKxiNode> otherNode) {
-        for (AbstractKxiNode n : otherNode) {
-            node.getAssemblyBlock().getBodyBlock().addAll(n.getAssemblyBlock().combineBlocks());
-        }
-    }
-
-    void getPost(AbstractKxiNode node) {
-        List<AbstractAssembly> temp = new ArrayList<>(assemblyList);
-        assemblyList.clear();
-        node.getAssemblyBlock().setPostBlock(temp);
-    }
-
 
     @Override
     public void preVisit(KxiMain node) {
@@ -326,6 +309,29 @@ public class StatementsToAssemblyVisitor extends KxiVisitorBase {
         label(node.getExitLoop());
     }
 
+    @Override
+    public void preVisit(KxiForStatement node) {
+        newLine();
+        comment("Start of loop");
+        label(node.getLoopLabel());
+        appendAssembly(node.getPreExpression());
+        appendAssembly(node);
+        newLine();
+        comment("Set up for while loop");
+        deref(node.getConditionalExpression());
+        regAndLabel(BLT, R2, node.getExitLoop());
+    }
+
+
+    @Override
+    public void visit(KxiForStatement node) {
+        newLine();
+        appendAssembly(node.getPostExpression());
+        comment("End of while loop");
+        regLabel(JMP, node.getLoopLabel());
+        label(node.getExitLoop());
+    }
+
 
     @Override
     public void visit(KxiReturnStatement node) {
@@ -402,7 +408,7 @@ public class StatementsToAssemblyVisitor extends KxiVisitorBase {
     public void preVisit(KxiSwitchStatement node) {
         newLine();
         comment("Set R5 to hold the switch value for cases");
-        evaluateTempVar(node.getExpression());
+        appendAssembly(node);
         deref(node.getExpression());
         twoReg(MOV, R5, R2);
     }

@@ -257,6 +257,8 @@ public class ExpressionToTempVisitor extends KxiVisitorBase {
 
             node.setExpressionL(left);
             node.setExpressionR(right);
+
+            valueStack.push(left);
         }
     }
 

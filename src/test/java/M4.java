@@ -361,6 +361,17 @@ public class M4 {
     }
 
     @Test
+    void forLoop() {
+        test("void main() {\n" +
+                "   int x = 0;\n" +
+                "   for(x; x < 10; x = x +1) {\n" +
+                "    cout << x;\n" +
+                "   }\n" +
+                "\n" +
+                "}", false);
+    }
+
+    @Test
     void whileLoopTwo() {
         test("void main() {\n" +
                 "   int x = 10;\n" +
