@@ -20,6 +20,7 @@ import compilers.ast.kxi_nodes.expressions.binary.conditional.*;
 import compilers.ast.kxi_nodes.expressions.literals.*;
 import compilers.ast.kxi_nodes.expressions.uni.KxiNot;
 import compilers.ast.kxi_nodes.expressions.uni.KxiUniSubtract;
+import compilers.ast.kxi_nodes.scope.KxiBlock;
 import compilers.ast.kxi_nodes.statements.*;
 import compilers.ast.kxi_nodes.statements.conditional.KxiElseStatement;
 import compilers.ast.kxi_nodes.statements.conditional.KxiIfStatement;
@@ -243,6 +244,7 @@ public class StatementsToAssemblyVisitor extends KxiVisitorBase {
         ExpressionIdLit expressionIdLit;
         if (expression instanceof ExpressionIdLit) {
             expressionIdLit = (ExpressionIdLit) expression;
+            evaluateTempVar(expressionIdLit);
             ScalarType scalarType = expressionIdLit.getScalarType();
             if (scalarType != ScalarType.STRING) {
 
@@ -258,7 +260,7 @@ public class StatementsToAssemblyVisitor extends KxiVisitorBase {
         newLine();
         comment("Set up for if statement");
         appendAssembly(node);
-        evaluateTempVar(node.getConditionalExpression());
+        //evaluateTempVar(node.getConditionalExpression());
         deref(node.getConditionalExpression());
         if (node.getElseStatement() != null)
             regAndLabel(BLT, R2, node.getIfNot());
@@ -297,12 +299,18 @@ public class StatementsToAssemblyVisitor extends KxiVisitorBase {
         getPost(interBreak);
     }
 
+    @Override
+    public void visit(KxiExpressionStatement node) {
+        appendAssembly(node);
+    }
 
     @Override
     public void preVisit(KxiWhileStatement node) {
         newLine();
         comment("Start of loop");
         label(node.getLoopLabel());
+        appendAssembly(node);
+        newLine();
         comment("Set up for while loop");
         deref(node.getConditionalExpression());
         regAndLabel(BLT, R2, node.getExitLoop());
@@ -346,6 +354,7 @@ public class StatementsToAssemblyVisitor extends KxiVisitorBase {
     public void visit(KxiVariableDeclaration node) {
         //assign R1 to result of R2
         newLine();
+        appendAssembly(node);
         comment("Initializing Variable " + node.getId());
         comment("Get ptr to var");
         getFP();

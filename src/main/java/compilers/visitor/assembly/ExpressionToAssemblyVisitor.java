@@ -240,29 +240,29 @@ public class ExpressionToAssemblyVisitor extends KxiVisitorBase {
     }
 
     @Override
-    public void visit(KxiWhileStatement node) {
-        getBody(node.getConditionalExpression());
+    public void preVisit(KxiWhileStatement node) {
+        setCurrentScope(node);
     }
 
     @Override
-    public void visit(KxiPreForExpression node) {
-        getBody(node.getExpression());
+    public void preVisit(KxiPreForExpression node) {
+        setCurrentScope(node);
     }
 
     @Override
-    public void visit(KxiPostForExpression node) {
-        getBody(node.getExpression());
+    public void preVisit(KxiPostForExpression node) {
+        setCurrentScope(node);
     }
 
     @Override
-    public void visit(KxiForStatement node) {
-        getBody(node.getConditionalExpression());
+    public void preVisit(KxiForStatement node) {
+        setCurrentScope(node);
     }
 
     @Override
-    public void visit(KxiReturnStatement node) {
+    public void preVisit(KxiReturnStatement node) {
         if (node.getExpression() != null)
-            getBody(node.getExpression());
+            setCurrentScope(node);
     }
 
     @Override
@@ -271,18 +271,18 @@ public class ExpressionToAssemblyVisitor extends KxiVisitorBase {
     }
 
     @Override
-    public void visit(KxiCinStatement node) {
-        getBody(node.getExpression());
+    public void preVisit(KxiCinStatement node) {
+        setCurrentScope(node);
     }
 
     @Override
-    public void visit(KxiSwitchStatement node) {
-        getBody(node.getExpression());
+    public void preVisit(KxiSwitchStatement node) {
+        setCurrentScope(node);
     }
 
     @Override
-    public void visit(KxiExpressionStatement node) {
-        getBody(node.getExpression());
+    public void preVisit(KxiExpressionStatement node) {
+        setCurrentScope(node);
     }
 
 
@@ -554,6 +554,8 @@ public class ExpressionToAssemblyVisitor extends KxiVisitorBase {
         newLine();
         comment("Assignment");
         comment("str R2 into R1");
+        evaluateTempVar(node.getExpressionL());
+        evaluateTempVar(node.getExpressionR());
         deref(node.getExpressionR());
         twoReg(STRI, R2, R1);
 

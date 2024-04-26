@@ -502,7 +502,7 @@ public class M4 {
                 "    if(true)\n" +
                 "        if(false){}\n" +
                 "            else{\n" +
-                "            cout << \"hey\";\n" +
+                "            cout << 99;\n" +
                 "        }\n" +
                 "}", false);
     }
