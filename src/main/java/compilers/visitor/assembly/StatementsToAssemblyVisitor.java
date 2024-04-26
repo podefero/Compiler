@@ -147,8 +147,8 @@ public class StatementsToAssemblyVisitor extends KxiVisitorBase {
         node.getAssemblyBlock().setPreBlock(temp);
     }
 
-    void appendBody(AbstractKxiNode node, AbstractKxiNode otherNode) {
-        node.getAssemblyBlock().getBodyBlock().addAll(otherNode.getAssemblyBlock().combineBlocks());
+    void appendAssembly(AbstractKxiNode node) {
+        assemblyList.addAll(node.getAssemblyBlock().combineBlocks());
     }
 
     void appendMultiBody(AbstractKxiNode node, List<? extends AbstractKxiNode> otherNode) {
@@ -209,16 +209,34 @@ public class StatementsToAssemblyVisitor extends KxiVisitorBase {
                 leftOp(PUSH, R0);
             }
         }
-        getPre(node);
+
     }
 
     @Override
     public void visit(KxiMain node) {
         newLine();
+        comment("Return " + currentFunctionData.getLabel());
+        comment("Get ptr to Return Address in R15");
+        getFP();
+        comment("Deref the ptr so R15 now has the return address");
+        twoReg(LDR, R15, R14);
+        comment("Get PFP in R14");
+        getFP();
+        decFP(4);
+        twoReg(LDRI, R14, R14);
+        comment("SP = FP to pop activation record");
+        twoReg(MOV, SP, FP);
+        comment("FP = PFP ");
+        twoReg(MOV, FP, R14);
+        comment("push result on stack");
+//        deref(node.getExpression());
+//        leftOp(PUSH, R2);
+        comment("jump to return address");
+        leftOp(JMR, R15);
+        newLine();
         label("END");
         trap(0);
         rootNode = new AssemblyMain(new GenericListNode(getAssemblyList()));
-        getPost(node);
     }
 
     void deref(AbstractKxiExpression expression) {
@@ -239,6 +257,7 @@ public class StatementsToAssemblyVisitor extends KxiVisitorBase {
     public void preVisit(KxiIfStatement node) {
         newLine();
         comment("Set up for if statement");
+        appendAssembly(node);
         evaluateTempVar(node.getConditionalExpression());
         deref(node.getConditionalExpression());
         if (node.getElseStatement() != null)
@@ -247,15 +266,12 @@ public class StatementsToAssemblyVisitor extends KxiVisitorBase {
             regAndLabel(BLT, R2, node.getDone());
         comment("Use this for else");
         twoReg(MOV, R4, R2);
-        getPre(node);
     }
 
 
     @Override
     public void visit(KxiIfStatement node) {
         label(node.getDone());
-        rootNode = new AssemblyMain(new GenericListNode(getAssemblyList()));
-        getPost(node);
     }
 
     @Override
@@ -264,14 +280,12 @@ public class StatementsToAssemblyVisitor extends KxiVisitorBase {
         regLabel(JMP, node.getDone());
         comment("else statement");
         label(node.getIfNot());
-        getPre(node);
     }
 
     @Override
     public void visit(KxiElseStatement node) {
         newLine();
         regLabel(JMP, node.getDone());
-        getPost(node);
     }
 
 
@@ -292,7 +306,6 @@ public class StatementsToAssemblyVisitor extends KxiVisitorBase {
         comment("Set up for while loop");
         deref(node.getConditionalExpression());
         regAndLabel(BLT, R2, node.getExitLoop());
-        getPre(node);
     }
 
 
@@ -302,7 +315,6 @@ public class StatementsToAssemblyVisitor extends KxiVisitorBase {
         comment("End of while loop");
         regLabel(JMP, node.getLoopLabel());
         label(node.getExitLoop());
-        getPost(node);
     }
 
 
@@ -327,7 +339,6 @@ public class StatementsToAssemblyVisitor extends KxiVisitorBase {
         leftOp(PUSH, R2);
         comment("jump to return address");
         leftOp(JMR, R15);
-        getPost(node);
     }
 
 
@@ -341,7 +352,6 @@ public class StatementsToAssemblyVisitor extends KxiVisitorBase {
         decFP(interSymbolTable.getOffset(node.getId(), currentFunctionData));
         comment("store R2 into ptr R14");
         twoReg(STRI, R2, R14);
-        getPost(node);
     }
 
 
@@ -353,13 +363,13 @@ public class StatementsToAssemblyVisitor extends KxiVisitorBase {
         else if (scalarType == ScalarType.STRING) trpVal = 5;
         else trpVal = 3;
 
+        appendAssembly(node);
         deref(node.getExpression());
 
         newLine();
         comment("COUT  result");
         twoReg(MOV, R3, R2);
         trap(trpVal);
-        getPost(node);
     }
 
     @Override
@@ -376,7 +386,6 @@ public class StatementsToAssemblyVisitor extends KxiVisitorBase {
             trap(4);
             twoReg(MOV, R2, R3);
         }
-        getPre(node);
     }
 
     @Override
@@ -386,7 +395,6 @@ public class StatementsToAssemblyVisitor extends KxiVisitorBase {
         evaluateTempVar(node.getExpression());
         deref(node.getExpression());
         twoReg(MOV, R5, R2);
-        getPre(node);
     }
 
     @Override
@@ -394,7 +402,6 @@ public class StatementsToAssemblyVisitor extends KxiVisitorBase {
         newLine();
         comment("Exit for switch");
         label(node.getExitLoop());
-        getPost(node);
 
     }
 
@@ -408,7 +415,6 @@ public class StatementsToAssemblyVisitor extends KxiVisitorBase {
         twoReg(CMP, R2, R5);
         regAndLabel(BGT, R2, node.getExit());
         regAndLabel(BLT, R2, node.getExit());
-        getPre(node);
     }
 
     @Override
@@ -416,7 +422,6 @@ public class StatementsToAssemblyVisitor extends KxiVisitorBase {
         newLine();
         comment("Case block");
         label(node.getExit());
-        getPost(node);
 
     }
 
@@ -429,7 +434,6 @@ public class StatementsToAssemblyVisitor extends KxiVisitorBase {
         twoReg(CMP, R2, R5);
         regAndLabel(BGT, R2, node.getExit());
         regAndLabel(BLT, R2, node.getExit());
-        getPre(node);
     }
 
     @Override
@@ -437,7 +441,6 @@ public class StatementsToAssemblyVisitor extends KxiVisitorBase {
         newLine();
         comment("Case block");
         label(node.getExit());
-        getPost(node);
 
     }
 

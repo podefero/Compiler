@@ -11,7 +11,6 @@ import java.util.List;
 @Setter
 public class KxiPostForExpression extends AbstractKxiExpression {
     private AbstractKxiExpression expression;
-    private List<InterExpression> interExpressions;
 
     public KxiPostForExpression(AbstractKxiExpression expression) {
         super(expression);

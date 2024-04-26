@@ -9,6 +9,7 @@ import compilers.util.OutputHandler;
 import compilers.visitor.antlr.AntlrToKxiVisitor;
 import compilers.visitor.assembly.AssemblyAssembleVisitor;
 import compilers.visitor.assembly.ExpressionToAssemblyVisitor;
+import compilers.visitor.assembly.StatementsToAssemblyVisitor;
 import compilers.visitor.generic.GraphVizVisitor;
 import compilers.visitor.intermediate.*;
 import compilers.visitor.kxi.invalid_break.InvalidBreakVisitor;
@@ -1181,18 +1182,12 @@ public class M4 {
         rootNode.accept(breakAndReturnsVisitor);
 
         rootNode.accept(new FullyLoadedIdVisitor(symbolTableVisitor.getScopeHandler()));
-        drawGraph(rootNode);
+
+
         ExpressionToTempVisitor expressionToTempVisitor = new ExpressionToTempVisitor();
         rootNode.accept(expressionToTempVisitor);
-        //rootNode.accept(new InterStatementsSetupVisitor());
-//        rootNode.accept(new StatementToInterVisitor());
 
-//        KxiToIntermediateVisitor kxiToIntermediateVisitor = new KxiToIntermediateVisitor(symbolTableVisitor.getScopeHandler());
-//        rootNode.accept(kxiToIntermediateVisitor);
-//
-//        IntermediateFinalizeVisitor intermediateFinalizeVisitor = new IntermediateFinalizeVisitor(kxiToIntermediateVisitor.getGlobalVariables(), kxiToIntermediateVisitor.getGlobalInit(), kxiToIntermediateVisitor.getFunctions());
-//        rootNode.accept(intermediateFinalizeVisitor);
-//
+        drawGraph(rootNode);
 
         InterSymbolTableVisitor interSymbolTableVisitor =
                 new InterSymbolTableVisitor(new InterSymbolTable(new HashMap<>(), new HashMap<>()), null, expressionToTempVisitor.tempVars);
@@ -1200,17 +1195,20 @@ public class M4 {
 //        InterGlobal interGlobal = intermediateFinalizeVisitor.getInterGlobal();
         rootNode.accept(interSymbolTableVisitor);
 
+        ExpressionToAssemblyVisitor expressionToAssemblyVisitor = new ExpressionToAssemblyVisitor(interSymbolTableVisitor.getInterSymbolTable()
+                , interSymbolTableVisitor.getInterSymbolTable().getFunctionDataMap().get("main$main"));
 
-        ExpressionToAssemblyVisitor interToAssemblyVisitor = new ExpressionToAssemblyVisitor(new ArrayList<>()
+        rootNode.accept(expressionToAssemblyVisitor);
+
+        StatementsToAssemblyVisitor statementsToAssemblyVisitor = new StatementsToAssemblyVisitor(new ArrayList<>()
                 , interSymbolTableVisitor.getInterSymbolTable()
                 , interSymbolTableVisitor.getInterSymbolTable().getFunctionDataMap().get("main$main")
                 , null);
 
-        rootNode.accept(interToAssemblyVisitor);
-
+        rootNode.accept(statementsToAssemblyVisitor);
 
         AssemblyAssembleVisitor assemblyAssembleVisitor = new AssemblyAssembleVisitor();
-        AssemblyMain assemblyMain = interToAssemblyVisitor.getRootNode();
+        AssemblyMain assemblyMain = statementsToAssemblyVisitor.getRootNode();
 
         assemblyMain.accept(assemblyAssembleVisitor);
 

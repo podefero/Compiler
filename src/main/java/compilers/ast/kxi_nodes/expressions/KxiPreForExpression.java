@@ -11,7 +11,6 @@ import java.util.List;
 @Setter
 public class KxiPreForExpression extends AbstractKxiExpression {
     private AbstractKxiExpression expression;
-    private List<InterExpression> interExpressions;
 
 
     public KxiPreForExpression(AbstractKxiExpression expression) {
