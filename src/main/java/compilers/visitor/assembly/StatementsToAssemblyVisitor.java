@@ -25,6 +25,7 @@ import compilers.ast.kxi_nodes.statements.*;
 import compilers.ast.kxi_nodes.statements.conditional.KxiElseStatement;
 import compilers.ast.kxi_nodes.statements.conditional.KxiIfStatement;
 import compilers.ast.kxi_nodes.statements.conditional.KxiWhileStatement;
+import compilers.ast.kxi_nodes.token_literals.IdentifierToken;
 import compilers.ast.kxi_nodes.token_literals.IntLitToken;
 import compilers.ast.kxi_nodes.token_literals.TokenLiteral;
 import compilers.util.DataSizes;
@@ -47,6 +48,7 @@ import static compilers.ast.assembly.Registers.*;
 @Getter
 public class StatementsToAssemblyVisitor extends KxiVisitorBase {
     private final List<AbstractAssembly> assemblyList;
+    List<AbstractAssembly> directives;
     private InterSymbolTable interSymbolTable;
     private FunctionData currentFunctionData;
     private AssemblyMain rootNode;
@@ -77,7 +79,7 @@ public class StatementsToAssemblyVisitor extends KxiVisitorBase {
     //DIR
     private <T> void directive(Directive directive, String label, T value) {
         if (value == null) {
-            assemblyList.add(new AssemblyDirective(label, directive.getValue(), ""));
+            assemblyList.add(0, new AssemblyDirective(label, directive.getValue(), ""));
         } else {
             if (directive == INT)
                 directiveInt(label, (Integer) value);
@@ -89,15 +91,15 @@ public class StatementsToAssemblyVisitor extends KxiVisitorBase {
     }
 
     private void directiveInt(String label, int value) {
-        assemblyList.add(new AssemblyDirective(label, INT.getValue(), new OperandInteger(value).getNumInteger()));
+        assemblyList.add(0, new AssemblyDirective(label, INT.getValue(), new OperandInteger(value).getNumInteger()));
     }
 
     private void directiveByte(String label, char value) {
-        assemblyList.add(new AssemblyDirective(label, BYT.getValue(), value + ""));
+        assemblyList.add(0, new AssemblyDirective(label, BYT.getValue(), value + ""));
     }
 
     private void directiveString(String label, String value) {
-        assemblyList.add(new AssemblyDirective(label, Directive.STR.getValue(), value));
+        assemblyList.add(0, new AssemblyDirective(label, Directive.STR.getValue(), value));
     }
 
     //OPS
@@ -246,12 +248,12 @@ public class StatementsToAssemblyVisitor extends KxiVisitorBase {
             expressionIdLit = (ExpressionIdLit) expression;
             evaluateTempVar(expressionIdLit);
             ScalarType scalarType = expressionIdLit.getScalarType();
-            if (scalarType != ScalarType.STRING) {
 
-                comment("Deref stack var");
-                if (expressionIdLit.isLeft()) twoReg(LDRI, R1, R1);
-                else twoReg(LDRI, R2, R2);
-            }
+
+            comment("Deref stack var");
+            if (expressionIdLit.isLeft()) twoReg(LDRI, R1, R1);
+            else twoReg(LDRI, R2, R2);
+
         }
     }
 
@@ -296,7 +298,6 @@ public class StatementsToAssemblyVisitor extends KxiVisitorBase {
         newLine();
         comment("Break out of loop");
         regLabel(JMP, interBreak.getExitLoop());
-        getPost(interBreak);
     }
 
     @Override
@@ -453,6 +454,13 @@ public class StatementsToAssemblyVisitor extends KxiVisitorBase {
 
     }
 
+    @Override
+    public void visit(ExpressionStringLit node) {
+        directive(Directive.STR, node.getGlobalVariable().getId(), node.getTokenLiteral().getValue());
+        if (node.isLeft()) leftPtrVar(node.getGlobalVariable());
+        else rightPtrVar(node.getGlobalVariable());
+    }
+
     void initTempVar(ExpressionIdLit id) {
         comment("Initializing Variable " + id.getId());
         comment("Get ptr to var");
@@ -465,13 +473,10 @@ public class StatementsToAssemblyVisitor extends KxiVisitorBase {
     void evaluateTempVar(AbstractKxiExpression expressionLiteral) {
         if (expressionLiteral instanceof ExpressionIdLit) {
             ExpressionIdLit node = (ExpressionIdLit) expressionLiteral;
-            if (node.getScalarType() == ScalarType.STRING) {
-                if (node.isLeft()) leftPtrVar(node);
-                else rightPtrVar(node);
-            } else {
-                if (node.isLeft()) lefStackVar(node);
-                else rightStackVar(node);
-            }
+
+            if (node.isLeft()) lefStackVar(node);
+            else rightStackVar(node);
+
         }
     }
 
@@ -484,8 +489,6 @@ public class StatementsToAssemblyVisitor extends KxiVisitorBase {
         twoReg(MOV, R2, R1);
         initTempVar(idLit);
     }
-
-
 
 
     public void rightPtrVar(ExpressionIdLit node) {

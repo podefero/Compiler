@@ -26,6 +26,18 @@ public class M3Tests {
     }
 
     @Test
+    void whileLoopInf() {
+        test("void main() {\n" +
+                "   ix = 10;\n" +
+                "   while (x > 0) {\n" +
+                "    x = x - 1;\n" +
+                "    cout << x;\n" +
+                "    if(x > 5) break;\n" +
+                "   }\n" +
+                "}", true);
+    }
+
+    @Test
     void breakStatements() {
         test("void main() {\n" +
                 "    break;\n" +

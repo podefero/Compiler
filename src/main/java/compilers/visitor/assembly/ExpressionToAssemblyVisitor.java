@@ -633,14 +633,8 @@ public class ExpressionToAssemblyVisitor extends KxiVisitorBase {
 
     @Override
     public void visit(ExpressionIdLit node) {
-        if (node.getScalarType() == ScalarType.STRING) {
-            if (node.isLeft()) leftPtrVar(node);
-            else rightPtrVar(node);
-        } else {
-            if (node.isLeft()) lefStackVar(node);
-            else rightStackVar(node);
-        }
-
+        if (node.isLeft()) lefStackVar(node);
+        else rightStackVar(node);
     }
 
     @Override

@@ -705,10 +705,7 @@ EXPRESSIONS DOT
         if (resultType != ScalarType.CHAR && resultType != ScalarType.INT && resultType != ScalarType.STRING && resultType != ScalarType.NULL)
             exceptionStack.push(new TypeCheckException(statement.getLineInfo(), "COUT does not support type: " + resultType));
         //useful for desugar
-        if (resultType == ScalarType.INT)
-            statement.setScalarType(resultType);
-        if (resultType == ScalarType.CHAR)
-            statement.setScalarType(resultType);
+        statement.setScalarType(resultType);
 
     }
 

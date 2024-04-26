@@ -360,36 +360,32 @@ public class M4 {
                 "    }", false);
     }
 
-//    @Test
-//    void whileLoopInf() {
-//        test("  void main() {\n" +
-//                "        int x = 10;\n" +
-//                "        while (x > 0){\n" +
-//                "            cout << x;\n" +
-//                "            //RHS should never evaluate, if it does, this is an infinite loop (you're welcome if this broke lol)\n" +
-//                "            true || x < (x += 10);\n" +
-//                "            x = x - 1;\n" +
-//                "        }\n" +
-//                "    }", false);
-//    }
+    @Test
+    void whileLoopTwo() {
+        test("void main() {\n" +
+                "   int x = 10;\n" +
+                "   while (x > 0) {\n" +
+                "    x = x - 1;\n" +
+                "    cout << x;\n" +
+                "    if(x < 5) break;\n" +
+                "   }\n" +
+                "}", false);
+    }
 
 
     @Test
-    void nestedWhileLoops() {
-        test(" class Cheese {\n" +
-                "        static public int x = 3;\n" +
-                "        static public void count() {\n" +
-                "            cout << Cheese.x;\n" +
-                "            Cheese.x = Cheese.x -1;\n" +
-                "            if (Cheese.x != 0) {\n" +
-                "                count();\n" +
-                "            }\n" +
-                "        }\n" +
-                "    }\n" +
-                "    void main() {\n" +
-                "        Cheese.count();\n" +
-                "    }", false);
+    void whileLoopInf() {
+        test("void main() {\n" +
+                "   ix = 10;\n" +
+                "   while (x > 0) {\n" +
+                "    x = x - 1;\n" +
+                "    cout << x;\n" +
+                "    if(x > 5) break;\n" +
+                "   }\n" +
+                "}", false);
     }
+
+
 
 
     @Test
@@ -1029,6 +1025,14 @@ public class M4 {
                 "}", false);
     }
 
+    @Test
+    void helloWorldTwo() {
+        test("void main() {\n" +
+                "    string s = \"helloworld\";\n" +
+                "    cout << s;\n" +
+                "}", false);
+    }
+
 
     @Test
     void simpVariable() {
@@ -1200,7 +1204,7 @@ public class M4 {
 
         rootNode.accept(expressionToAssemblyVisitor);
 
-        StatementsToAssemblyVisitor statementsToAssemblyVisitor = new StatementsToAssemblyVisitor(new ArrayList<>()
+        StatementsToAssemblyVisitor statementsToAssemblyVisitor = new StatementsToAssemblyVisitor(new ArrayList<>(), new ArrayList<>()
                 , interSymbolTableVisitor.getInterSymbolTable()
                 , interSymbolTableVisitor.getInterSymbolTable().getFunctionDataMap().get("main$main")
                 , null);
