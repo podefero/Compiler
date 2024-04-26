@@ -2,13 +2,22 @@ package compilers;
 
 import compilers.antlr.KxiLexer;
 import compilers.antlr.KxiParser;
+import compilers.ast.assembly.AssemblyMain;
+import compilers.ast.intermediate.symboltable.InterSymbolTable;
 import compilers.ast.kxi_nodes.AbstractKxiNode;
 import compilers.ast.kxi_nodes.KxiMain;
 import compilers.commandargs.ArgumentFlags;
 import compilers.util.InputHandler;
 import compilers.util.OutputHandler;
 import compilers.visitor.antlr.AntlrToKxiVisitor;
+import compilers.visitor.assembly.AssemblyAssembleVisitor;
+import compilers.visitor.assembly.ExpressionToAssemblyVisitor;
+import compilers.visitor.assembly.StatementsToAssemblyVisitor;
 import compilers.visitor.generic.GraphVizVisitor;
+import compilers.visitor.intermediate.BreakAndReturnsVisitor;
+import compilers.visitor.intermediate.ExpressionToTempVisitor;
+import compilers.visitor.intermediate.FullyLoadedIdVisitor;
+import compilers.visitor.intermediate.InterSymbolTableVisitor;
 import compilers.visitor.kxi.invalid_break.InvalidBreakVisitor;
 import compilers.visitor.kxi.invalid_write.InvalidWriteVisitor;
 import compilers.visitor.kxi.symboltable.ScopeHandler;
@@ -17,6 +26,8 @@ import compilers.visitor.kxi.typecheck.TypeCheckerVisitor;
 import org.antlr.v4.runtime.CommonTokenStream;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Stack;
 
 public class Main {
@@ -120,33 +131,40 @@ public class Main {
     }
 
     static void compile(AbstractKxiNode rootNode, OutputHandler outputHandler, ScopeHandler scopeHandler) throws IOException {
-//        BreakAndReturnsVisitor breakAndReturnsVisitor = new BreakAndReturnsVisitor();
-//        rootNode.accept(breakAndReturnsVisitor);
-//
-//
-//        KxiToIntermediateVisitor kxiToIntermediateVisitor = new KxiToIntermediateVisitor(scopeHandler);
-//        rootNode.accept(kxiToIntermediateVisitor);
-//
-//        InterSymbolTableVisitor interSymbolTableVisitor =
-//                new InterSymbolTableVisitor(new InterSymbolTable(new HashMap<>(), new HashMap<>()), null);
-//
-//        InterGlobal interGlobal = kxiToIntermediateVisitor.getRootNode();
-//        interGlobal.accept(interSymbolTableVisitor);
-//
-//        InterToAssemblyVisitor interToAssemblyVisitor = new InterToAssemblyVisitor(new ArrayList<>()
-//                , null
-//                , interSymbolTableVisitor.getInterSymbolTable()
-//                , interSymbolTableVisitor.getInterSymbolTable().getFunctionDataMap().get("main$main"));
-//
-//        interGlobal.accept(interToAssemblyVisitor);
-//
-//
-//        AssemblyAssembleVisitor assemblyAssembleVisitor = new AssemblyAssembleVisitor();
-//        AssemblyMain assemblyMain = interToAssemblyVisitor.getRootNode();
-//
-//        assemblyMain.accept(assemblyAssembleVisitor);
-//
-//        outputHandler.outputAsm(assemblyAssembleVisitor.getAsm());
+
+        BreakAndReturnsVisitor breakAndReturnsVisitor = new BreakAndReturnsVisitor();
+        rootNode.accept(breakAndReturnsVisitor);
+
+        rootNode.accept(new FullyLoadedIdVisitor(scopeHandler));
+
+
+        ExpressionToTempVisitor expressionToTempVisitor = new ExpressionToTempVisitor();
+        rootNode.accept(expressionToTempVisitor);
+
+
+        InterSymbolTableVisitor interSymbolTableVisitor =
+                new InterSymbolTableVisitor(new InterSymbolTable(new HashMap<>(), new HashMap<>()), null, expressionToTempVisitor.tempVars);
+
+        rootNode.accept(interSymbolTableVisitor);
+
+        ExpressionToAssemblyVisitor expressionToAssemblyVisitor = new ExpressionToAssemblyVisitor(interSymbolTableVisitor.getInterSymbolTable()
+                , interSymbolTableVisitor.getInterSymbolTable().getFunctionDataMap().get("main$main"));
+
+        rootNode.accept(expressionToAssemblyVisitor);
+
+        StatementsToAssemblyVisitor statementsToAssemblyVisitor = new StatementsToAssemblyVisitor(new ArrayList<>(), new ArrayList<>()
+                , interSymbolTableVisitor.getInterSymbolTable()
+                , interSymbolTableVisitor.getInterSymbolTable().getFunctionDataMap().get("main$main")
+                , null);
+
+        rootNode.accept(statementsToAssemblyVisitor);
+
+        AssemblyAssembleVisitor assemblyAssembleVisitor = new AssemblyAssembleVisitor();
+        AssemblyMain assemblyMain = statementsToAssemblyVisitor.getRootNode();
+
+        assemblyMain.accept(assemblyAssembleVisitor);
+
+        outputHandler.outputAsm(assemblyAssembleVisitor.getAsm());
 
     }
 
