@@ -43,23 +43,18 @@ public class InputHandler {
 
 
     public InputStream stdinToInputStream() {
-        Scanner scanner = new Scanner(System.in);
-
-        // Prompt the user to enter multi-line input
-        System.out.println("Enter multi-line input (enter an empty line to finish):");
-
-        // Read input until an empty line is encountered
         StringBuilder multiLineInput = new StringBuilder();
-        String line;
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 
+        String line;
         try {
-            while (!(line = scanner.nextLine()).isEmpty()) {
+            // Read input until EOF
+            while ((line = reader.readLine()) != null) {
                 multiLineInput.append(line).append("\n");
             }
-        } catch (NoSuchElementException e) {
-            // End of input reached
-        } finally {
-            scanner.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
         InputStream inputStream = new ByteArrayInputStream(multiLineInput.toString().getBytes());

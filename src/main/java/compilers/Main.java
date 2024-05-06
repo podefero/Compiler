@@ -24,10 +24,12 @@ import compilers.visitor.kxi.symboltable.ScopeHandler;
 import compilers.visitor.kxi.symboltable.SymbolTableVisitor;
 import compilers.visitor.kxi.typecheck.TypeCheckerVisitor;
 import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.Token;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Stack;
 
 public class Main {
@@ -43,23 +45,33 @@ public class Main {
 
     static void lexing(ArgumentFlags argumentFlags, InputHandler inputHandler, OutputHandler outputHandler) {
         KxiLexer kxiLexer = new KxiLexer(inputHandler.fileToCharStream());
-
-        // Get the token stream
-        CommonTokenStream tokens = new CommonTokenStream(kxiLexer);
-
+        CommonTokenStream commonTokenStream = new CommonTokenStream(kxiLexer);
         if (argumentFlags.printTokens) {
             try {
-                printTokens(kxiLexer, outputHandler);
+                printTokens(outputHandler, commonTokenStream);
             } catch (IOException e) {
                 //print to stdout if file is not found
-                System.out.println(e.getMessage());
+                //System.out.println(e.getMessage());
             }
         }
-        if (argumentFlags.parseTree) parseTree(new CommonTokenStream(kxiLexer), argumentFlags, outputHandler);
+        if (argumentFlags.parseTree) parseTree(commonTokenStream, argumentFlags, outputHandler);
     }
 
-    static void printTokens(KxiLexer kxiLexer, OutputHandler outputHandler) throws IOException {
-        outputHandler.outputLex(kxiLexer.printTokens());
+    private static String printTokens(CommonTokenStream tokens) {
+        //CommonTokenStream tokens = new CommonTokenStream(this);
+        tokens.fill();
+        List<Token> tokenList = tokens.getTokens();
+        StringBuilder stringBuilder = new StringBuilder();
+        for (Token token : tokenList) {
+            String tokenName = KxiLexer.VOCABULARY.getSymbolicName(token.getType());
+            //stringBuilder.append("Line#: " + token.getLine() + ":" + token.getCharPositionInLine() + " " + token.getText() + " " + tokenName + "\n");
+            stringBuilder.append(tokenName + " " + token.getLine() + " " + token.getText() + "\n");
+        }
+        return stringBuilder.toString();
+    }
+
+    static void printTokens(OutputHandler outputHandler, CommonTokenStream commonTokenStream) throws IOException {
+        outputHandler.outputLex(printTokens(commonTokenStream));
     }
 
     static void parseTree(CommonTokenStream tokenStream, ArgumentFlags argumentFlags, OutputHandler outputHandler) {

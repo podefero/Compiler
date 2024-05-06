@@ -56,7 +56,7 @@ public class OutputHandler {
     }
 
 
-    private String getRelativeOutputFile(String fileExtension) throws IOException {
+    private String getRelativeOutputFile(String fileExtension) {
         if (outputFiles != null) {
             for (String file : outputFiles) {
                 if (file.endsWith("." + fileExtension)) return file;
