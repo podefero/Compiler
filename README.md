@@ -3,6 +3,11 @@ _By: Nathan Jones_
 ## How to compile
 ```bash
 #First build it
+./build.sh 
+```
+
+```bash
+#To compile
 ./compile.sh [arguments]
 # Arguments are: [-h] [-l] [-p] [-s] [-c] [-a] [-o [FILE [FILE ...]]] [-i [KXI [KXI ...]]]
 ```
