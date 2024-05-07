@@ -23,8 +23,7 @@ import compilers.visitor.kxi.invalid_write.InvalidWriteVisitor;
 import compilers.visitor.kxi.symboltable.ScopeHandler;
 import compilers.visitor.kxi.symboltable.SymbolTableVisitor;
 import compilers.visitor.kxi.typecheck.TypeCheckerVisitor;
-import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -76,22 +75,30 @@ public class Main {
 
     static void parseTree(CommonTokenStream tokenStream, ArgumentFlags argumentFlags, OutputHandler outputHandler) {
         KxiParser parser = new KxiParser(tokenStream);
-        parser.removeErrorListeners();
         KxiMain kxiMain = null;
         AntlrToKxiVisitor antlrToKxiVisitor = new AntlrToKxiVisitor();
+
+        parser.removeErrorListeners();
+        parser.addErrorListener(new BaseErrorListener() {
+            @Override
+            public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line, int charPositionInLine, String msg, RecognitionException e) {
+                throw new RuntimeException("Syntax error at line " + line + ":" + charPositionInLine + " " + msg);
+            }
+        });
 
         try {
             antlrToKxiVisitor.visitCompilationUnit(parser.compilationUnit());
             kxiMain = (KxiMain) antlrToKxiVisitor.getRootNode();
         } catch (RuntimeException ex) {
-            if (argumentFlags.printASTDiagram)
+            if (argumentFlags.printASTDiagram) {
                 System.err.println(ex.getMessage());
+            }
             return;
         }
 
         if (argumentFlags.printASTDiagram) {
             try {
-                printASTDiagram(kxiMain, outputHandler, antlrToKxiVisitor);
+                printASTDiagram(kxiMain, outputHandler);
             } catch (IOException e) {
                 System.out.println("Need .dot file to output graphVis");
             }
@@ -100,7 +107,7 @@ public class Main {
         if (argumentFlags.semantics) semantics(kxiMain, argumentFlags, outputHandler);
     }
 
-    static void printASTDiagram(KxiMain kxiMain, OutputHandler outputHandler, AntlrToKxiVisitor antlrToKxiVisitor) throws IOException {
+    static void printASTDiagram(KxiMain kxiMain, OutputHandler outputHandler) throws IOException {
         GraphVizVisitor graphVizVisitor = new GraphVizVisitor(kxiMain);
         outputHandler.outputAST(graphVizVisitor.getGraph());
     }
