@@ -31,7 +31,7 @@ public class KxiFactoryDefault extends AbstractKxiFactory {
             else expression = null;
 
             return new KxiVariableDeclaration(expression
-                    , new IdentifierToken(getTokenText(varCtx.IDENTIFIER()))
+                    , new IdentifierToken(getTokenText(varCtx.ID()))
                     , pop(stack));
 
         } else if (ctx instanceof BlockContext) {
@@ -39,22 +39,22 @@ public class KxiFactoryDefault extends AbstractKxiFactory {
 
         } else if (ctx instanceof CompilationUnitContext) {
             return new KxiMain(pop(stack)
-                    , new IdentifierToken(getTokenText(((CompilationUnitContext) ctx).IDENTIFIER()))
+                    , new IdentifierToken(getTokenText(((CompilationUnitContext) ctx).ID()))
                     , popList(stack, getListSizeFromCtx(((CompilationUnitContext) ctx).classDefinition())));
 
         } else if (ctx instanceof TypeContext) {
             ScalarType scalarType = ScalarType.UNKNOWN;
             ScalarTypeContext scalarTypeContext = ((TypeContext) ctx).scalarType();
             IdentifierToken id = null;
-            int numArrays = ((TypeContext) ctx).LBRACKET().size();
+            int numArrays = ((TypeContext) ctx).LSQUARE().size();
             if (scalarTypeContext.VOID() != null) scalarType = ScalarType.VOID;
             else if (scalarTypeContext.INT() != null) scalarType = ScalarType.INT;
-            else if (scalarTypeContext.CHAR_KEY() != null) scalarType = ScalarType.CHAR;
+            else if (scalarTypeContext.CHAR() != null) scalarType = ScalarType.CHAR;
             else if (scalarTypeContext.BOOL() != null) scalarType = ScalarType.BOOL;
             else if (scalarTypeContext.STRING() != null) scalarType = ScalarType.STRING;
-            else if (scalarTypeContext.IDENTIFIER() != null) {
+            else if (scalarTypeContext.ID() != null) {
                 scalarType = ScalarType.ID;
-                id = new IdentifierToken(getTokenText(((TypeContext) ctx).scalarType().IDENTIFIER()));
+                id = new IdentifierToken(getTokenText(((TypeContext) ctx).scalarType().ID()));
             }
             KxiType kxiType = new KxiType(scalarType, id);
             if (numArrays > 0) {
@@ -71,7 +71,7 @@ public class KxiFactoryDefault extends AbstractKxiFactory {
 
         } else if (ctx instanceof ClassDefinitionContext) {
             return new KxiClass(popList(stack, getListSizeFromCtx(((ClassDefinitionContext) ctx).classMemberDefinition()))
-                    , new IdentifierToken(getTokenText(((ClassDefinitionContext) ctx).IDENTIFIER())));
+                    , new IdentifierToken(getTokenText(((ClassDefinitionContext) ctx).ID())));
 
         } else if (ctx instanceof DataMemberDeclarationContext) {
             boolean isStatic = ((DataMemberDeclarationContext) ctx).STATIC() != null;
@@ -95,7 +95,7 @@ public class KxiFactoryDefault extends AbstractKxiFactory {
             } else {
                 parameterList = popList(stack, 0);
             }
-            return new KxiMethodSuffixHelper(block, parameterList, new IdentifierToken(getTokenText(methodSuffixContext.IDENTIFIER())));
+            return new KxiMethodSuffixHelper(block, parameterList, new IdentifierToken(getTokenText(methodSuffixContext.ID())));
 
         } else if (ctx instanceof ModifierContext) {
             ModifierContext modifierContext = (ModifierContext) ctx;
@@ -105,7 +105,7 @@ public class KxiFactoryDefault extends AbstractKxiFactory {
             return new KxiModifierHelper(modifier);
 
         } else if (ctx instanceof ParameterContext) {
-            return new KxiParameter(new IdentifierToken(getTokenText(((ParameterContext) ctx).IDENTIFIER())), pop(stack));
+            return new KxiParameter(new IdentifierToken(getTokenText(((ParameterContext) ctx).ID())), pop(stack));
 
         } else if (ctx instanceof CaseBlockContext) {
             CaseBlockContext caseBlockContext = (CaseBlockContext) ctx;

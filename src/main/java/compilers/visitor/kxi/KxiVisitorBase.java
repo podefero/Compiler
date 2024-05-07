@@ -57,7 +57,7 @@ public class KxiVisitorBase implements VisitKxi {
         // StringBuilder body = new StringBuilder();
         while (hasErrors()) {
             //body.append(exceptionStack.pop().getMessage() + '\n');
-            System.out.println(exceptionStack.pop().getMessage());
+            System.err.println(exceptionStack.pop().getMessage());
         }
     }
 

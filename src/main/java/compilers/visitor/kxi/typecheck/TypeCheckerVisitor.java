@@ -38,7 +38,7 @@ public class TypeCheckerVisitor extends KxiVisitorBase {
 
     @Override
     public void dumpErrorStack() {
-        System.out.println("TypeCheck Errors");
+        System.err.println("TypeCheck Errors");
         super.dumpErrorStack();
     }
 

@@ -70,7 +70,7 @@ public class LexerTest {
 
     @Test
     void testTokenIdentifier() {
-        testTokenType("main", KxiLexer.IDENTIFIER, "main");
+        testTokenType("main", KxiLexer.ID, "main");
     }
 
 
@@ -92,7 +92,7 @@ public class LexerTest {
 
     @Test
     void testTokenDefault() {
-        testTokenType("Chicken", KxiLexer.IDENTIFIER, "Chicken");
+        testTokenType("Chicken", KxiLexer.ID, "Chicken");
     }
 
     @Test

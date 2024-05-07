@@ -56,43 +56,43 @@ public class KxiFactoryExpression extends AbstractKxiFactory {
         //handle the pattern expression terminal expression
         if (ctx.children.size() == 3) {
             switch (type) {
-                case EQUALS:
+                case EQ:
                     return new KxiEquals(pop(stack), pop(stack));
-                case PLUSEQUALS:
+                case PLUSEQ:
                     return new KxiPlusEquals(pop(stack), pop(stack));
-                case SUBEQUALS:
+                case SUBEQ:
                     return new KxiSubtractEquals(pop(stack), pop(stack));
-                case MULTEQUALS:
+                case TIMESEQ:
                     return new KxiMultEquals(pop(stack), pop(stack));
-                case DIVEQUALS:
+                case DIVIDEEQ:
                     return new KxiDivEquals(pop(stack), pop(stack));
-                case MULT:
+                case TIMES:
                     return new KxiMult(pop(stack), pop(stack));
                 case DIVIDE:
                     return new KxiDiv(pop(stack), pop(stack));
                 case PLUS:
                     return new KxiPlus(pop(stack), pop(stack));
-                case SUBTRACT:
+                case MINUS:
                     return new KxiSubtract(pop(stack), pop(stack));
-                case EQUALSEQUALS:
+                case EQEQ:
                     return new KxiEqualsEquals(pop(stack), pop(stack));
-                case NOTEQUALS:
+                case NOTEQ:
                     return new KxiNotEquals(pop(stack), pop(stack));
-                case LESSTHEN:
+                case LT:
                     return new KxiLessThen(pop(stack), pop(stack));
-                case GREATERTHEN:
+                case GT:
                     return new KxiGreaterThen(pop(stack), pop(stack));
-                case LESSEQUALS:
+                case LEQ:
                     return new KxiLessEqualsThen(pop(stack), pop(stack));
-                case GREATEREQUALS:
+                case GEQ:
                     return new KxiGreaterEqualsThen(pop(stack), pop(stack));
                 case AND:
                     return new KxiAnd(pop(stack), pop(stack));
                 case OR:
                     return new KxiOr(pop(stack), pop(stack));
                 case DOT:
-                    return new KxiDotExpression(new IdentifierToken(getTokenText(expressionContext.IDENTIFIER())), pop(stack));
-                case LPARENTH:
+                    return new KxiDotExpression(new IdentifierToken(getTokenText(expressionContext.ID())), pop(stack));
+                case LPAREN:
                     return new KxiParenthExpression(pop(stack));
                 case NEW:
                     if (expressionContext.index() != null)
@@ -100,9 +100,9 @@ public class KxiFactoryExpression extends AbstractKxiFactory {
                     else {
                         if (expressionContext.arguments().argumentList() != null)
                             return new KxiNewExpressionArgument(new KxiArguments(popList(stack, getListSizeFromCtx(expressionContext.arguments().argumentList().expression())))
-                                    , new IdentifierToken(getTokenText(expressionContext.IDENTIFIER())));
+                                    , new IdentifierToken(getTokenText(expressionContext.ID())));
                         else
-                            return new KxiNewExpressionArgument(new KxiArguments(new GenericListNode(new ArrayList<>())), new IdentifierToken(getTokenText(expressionContext.IDENTIFIER())));
+                            return new KxiNewExpressionArgument(new KxiArguments(new GenericListNode(new ArrayList<>())), new IdentifierToken(getTokenText(expressionContext.ID())));
 
 
                     }
@@ -117,7 +117,7 @@ public class KxiFactoryExpression extends AbstractKxiFactory {
                     return new KxiNot(pop(stack));
                 case PLUS:
                     return new KxiUniPlus(pop(stack));
-                case SUBTRACT:
+                case MINUS:
                     return new KxiUniSubtract(pop(stack));
                 case INTLIT:
                     return new ExpressionIntLit(new IntLitToken(getTokenText(expressionContext.INTLIT())));
@@ -133,8 +133,8 @@ public class KxiFactoryExpression extends AbstractKxiFactory {
                     return new ExpressionNullLit(new NullToken(getTokenText(expressionContext.NULL())));
                 case THIS:
                     return new ExpressionThisLit(new ThisToken(getTokenText(expressionContext.THIS())));
-                case IDENTIFIER:
-                    return new ExpressionIdLit(new IdentifierToken(getTokenText(expressionContext.IDENTIFIER())));
+                case ID:
+                    return new ExpressionIdLit(new IdentifierToken(getTokenText(expressionContext.ID())));
                 default:
                     break;
             }

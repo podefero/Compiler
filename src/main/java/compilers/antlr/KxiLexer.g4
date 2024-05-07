@@ -112,7 +112,7 @@ DIVIDE  :   '/' ;
 PLUSEQ   :   '+''=' ;
 SUBEQ   :   '-''=' ;
 TIMESEQ  :   '*''=' ;
-DIVEEQ   :   '/''=' ;
+DIVIDEEQ   :   '/''=' ;
 EXTRACT    :   '<''<' ;
 INSERT    :   '>''>' ;
 DOT :   '.' ;
@@ -120,7 +120,7 @@ COMMA   :   ',' ;
 COLON   : ':' ;
 
 ID :    (ALPHA | UNDER_SCORE) (ALPHA | DIGIT | UNDER_SCORE)* ;
-CHARLIT : '\'' (CHARACTER | '\'' | '"') '\'' ;
+CHARLIT : '\'' (CHARACTER | '\\' '\'' | '"') '\'' ;
 STRINGLIT : '"' (CHARACTER | '\'' | '\\"')* '"' ;
 INTLIT     :    DIGIT+ ;
 COMMENT : '//' ~[\r\n]* LINE_ENDING -> skip;
