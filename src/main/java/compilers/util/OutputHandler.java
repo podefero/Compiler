@@ -36,6 +36,7 @@ public class OutputHandler {
 
     public void outputAsm(String asm) throws IOException {
         String file = getRelativeOutputFile("asm");
+        if(file.isEmpty() && !useStdout) file = outputFiles[0]+".asm";
         if (file.isEmpty()) System.out.println(asm);
         else
             writeFile(asm, file);
@@ -43,6 +44,7 @@ public class OutputHandler {
 
     public void outputLex(String lex) throws IOException {
         String file = getRelativeOutputFile("lex");
+        if(file.isEmpty() && !useStdout) file = outputFiles[0]+".lex";
         if (file.isEmpty()) System.out.println(lex);
         else
             writeFile(lex, file);
@@ -50,6 +52,7 @@ public class OutputHandler {
 
     public void outputAST(MutableGraph graph) throws IOException {
         String file = getRelativeOutputFile("dot");
+        if(file.isEmpty() && !useStdout) file = outputFiles[0]+".dot";
         if (!file.isEmpty())
             Graphviz.fromGraph(graph).width(1920).height(1080).render(Format.DOT).toFile(new File(getRelativeOutputFile("dot")));
     }

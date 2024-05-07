@@ -30,7 +30,7 @@ public class InvalidWriteVisitor extends KxiVisitorBase {
 
     @Override
     public void dumpErrorStack() {
-        System.err.println("InvalidWriter Errors");
+        //System.err.println("InvalidWriter Errors");
         super.dumpErrorStack();
     }
 

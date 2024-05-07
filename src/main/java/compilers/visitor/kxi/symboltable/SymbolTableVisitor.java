@@ -43,7 +43,7 @@ public class SymbolTableVisitor extends KxiVisitorBase {
 
     @Override
     public void dumpErrorStack() {
-        System.err.println("SymbolTable Errors");
+        //System.err.println("SymbolTable Errors");
         super.dumpErrorStack();
     }
 

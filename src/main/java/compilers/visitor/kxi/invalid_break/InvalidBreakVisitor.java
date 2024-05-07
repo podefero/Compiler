@@ -22,7 +22,7 @@ public class InvalidBreakVisitor extends KxiVisitorBase {
 
     @Override
     public void dumpErrorStack() {
-        System.err.println("Invalid Break Errors");
+        //System.err.println("Invalid Break Errors");
         super.dumpErrorStack();
     }
 
