@@ -2,27 +2,27 @@ parser grammar KxiParser;
 
 options { tokenVocab=KxiLexer; }
 
-compilationUnit : classDefinition* VOID IDENTIFIER LPARENTH RPARENTH block ;
-classDefinition : CLASS IDENTIFIER LCURLY classMemberDefinition* RCURLY ;
-scalarType : VOID | INT | CHAR_KEY | BOOL | STRING | IDENTIFIER ;
-type : scalarType (LBRACKET RBRACKET)* ;
+compilationUnit : classDefinition* VOID ID LPAREN RPAREN block ;
+classDefinition : CLASS ID LCURLY classMemberDefinition* RCURLY ;
+scalarType : VOID | INT | CHAR | BOOL | STRING | ID ;
+type : scalarType (LSQUARE RSQUARE)* ;
 modifier : PUBLIC | PRIVATE ;
 classMemberDefinition : methodDeclaration | dataMemberDeclaration | constructorDeclaration ;
 dataMemberDeclaration : STATIC? modifier variableDeclaration ;
 methodDeclaration : STATIC? modifier type methodSuffix ;
 constructorDeclaration : methodSuffix ;
-methodSuffix : IDENTIFIER LPARENTH parameterList? RPARENTH block ;
+methodSuffix : ID LPAREN parameterList? RPAREN block ;
 parameterList : parameter (COMMA parameter)* ;
-parameter : type IDENTIFIER ;
-variableDeclaration : type IDENTIFIER initializer? SEMICOLON ;
-initializer : EQUALS expression ;
-statement : IF LPARENTH expression RPARENTH statement (ELSE statement)?
-            | WHILE LPARENTH expression RPARENTH statement
-            | FOR LPARENTH expression? SEMICOLON expression SEMICOLON expression? RPARENTH statement
+parameter : type ID ;
+variableDeclaration : type ID initializer? SEMICOLON ;
+initializer : EQ expression ;
+statement : IF LPAREN expression RPAREN statement (ELSE statement)?
+            | WHILE LPAREN expression RPAREN statement
+            | FOR LPAREN expression? SEMICOLON expression SEMICOLON expression? RPAREN statement
             | RETURN expression? SEMICOLON
-            | COUT OUTSTREAM expression SEMICOLON
-            | CIN INSTREAM expression SEMICOLON
-            | SWITCH LPARENTH expression RPARENTH caseBlock
+            | COUT EXTRACT expression SEMICOLON
+            | CIN INSERT expression SEMICOLON
+            | SWITCH LPAREN expression RPAREN caseBlock
             | BREAK SEMICOLON
             | expression SEMICOLON
             | block
@@ -32,28 +32,27 @@ caseBlock : LCURLY case* DEFAULT COLON statement* RCURLY ;
 case : CASE (INTLIT | CHARLIT) COLON statement* ;
 expression :
             //l to r
-            LPARENTH expression RPARENTH
+            LPAREN expression RPAREN
             | expression index
             | expression arguments
-            | expression DOT IDENTIFIER
-            | NEW IDENTIFIER arguments
+            | expression DOT ID
+            | NEW ID arguments
             | NEW type index
             //r to l
             | NOT expression
             | PLUS expression
-            | SUBTRACT expression
+            | MINUS expression
             //r to l
             //l to r
 
-            | expression (MULT | DIVIDE) expression
-            | expression (PLUS | SUBTRACT) expression
-            | expression (LESSTHEN | GREATERTHEN | LESSEQUALS | GREATEREQUALS)  expression
-            | expression (EQUALSEQUALS | NOTEQUALS) expression
-            | expression NOTEQUALS expression
+            | expression (TIMES | DIVIDE) expression
+            | expression (PLUS | MINUS) expression
+            | expression (LT | GT | LEQ | GEQ)  expression
+            | expression (EQEQ | NOTEQ) expression
             | expression AND expression
             | expression OR expression
             // r to l
-            |  <assoc=right> expression (EQUALS | PLUSEQUALS | SUBEQUALS | MULTEQUALS | DIVEQUALS) expression
+            |  <assoc=right> expression (EQ | PLUSEQ | SUBEQ | TIMESEQ | DIVIDEEQ) expression
             | INTLIT
             | CHARLIT
             | STRINGLIT
@@ -61,7 +60,7 @@ expression :
             | FALSE
             | NULL
             | THIS
-            | IDENTIFIER ;
-arguments : LPARENTH argumentList? RPARENTH ;
+            | ID ;
+arguments : LPAREN argumentList? RPAREN ;
 argumentList : expression (COMMA expression)* ;
-index : LBRACKET expression RBRACKET ;
+index : LSQUARE expression RSQUARE ;

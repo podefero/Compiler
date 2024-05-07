@@ -83,7 +83,7 @@ public class Main {
             antlrToKxiVisitor.visitCompilationUnit(parser.compilationUnit());
             kxiMain = (KxiMain) antlrToKxiVisitor.getRootNode();
         } catch (RuntimeException ex) {
-            System.out.println(ex.getMessage());
+            System.err.println(ex.getMessage());
             return;
         }
 
