@@ -117,8 +117,7 @@ public class InvalidWriteVisitor extends KxiVisitorBase {
     @Override
     public void visitAssignment(AbstractBinaryAssignmentExpression assignmentExpression) {
         ResultFlag right = pop(); //remove what's on right hand side
-        ResultFlag left = pop();
-        if (left != ResultFlag.ID)
+        if (resultFlagStack.peek() != ResultFlag.ID)
             flagCheck(assignmentExpression.getLineInfo(), "Can't write to", hasFlag(
                     ResultFlag.Method
                     , ResultFlag.Class
@@ -127,6 +126,8 @@ public class InvalidWriteVisitor extends KxiVisitorBase {
                     , ResultFlag.Literal
                     , ResultFlag.New
             ));
+        ResultFlag left = pop();
+
         //resultFlagStack.clear();
         resultFlagStack.push(right);
     }

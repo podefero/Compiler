@@ -38,6 +38,32 @@ public class M3Tests {
     }
 
     @Test
+    void instanceMemberStaticContext() {
+        test("class MyClass {\n" +
+                "    static public int staticVariable = 10;\n" +
+                "    public int instanceVariable;\n" +
+                "\n" +
+                "    static public void staticMethod() {\n" +
+                "        // Attempting to assign a value to an instance variable within a static method\n" +
+                "        instanceVariable = 20; // This line will cause an error\n" +
+                "    }\n" +
+                "\n" +
+                "    public void instanceMethod() {\n" +
+                "        // This is a non-static method where you can assign instance variables\n" +
+                "        instanceVariable = 30; // This is valid\n" +
+                "    }\n" +
+                "}\n" +
+                "void main() {}", true);
+    }
+
+    @Test
+    void writeToLiteral() {
+        test("void main() {\n" +
+                "    3 = 1;\n" +
+                "}", true);
+    }
+
+    @Test
     void breakStatements() {
         test("void main() {\n" +
                 "    break;\n" +

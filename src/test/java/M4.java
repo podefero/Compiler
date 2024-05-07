@@ -390,7 +390,7 @@ public class M4 {
     @Test
     void whileLoopInf() {
         test("void main() {\n" +
-                "   ix = 10;\n" +
+                "   int x = 10;\n" +
                 "   while (x > 0) {\n" +
                 "    x = x - 1;\n" +
                 "    cout << x;\n" +

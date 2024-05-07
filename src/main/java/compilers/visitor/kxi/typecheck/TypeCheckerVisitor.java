@@ -2,6 +2,7 @@ package compilers.visitor.kxi.typecheck;
 
 import compilers.ast.kxi_nodes.*;
 import compilers.ast.kxi_nodes.class_members.KxiDataMember;
+import compilers.ast.kxi_nodes.class_members.KxiMethod;
 import compilers.ast.kxi_nodes.expressions.*;
 import compilers.ast.kxi_nodes.expressions.binary.arithmic.KxiDiv;
 import compilers.ast.kxi_nodes.expressions.binary.arithmic.KxiMult;
@@ -31,10 +32,16 @@ import java.util.List;
 import java.util.Stack;
 
 
-@AllArgsConstructor
 public class TypeCheckerVisitor extends KxiVisitorBase {
     private ScopeHandler scopeHandler;
     private Stack<ResultType> resultTypeStack;
+    private boolean staticContext;
+
+    public TypeCheckerVisitor(ScopeHandler scopeHandler, Stack<ResultType> resultTypeStack) {
+        this.scopeHandler = scopeHandler;
+        this.resultTypeStack = resultTypeStack;
+        staticContext = false;
+    }
 
     @Override
     public void dumpErrorStack() {
@@ -77,6 +84,8 @@ public class TypeCheckerVisitor extends KxiVisitorBase {
                 //check if left is pointer
             else if (resultL.getTypeData().isStatic() && resultR.containsFlag(ResultFlag.This)) {
                 exceptionStack.push(new TypeCheckException(codeLine, "Can't access non-static member " + resultR.getReferenceId() + " in a static context"));
+            } else if (!resultL.getTypeData().isStatic() && staticContext) {
+                exceptionStack.push(new TypeCheckException(codeLine, "Can't assign to instance member in a static context"));
             } else if (right == ScalarType.NULL) {
                 if (left != ScalarType.ID && arrayDepthL == 0 && left != ScalarType.STRING) {
                     exceptionStack.push(new TypeCheckException(codeLine, "Mismatched Types provided: " + right + " expected pointer"));
@@ -293,7 +302,19 @@ public class TypeCheckerVisitor extends KxiVisitorBase {
         }
     }
 
-      /*
+    @Override
+    public void preVisit(KxiMethod kxiMethod) {
+        if (kxiMethod.isStatic())
+            staticContext = true;
+    }
+
+    @Override
+    public void visit(KxiMethod kxiMethod) {
+        if (kxiMethod.isStatic())
+            staticContext = false;
+    }
+
+    /*
     EXPRESSIONS
      */
 
@@ -308,7 +329,7 @@ public class TypeCheckerVisitor extends KxiVisitorBase {
         if (variableDeclaration.getInitializer() != null) {
             ResultType leftOver = resultTypeStack.pop(); // pop to preserve order
             pushNewResult(variableDeclaration.getIdToken().getValue()
-                    , new SymbolData(false, null, variableDeclaration.getType())
+                    , new SymbolData(staticContext, null, variableDeclaration.getType())
                     , currentScope);
             resultTypeStack.push(leftOver);
             matchResults(variableDeclaration.getLineInfo());
