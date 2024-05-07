@@ -110,7 +110,7 @@ MINUS    :   '-' ;
 TIMES    :   '*' ;
 DIVIDE  :   '/' ;
 PLUSEQ   :   '+''=' ;
-SUBEQ   :   '-''=' ;
+MINUSEQ   :   '-''=' ;
 TIMESEQ  :   '*''=' ;
 DIVIDEEQ   :   '/''=' ;
 EXTRACT    :   '<''<' ;
@@ -120,7 +120,7 @@ COMMA   :   ',' ;
 COLON   : ':' ;
 
 ID :    (ALPHA | UNDER_SCORE) (ALPHA | DIGIT | UNDER_SCORE)* ;
-CHARLIT : '\'' (CHARACTER | '\\' '\'' | '"') '\'' ;
+CHARLIT : '\'' (CHARACTER | '\\\'' | '"') '\'' ;
 STRINGLIT : '"' (CHARACTER | '\'' | '\\"')* '"' ;
 INTLIT     :    DIGIT+ ;
 COMMENT : '//' ~[\r\n]* LINE_ENDING -> skip;

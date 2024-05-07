@@ -22,7 +22,7 @@ public class KxiParser extends Parser {
 		RETURN=18, STATIC=19, STRING=20, SWITCH=21, THIS=22, TRUE=23, VOID=24, 
 		WHILE=25, SEMICOLON=26, LCURLY=27, RCURLY=28, LPAREN=29, RPAREN=30, LSQUARE=31, 
 		RSQUARE=32, EQ=33, EQEQ=34, NOTEQ=35, GEQ=36, LEQ=37, LT=38, GT=39, AND=40, 
-		OR=41, NOT=42, PLUS=43, MINUS=44, TIMES=45, DIVIDE=46, PLUSEQ=47, SUBEQ=48, 
+		OR=41, NOT=42, PLUS=43, MINUS=44, TIMES=45, DIVIDE=46, PLUSEQ=47, MINUSEQ=48, 
 		TIMESEQ=49, DIVIDEEQ=50, EXTRACT=51, INSERT=52, DOT=53, COMMA=54, COLON=55, 
 		ID=56, CHARLIT=57, STRINGLIT=58, INTLIT=59, COMMENT=60, MULTI_COMMENT=61, 
 		WS=62, NEWLINE=63, UNKNOWN=64;
@@ -62,7 +62,7 @@ public class KxiParser extends Parser {
 			"RETURN", "STATIC", "STRING", "SWITCH", "THIS", "TRUE", "VOID", "WHILE", 
 			"SEMICOLON", "LCURLY", "RCURLY", "LPAREN", "RPAREN", "LSQUARE", "RSQUARE", 
 			"EQ", "EQEQ", "NOTEQ", "GEQ", "LEQ", "LT", "GT", "AND", "OR", "NOT", 
-			"PLUS", "MINUS", "TIMES", "DIVIDE", "PLUSEQ", "SUBEQ", "TIMESEQ", "DIVIDEEQ", 
+			"PLUS", "MINUS", "TIMES", "DIVIDE", "PLUSEQ", "MINUSEQ", "TIMESEQ", "DIVIDEEQ", 
 			"EXTRACT", "INSERT", "DOT", "COMMA", "COLON", "ID", "CHARLIT", "STRINGLIT", 
 			"INTLIT", "COMMENT", "MULTI_COMMENT", "WS", "NEWLINE", "UNKNOWN"
 		};
@@ -1385,7 +1385,7 @@ public class KxiParser extends Parser {
 		public TerminalNode OR() { return getToken(KxiParser.OR, 0); }
 		public TerminalNode EQ() { return getToken(KxiParser.EQ, 0); }
 		public TerminalNode PLUSEQ() { return getToken(KxiParser.PLUSEQ, 0); }
-		public TerminalNode SUBEQ() { return getToken(KxiParser.SUBEQ, 0); }
+		public TerminalNode MINUSEQ() { return getToken(KxiParser.MINUSEQ, 0); }
 		public TerminalNode TIMESEQ() { return getToken(KxiParser.TIMESEQ, 0); }
 		public TerminalNode DIVIDEEQ() { return getToken(KxiParser.DIVIDEEQ, 0); }
 		public TerminalNode DOT() { return getToken(KxiParser.DOT, 0); }

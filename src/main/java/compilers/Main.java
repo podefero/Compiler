@@ -76,20 +76,22 @@ public class Main {
 
     static void parseTree(CommonTokenStream tokenStream, ArgumentFlags argumentFlags, OutputHandler outputHandler) {
         KxiParser parser = new KxiParser(tokenStream);
-
+        parser.removeErrorListeners();
         KxiMain kxiMain = null;
+        AntlrToKxiVisitor antlrToKxiVisitor = new AntlrToKxiVisitor();
+
         try {
-            AntlrToKxiVisitor antlrToKxiVisitor = new AntlrToKxiVisitor();
             antlrToKxiVisitor.visitCompilationUnit(parser.compilationUnit());
             kxiMain = (KxiMain) antlrToKxiVisitor.getRootNode();
         } catch (RuntimeException ex) {
-            System.err.println(ex.getMessage());
+            if (argumentFlags.printASTDiagram)
+                System.err.println(ex.getMessage());
             return;
         }
 
         if (argumentFlags.printASTDiagram) {
             try {
-                printASTDiagram(kxiMain, outputHandler);
+                printASTDiagram(kxiMain, outputHandler, antlrToKxiVisitor);
             } catch (IOException e) {
                 System.out.println("Need .dot file to output graphVis");
             }
@@ -98,7 +100,7 @@ public class Main {
         if (argumentFlags.semantics) semantics(kxiMain, argumentFlags, outputHandler);
     }
 
-    static void printASTDiagram(KxiMain kxiMain, OutputHandler outputHandler) throws IOException {
+    static void printASTDiagram(KxiMain kxiMain, OutputHandler outputHandler, AntlrToKxiVisitor antlrToKxiVisitor) throws IOException {
         GraphVizVisitor graphVizVisitor = new GraphVizVisitor(kxiMain);
         outputHandler.outputAST(graphVizVisitor.getGraph());
     }
@@ -109,29 +111,28 @@ public class Main {
         rootNode.accept(symbolTableVisitor);
         if (symbolTableVisitor.hasErrors()) {
             hasError = true;
-            symbolTableVisitor.dumpErrorStack();
         }
 
         TypeCheckerVisitor typeCheckerVisitor = new TypeCheckerVisitor(symbolTableVisitor.getScopeHandler(), new Stack<>());
         rootNode.accept(typeCheckerVisitor);
         if (typeCheckerVisitor.hasErrors()) {
             hasError = true;
-            typeCheckerVisitor.dumpErrorStack();
         }
 
         InvalidWriteVisitor invalidWriteVisitor = new InvalidWriteVisitor(new Stack<>(), symbolTableVisitor.getScopeHandler());
         rootNode.accept(invalidWriteVisitor);
         if (invalidWriteVisitor.hasErrors()) {
             hasError = true;
-            invalidWriteVisitor.dumpErrorStack();
         }
 
         InvalidBreakVisitor invalidBreakVisitor = new InvalidBreakVisitor();
         rootNode.accept(invalidBreakVisitor);
         if (invalidBreakVisitor.hasErrors()) {
             hasError = true;
-            invalidBreakVisitor.dumpErrorStack();
         }
+
+        if (argumentFlags.printSemanticInformation)
+            printSemanticInfo(symbolTableVisitor, typeCheckerVisitor, invalidWriteVisitor, invalidBreakVisitor);
 
         if (argumentFlags.compile && !hasError) {
             try {
@@ -140,6 +141,13 @@ public class Main {
                 throw new RuntimeException(e);
             }
         }
+    }
+
+    static void printSemanticInfo(SymbolTableVisitor symbolTableVisitor, TypeCheckerVisitor typeCheckerVisitor, InvalidWriteVisitor invalidWriteVisitor, InvalidBreakVisitor invalidBreakVisitor) {
+        symbolTableVisitor.dumpErrorStack();
+        typeCheckerVisitor.dumpErrorStack();
+        invalidBreakVisitor.dumpErrorStack();
+        invalidWriteVisitor.dumpErrorStack();
     }
 
     static void compile(AbstractKxiNode rootNode, OutputHandler outputHandler, ScopeHandler scopeHandler) throws IOException {

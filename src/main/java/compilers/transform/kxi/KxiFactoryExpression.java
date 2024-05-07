@@ -60,7 +60,7 @@ public class KxiFactoryExpression extends AbstractKxiFactory {
                     return new KxiEquals(pop(stack), pop(stack));
                 case PLUSEQ:
                     return new KxiPlusEquals(pop(stack), pop(stack));
-                case SUBEQ:
+                case MINUSEQ:
                     return new KxiSubtractEquals(pop(stack), pop(stack));
                 case TIMESEQ:
                     return new KxiMultEquals(pop(stack), pop(stack));

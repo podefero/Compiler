@@ -52,7 +52,7 @@ expression :
             | expression AND expression
             | expression OR expression
             // r to l
-            |  <assoc=right> expression (EQ | PLUSEQ | SUBEQ | TIMESEQ | DIVIDEEQ) expression
+            |  <assoc=right> expression (EQ | PLUSEQ | MINUSEQ | TIMESEQ | DIVIDEEQ) expression
             | INTLIT
             | CHARLIT
             | STRINGLIT

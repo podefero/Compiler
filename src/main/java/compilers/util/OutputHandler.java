@@ -50,8 +50,7 @@ public class OutputHandler {
 
     public void outputAST(MutableGraph graph) throws IOException {
         String file = getRelativeOutputFile("dot");
-        if (file.isEmpty()) System.out.println(Graphviz.fromGraph(graph).render(Format.DOT));
-        else
+        if (!file.isEmpty())
             Graphviz.fromGraph(graph).width(1920).height(1080).render(Format.DOT).toFile(new File(getRelativeOutputFile("dot")));
     }
 
@@ -59,7 +58,9 @@ public class OutputHandler {
     private String getRelativeOutputFile(String fileExtension) {
         if (outputFiles != null) {
             for (String file : outputFiles) {
-                if (file.endsWith("." + fileExtension)) return file;
+                if (file.endsWith("." + fileExtension)) {
+                    return file.trim();
+                }
             }
         }
         return "";
