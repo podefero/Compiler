@@ -366,9 +366,7 @@ public class StatementsToAssemblyVisitor extends KxiVisitorBase {
         newLine();
         if(node.getInitializer() != null && node.getInitializer() instanceof ExpressionIdLit) {
             evaluateTempVar(node.getInitializer());
-            if(((ExpressionIdLit) node.getInitializer()).getScalarType() == ScalarType.STRING) {
-                deref(node.getInitializer());
-            }
+            deref(node.getInitializer());
         }
         appendAssembly(node);
         comment("Initializing Variable " + node.getId());

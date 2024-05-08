@@ -331,6 +331,27 @@ public class M4 {
                 "            }", false);
     }
 
+    @Test
+    void switchOneVar() {
+        test("   void main(){\n" +
+                "            int n = 1;\n" +
+                "            int p = n;\n" +
+
+                "            switch(p){\n" +
+                "                case 1:\n" +
+                "                    cout << \"one\";\n" +
+                "                    break;\n" +
+                "                case 2:\n" +
+                "                case 3:\n" +
+                "                    cout << \"two or three\";\n" +
+                "                    break;\n" +
+                "                default:\n" +
+                "                    cout << \"a number not in the range of 1 to 3\";\n" +
+                "                    break;\n" +
+                "                }\n" +
+                "            }", false);
+    }
+
 
     @Test
     void defaultSwitch() {
