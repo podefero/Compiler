@@ -364,6 +364,12 @@ public class StatementsToAssemblyVisitor extends KxiVisitorBase {
         }
         //assign R1 to result of R2
         newLine();
+        if(node.getInitializer() != null && node.getInitializer() instanceof ExpressionIdLit) {
+            evaluateTempVar(node.getInitializer());
+            if(((ExpressionIdLit) node.getInitializer()).getScalarType() == ScalarType.STRING) {
+                deref(node.getInitializer());
+            }
+        }
         appendAssembly(node);
         comment("Initializing Variable " + node.getId());
         comment("Get ptr to var");

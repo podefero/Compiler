@@ -10,6 +10,7 @@ import lombok.Setter;
 @Setter
 public class ExpressionIdLit extends ExpressionLiteral<IdentifierToken> {
     String id;
+    boolean stringLit;
     ScalarType scalarType;
     public ExpressionIdLit(IdentifierToken tokenLiteral) {
         super(tokenLiteral);

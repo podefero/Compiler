@@ -112,6 +112,7 @@ public class ExpressionToTempVisitor extends KxiVisitorBase {
     public void visit(ExpressionStringLit node) {
         ExpressionIdLit expressionIdLit = new ExpressionIdLit(new IdentifierToken("string" + HashString.updateStringHash()));
         expressionIdLit.setScalarType(ScalarType.STRING);
+        expressionIdLit.setStringLit(true);
         node.setGlobalVariable(expressionIdLit);
         valueStack.push(node);
     }

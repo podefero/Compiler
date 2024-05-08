@@ -182,7 +182,7 @@ public class ExpressionToAssemblyVisitor extends KxiVisitorBase {
         if (expression instanceof ExpressionIdLit) {
             expressionIdLit = (ExpressionIdLit) expression;
             ScalarType scalarType = expressionIdLit.getScalarType();
-            if (scalarType != ScalarType.STRING) {
+            if (!expressionIdLit.isStringLit()) {
 
                 comment("Deref stack var");
                 if (left) twoReg(LDRI, R1, R1);
@@ -657,13 +657,15 @@ public class ExpressionToAssemblyVisitor extends KxiVisitorBase {
     public void rightPtrVar(ExpressionIdLit node) {
         newLine();
         comment("get ptr to " + node.getId() + " into R2 from DIR");
-        regAndLabel(LDA, R2, node.getId());
+        rightStackVar(node);
+        //regAndLabel(LDA, R2, node.getId());
     }
 
     public void leftPtrVar(ExpressionIdLit node) {
         newLine();
         comment("get ptr to " + node.getId() + " into R1 from DIR");
-        regAndLabel(LDA, R1, node.getId());
+        lefStackVar(node);
+        //regAndLabel(LDA, R1, node.getId());
     }
 
 

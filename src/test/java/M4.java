@@ -798,6 +798,16 @@ public class M4 {
     }
 
     @Test
+    void stringPtr() {
+        test("void main() {\n" +
+                "    string result = \"hello\";\n" +
+                "    string other = result;\n" +
+                "    if(result == other) cout << \"idk\";\n" +
+                "    if(other == result) cout << \"idk2\";\n" +
+                "}\n", false);
+    }
+
+    @Test
     void ifElseTest() {
         test("void main() {\n" +
                 "    int m = 0;\n" +
