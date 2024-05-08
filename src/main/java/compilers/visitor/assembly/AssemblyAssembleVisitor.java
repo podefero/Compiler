@@ -59,17 +59,17 @@ public class AssemblyAssembleVisitor extends KxiVisitorBase {
         labelStack.push(node.getValue());
     }
 
-    @Override
-    public void visit(AssemblyComment node) {
-        instructions.add(node.getComment());
-        currentNumComments++;
-    }
-
-    @Override
-    public void visit(AssemblyNewLine node) {
-        instructions.add("\n");
-        currentNumComments++;
-    }
+//    @Override
+//    public void visit(AssemblyComment node) {
+//        instructions.add(node.getComment());
+//        currentNumComments++;
+//    }
+//
+//    @Override
+//    public void visit(AssemblyNewLine node) {
+//        instructions.add("\n");
+//        currentNumComments++;
+//    }
 
 
     @Override
