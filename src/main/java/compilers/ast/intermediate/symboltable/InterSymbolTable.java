@@ -11,6 +11,7 @@ import java.util.Map;
 public class InterSymbolTable {
     Map<String, FunctionData> functionDataMap;
     Map<String, GlobalData> globalDataMap;
+    Map<String, String> ptrVarMap;
 
     public String getFunctionLabel(InterId id) {
         return functionDataMap.get(id.getId()).getLabel();

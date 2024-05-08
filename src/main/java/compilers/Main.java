@@ -170,7 +170,7 @@ public class Main {
 
 
         InterSymbolTableVisitor interSymbolTableVisitor =
-                new InterSymbolTableVisitor(new InterSymbolTable(new HashMap<>(), new HashMap<>()), null, expressionToTempVisitor.tempVars);
+                new InterSymbolTableVisitor(new InterSymbolTable(new HashMap<>(), new HashMap<>(), new HashMap<>()), null, expressionToTempVisitor.tempVars);
 
         rootNode.accept(interSymbolTableVisitor);
 

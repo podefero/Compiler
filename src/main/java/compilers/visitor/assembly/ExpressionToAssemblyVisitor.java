@@ -26,6 +26,7 @@ import compilers.ast.kxi_nodes.token_literals.IntLitToken;
 import compilers.ast.kxi_nodes.token_literals.TokenLiteral;
 import compilers.util.HashString;
 import compilers.visitor.kxi.KxiVisitorBase;
+import compilers.visitor.kxi.symboltable.SymbolData;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -656,14 +657,16 @@ public class ExpressionToAssemblyVisitor extends KxiVisitorBase {
 
     public void rightPtrVar(ExpressionIdLit node) {
         newLine();
-        comment("get ptr to " + node.getId() + " into R2 from DIR");
-        regAndLabel(LDA, R2, node.getId());
+        String tempId = interSymbolTable.getPtrVarMap().get(node.getId());
+        comment("get ptr to " + tempId + " into R2 from DIR");
+        regAndLabel(LDA, R2,tempId);
     }
 
     public void leftPtrVar(ExpressionIdLit node) {
         newLine();
-        comment("get ptr to " + node.getId() + " into R1 from DIR");
-        regAndLabel(LDA, R1, node.getId());
+        String tempId = interSymbolTable.getPtrVarMap().get(node.getId());
+        comment("get ptr to " + tempId + " into R1 from DIR");
+        regAndLabel(LDA, R1, tempId);
     }
 
 

@@ -239,10 +239,24 @@ public class ExpressionToTempVisitor extends KxiVisitorBase {
 
     @Override
     public void visit(KxiVariableDeclaration node) {
-        tempVars.add(new ExpressionIdLit(node.getIdToken()));
+        ExpressionIdLit variable = new ExpressionIdLit(node.getIdToken());
         if (node.getInitializer() != null) {
-            node.setInitializer(valueStack.pop());
+            ExpressionLiteral value = valueStack.pop();
+            if(node.getType().getScalarType() == ScalarType.STRING) {
+                variable.setScalarType(ScalarType.STRING);
+                if(value instanceof ExpressionStringLit) {
+                    ExpressionStringLit stringLit = (ExpressionStringLit) value;
+                    variable.setTempId(stringLit.getGlobalVariable().getId());
+                } else if (value instanceof ExpressionIdLit) {
+                    ExpressionIdLit idLit = (ExpressionIdLit) value;
+                    variable.setTempId(idLit.getId());
+                }
+            }
+            node.setInitializer(value);
         }
+
+        tempVars.add(variable);
+
     }
 
     @Override
