@@ -24,8 +24,8 @@ public:
   unsigned int code_seg_end = 0;
   unsigned int data_seg_start = 0x04;
   unsigned int data_seg_end = 0;
-  static const int size = 1000000; // 1MB
-  static const int stack_size = 1024; // 1KB
+  static const int size = 2000000; // 1MB
+  static const int stack_size = 20480; // 1KB
   Registers registers;
 
 private:
