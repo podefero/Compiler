@@ -863,6 +863,15 @@ public class M4 {
     }
 
     @Test
+    void ptrEquals() {
+        test("void main() {\n" +
+                "    string result = \"hello\";\n" +
+                "    string other = result;\n" +
+                "    if(result == other) cout << \"idk\";\n" +
+                "}\n", false);
+    }
+
+    @Test
     void cMinusTestProg() {
         test("void main() {\n" +
                 "    // Test for loop\n" +
@@ -1243,7 +1252,7 @@ public class M4 {
         drawGraph(rootNode);
 
         InterSymbolTableVisitor interSymbolTableVisitor =
-                new InterSymbolTableVisitor(new InterSymbolTable(new HashMap<>(), new HashMap<>()), null, expressionToTempVisitor.tempVars);
+                new InterSymbolTableVisitor(new InterSymbolTable(new HashMap<>(), new HashMap<>(), new HashMap<>()), null, expressionToTempVisitor.tempVars);
 
 //        InterGlobal interGlobal = intermediateFinalizeVisitor.getInterGlobal();
         rootNode.accept(interSymbolTableVisitor);

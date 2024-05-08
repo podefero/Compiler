@@ -7,6 +7,7 @@ import compilers.ast.intermediate.statements.InterGlobalVariable;
 import compilers.ast.intermediate.expression.InterVariable;
 import compilers.ast.intermediate.symboltable.*;
 import compilers.ast.kxi_nodes.KxiMain;
+import compilers.ast.kxi_nodes.ScalarType;
 import compilers.ast.kxi_nodes.expressions.literals.ExpressionIdLit;
 import compilers.visitor.kxi.KxiVisitorBase;
 import lombok.AllArgsConstructor;
@@ -39,8 +40,15 @@ public class InterSymbolTableVisitor extends KxiVisitorBase {
         currentFunctionData = functionData;
         interSymbolTable.getFunctionDataMap().put(id, functionData);
 
-        for(ExpressionIdLit expressionIdLit : tempVars) {
+        for (ExpressionIdLit expressionIdLit : tempVars) {
             currentFunctionData.getActivationRecord().pushStackItem(expressionIdLit.getId(), StackType.LOCAL);
+            if (expressionIdLit.getScalarType() == ScalarType.STRING) {
+                if(interSymbolTable.getPtrVarMap().containsKey(expressionIdLit.getTempId())) {
+                    String tempId = interSymbolTable.getPtrVarMap().get(expressionIdLit.getTempId());
+                    expressionIdLit.setTempId(tempId);
+                }
+                interSymbolTable.getPtrVarMap().put(expressionIdLit.getId(), expressionIdLit.getTempId());
+            }
         }
 
     }
