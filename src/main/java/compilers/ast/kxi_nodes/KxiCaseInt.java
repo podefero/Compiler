@@ -14,6 +14,7 @@ public class KxiCaseInt extends AbstractKxiNode {
     private List<AbstractKxiStatement> statements;
     private IntLitToken caseValue;
     String label;
+    String fall;
     String exit;
 
     public KxiCaseInt(GenericListNode statements, IntLitToken caseValue) {
@@ -22,6 +23,7 @@ public class KxiCaseInt extends AbstractKxiNode {
         this.caseValue = caseValue;
         this.label = "case_"+ HashString.updateStringHash();
         this.exit = label+"_exit";
+        this.fall = label+"_fall";
     }
 
     @Override

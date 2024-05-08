@@ -54,6 +54,7 @@ public class StatementsToAssemblyVisitor extends KxiVisitorBase {
     private FunctionData currentFunctionData;
     private AssemblyMain rootNode;
 
+
     //COMMONLY Used
     private void getFP() {
         assemblyList.add(new AssemblyCode("", OpCodes.MOV.getValue(), new OperandReg(Registers.R14), new OperandReg(Registers.FP)));
@@ -418,6 +419,9 @@ public class StatementsToAssemblyVisitor extends KxiVisitorBase {
         appendAssembly(node);
         deref(node.getExpression());
         twoReg(MOV, R5, R2);
+        newLine();
+        comment("set r6 to 0 for case evaluation. (falling into eachother)");
+        regImmInt(MOVI, R6, 0);
     }
 
     @Override
@@ -432,12 +436,19 @@ public class StatementsToAssemblyVisitor extends KxiVisitorBase {
     @Override
     public void preVisit(KxiCaseInt node) {
         newLine();
-        comment("Evaluate case " + node.getCaseValue().getValue());
+        comment("Evaluate CASE " + node.getCaseValue().getValue());
+
+        regAndLabel(BGT, R6, node.getFall());
 
         regImmInt(MOVI, R2, node.getCaseValue().getValue());
         twoReg(CMP, R2, R5);
+
+
         regAndLabel(BGT, R2, node.getExit());
         regAndLabel(BLT, R2, node.getExit());
+        label(node.getFall());
+        regImmInt(MOVI, R6, 1);
+
     }
 
     @Override
@@ -451,12 +462,18 @@ public class StatementsToAssemblyVisitor extends KxiVisitorBase {
     @Override
     public void preVisit(KxiCaseChar node) {
         newLine();
-        comment("Evaluate case " + node.getCaseValue().getValue());
+        comment("Evaluate CASE " + node.getCaseValue().getValue());
+
+        regAndLabel(BGT, R6, node.getFall());
 
         regImmInt(MOVI, R2, node.getCaseValue().getValue());
         twoReg(CMP, R2, R5);
+
+
         regAndLabel(BGT, R2, node.getExit());
         regAndLabel(BLT, R2, node.getExit());
+        label(node.getFall());
+        regImmInt(MOVI, R6, 1);
     }
 
     @Override

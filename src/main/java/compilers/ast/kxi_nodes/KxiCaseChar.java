@@ -15,6 +15,7 @@ public class KxiCaseChar extends AbstractKxiNode {
     private CharLitToken caseValue;
     String label;
     String exit;
+    String fall;
 
     public KxiCaseChar(GenericListNode statements, CharLitToken caseValue) {
         super(statements, caseValue);
@@ -22,7 +23,7 @@ public class KxiCaseChar extends AbstractKxiNode {
         this.caseValue = caseValue;
         this.label = "case_"+ HashString.updateStringHash();
         this.exit = label+"_exit";
-
+        this.fall = label+"_fall";
     }
 
     @Override

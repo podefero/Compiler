@@ -353,6 +353,27 @@ public class M4 {
     }
 
     @Test
+    void sw(){
+        String d = "default";
+        int i = 0;
+        int result = 0;
+        switch(i) {
+            case 1 :
+                result = 1;
+                System.out.println("one");
+            case 2 :
+                result = 2;
+                System.out.println("two");
+            default :
+                result = 3;
+                System.out.println("three");
+                break;
+        }
+        System.out.println(result);
+    }
+
+
+    @Test
     void switchMut() {
         test("void main() {\n" +
                 "  string result = \"duh\";\n" +
