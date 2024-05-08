@@ -1,7 +1,10 @@
 package compilers.visitor.intermediate;
 
+import compilers.ast.kxi_nodes.KxiCaseChar;
+import compilers.ast.kxi_nodes.KxiCaseInt;
 import compilers.ast.kxi_nodes.KxiVariableDeclaration;
 import compilers.ast.kxi_nodes.ScalarType;
+import compilers.ast.kxi_nodes.class_members.KxiMethod;
 import compilers.ast.kxi_nodes.expressions.KxiPostForExpression;
 import compilers.ast.kxi_nodes.expressions.KxiPreForExpression;
 import compilers.ast.kxi_nodes.expressions.binary.AbstractKxiBinaryOperation;
@@ -16,6 +19,7 @@ import compilers.ast.kxi_nodes.expressions.uni.AbstractKxiUniOperation;
 import compilers.ast.kxi_nodes.expressions.uni.KxiNot;
 import compilers.ast.kxi_nodes.expressions.uni.KxiUniPlus;
 import compilers.ast.kxi_nodes.expressions.uni.KxiUniSubtract;
+import compilers.ast.kxi_nodes.scope.KxiCaseBlock;
 import compilers.ast.kxi_nodes.statements.KxiCinStatement;
 import compilers.ast.kxi_nodes.statements.KxiCoutStatement;
 import compilers.ast.kxi_nodes.statements.KxiReturnStatement;
@@ -35,10 +39,12 @@ import java.util.Stack;
 public class ExpressionToTempVisitor extends KxiVisitorBase {
     Stack<ExpressionLiteral> valueStack;
     public List<ExpressionIdLit> tempVars;
+    int caseCount;
 
     public ExpressionToTempVisitor() {
         valueStack = new Stack<>();
         tempVars = new ArrayList<>();
+        caseCount = 0;
     }
 
 
@@ -303,6 +309,21 @@ public class ExpressionToTempVisitor extends KxiVisitorBase {
         if (node.getExpression() != null)
             node.setExpression(valueStack.pop());
     }
+
+    @Override
+    public void preVisit(KxiCaseBlock node) {
+        caseCount = valueStack.size();
+    }
+
+    @Override
+    public void visit(KxiCaseBlock node) {
+        int newCount = valueStack.size();
+        int count = newCount - caseCount;
+        for(int i = 0; i < count; i++) {
+            valueStack.pop();
+        }
+    }
+
 
     @Override
     public void visit(KxiSwitchStatement node) {

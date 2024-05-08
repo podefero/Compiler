@@ -352,6 +352,23 @@ public class M4 {
                 "            }", false);
     }
 
+    @Test
+    void switchMut() {
+        test("void main() {\n" +
+                "  string result = \"duh\";\n" +
+                "  int i = 1;\n" +
+                "  switch(i) {\n" +
+                "    case 1 :\n" +
+                "        result = \"one\";\n" +
+                "        break;\n" +
+                "    default :\n" +
+                "        result = \"default\";\n" +
+                "        break;\n" +
+                "  }\n" +
+                "  cout << result;\n" +
+                "}\n", false);
+    }
+
 
     @Test
     void defaultSwitch() {
