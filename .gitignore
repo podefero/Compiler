@@ -4,6 +4,7 @@ target/
 !**/src/test/**/target/
 
 ### IntelliJ IDEA ###
+.idea
 .idea/modules.xml
 .idea/jarRepositories.xml
 .idea/compiler.xml
@@ -13,6 +14,16 @@ target/
 *.iml
 *.ipr
 
+### ANTLR ###
+src/main/java/compilers/antlr/KxiLexer.interp
+src/main/java/compilers/antlr/KxiLexer.tokens
+
+### OUTPUT FILES ###
+dot
+png
+asm
+src/test/resources/
+src/main/java/test_p
 ### Eclipse ###
 .apt_generated
 .classpath

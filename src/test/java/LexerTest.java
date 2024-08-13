@@ -1,6 +1,6 @@
-import compilers.lexer.KxiLexer;
-import compilers.lexer.TokenProcessor;
-import compilers.lexer.tokens.TokenType;
+import compilers.antlr.KxiLexer;
+import compilers.ast.kxi_nodes.token_literals.TokenProcessor;
+import compilers.ast.kxi_nodes.token_literals.TokenLiteral;
 import compilers.util.InputHandler;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
@@ -25,7 +25,7 @@ public class LexerTest {
         System.out.println(filepath);
         CharStream charStream;
 
-        charStream = new InputHandler(filepath).fileToCharStream();
+        charStream = new InputHandler('[' + filepath + ']').fileToCharStream();
 
         // Create an instance of the ANTLR-generated lexer
         KxiLexer kxiLexer = new KxiLexer(charStream);
@@ -69,6 +69,12 @@ public class LexerTest {
     }
 
     @Test
+    void testTokenIdentifier() {
+        testTokenType("main", KxiLexer.ID, "main");
+    }
+
+
+    @Test
     void testTokenCharSingleQuoteLit() {
         testTokenType("'\''", KxiLexer.CHARLIT, '\'');
     }
@@ -86,7 +92,7 @@ public class LexerTest {
 
     @Test
     void testTokenDefault() {
-        testTokenType("Chicken", KxiLexer.IDENTIFIER, "Chicken");
+        testTokenType("Chicken", KxiLexer.ID, "Chicken");
     }
 
     @Test
@@ -130,7 +136,7 @@ public class LexerTest {
         //make sure I get the right data type out of each token
         List<Token> tokens = getTokenList(input);
         TokenProcessor processor = new TokenProcessor();
-        TokenType processedType = null;
+        TokenLiteral processedType = null;
 
         for (Token token : tokens) {
             if (token.getType() == tokenType) {
@@ -138,7 +144,7 @@ public class LexerTest {
             }
         }
         if (processedType != null)
-            assertEquals(expected, processedType.getValue());
+            assertEquals(expected, processedType.getTokenText());
         else {
             printTokens(tokens);
             fail("processedType is null");

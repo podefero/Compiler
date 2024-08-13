@@ -4,6 +4,7 @@ import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 
 import java.io.*;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 public class InputHandler {
@@ -42,24 +43,23 @@ public class InputHandler {
 
 
     public InputStream stdinToInputStream() {
-        Scanner scanner = new Scanner(System.in);
-
-        // Prompt the user to enter multi-line input
-        System.out.println("Enter multi-line input (enter an empty line to finish):");
-
-        // Read input until an empty line is encountered
         StringBuilder multiLineInput = new StringBuilder();
-        String line;
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 
-        while (!(line = scanner.nextLine()).isEmpty()) {
-            multiLineInput.append(line).append("\n");
+        String line;
+        try {
+            // Read input until EOF
+            while ((line = reader.readLine()) != null) {
+                multiLineInput.append(line).append("\n");
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
-        scanner.close();
         InputStream inputStream = new ByteArrayInputStream(multiLineInput.toString().getBytes());
         return inputStream;
     }
-
     public void setUseStdin(boolean useStdin) {
         this.useStdin = useStdin;
     }
